@@ -3,6 +3,7 @@ package jp.kotmw.splatoon.mainweapons.threads;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import jp.kotmw.splatoon.mainweapons.Shooter;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.util.MaterialUtil;
@@ -17,14 +18,14 @@ public class ShooterBulletRunnable extends BukkitRunnable {
 
     private String playerName;
     private Projectile bullet;
-    private Shooter shooter;
+    private MainWeapon shooter;
 
     private int paintInterval=5;
     private int paintTimer=0;
 
 
 
-    public ShooterBulletRunnable(String name,Projectile bullet,Shooter shooter) {
+    public ShooterBulletRunnable(String name,Projectile bullet,MainWeapon shooter) {
         this.playerName = name;
         this.bullet=bullet;
         this.shooter=shooter;

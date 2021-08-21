@@ -213,6 +213,7 @@ public class MainGame extends MessageUtil {
 				}
 			}
 			player.getInventory().clear();
+			player.setFoodLevel(20);
 			player.setGameMode(Bukkit.getDefaultGameMode());
 			for(PotionEffect potion : player.getActivePotionEffects())
 				player.removePotionEffect(potion.getType());

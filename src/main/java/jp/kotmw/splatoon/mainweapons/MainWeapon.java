@@ -1,20 +1,13 @@
 package jp.kotmw.splatoon.mainweapons;
 
-import jp.kotmw.splatoon.Main;
 import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.WeaponType;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
-import jp.kotmw.splatoon.maingame.threads.SquidRunnable;
-import jp.kotmw.splatoon.mainweapons.threads.ShooterBulletRunnable;
-import jp.kotmw.splatoon.mainweapons.threads.ShooterRunnable;
-import jp.kotmw.splatoon.manager.Paint;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +16,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
@@ -31,9 +23,14 @@ import java.util.Random;
 
 public abstract class MainWeapon implements Listener {
 
-	public static String bulletname;
-	public static WeaponType type;
+	public String bulletname;
+	public WeaponType weaponType;
 
+	public MainWeapon(String bulletname,WeaponType weaponType){
+		this.bulletname=bulletname;
+		this.weaponType=weaponType;
+	}
+/*
 	public MainWeapon setBulletName(String bulletName){
 		this.bulletname=bulletName;
 		return this;
@@ -43,7 +40,7 @@ public abstract class MainWeapon implements Listener {
 		this.type=weaponType;
 		return this;
 	}
-
+*/
 	@Nullable
 	public ArenaData getArena(Player pe){
 		if(DataStore.hasPlayerData(pe.getName())){
@@ -56,19 +53,27 @@ public abstract class MainWeapon implements Listener {
 	}
 
 	public boolean isMyWeaponType(PlayerData data){
-		return DataStore.getWeapondata(data.getWeapon()).getType() == this.type;
+		return DataStore.getWeapondata(data.getWeapon()).getType() == this.weaponType;
+	}
+
+	public boolean canShoot(PlayerData data){
+
+		Player player = Bukkit.getPlayer(data.getName());
+		//System.out.println(player.getInventory().getItemInMainHand());
+		return !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
 	}
 
 	public boolean isMyWeapon(PlayerData data,ItemStack item){
 		if(isMyWeaponType(data)
 				&& !data.isAllCancel()
 				&& item != null
-				&& item.getType() == DataStore.getWeapondata(data.getWeapon()).getItemtype()
+				&& isMyWeaponType(data)
 				&& item.hasItemMeta()
 				&& item.getItemMeta().getDisplayName().equalsIgnoreCase(data.getWeapon())){
-
+			//System.out.println("is my weapon");
 			return true;
 		}
+		//System.out.println("not my weapon");
 		return false;
 	}
 
@@ -78,7 +83,7 @@ public abstract class MainWeapon implements Listener {
 			Projectile projectile=(Projectile) entity;
 			if(bulletname==null){
 				bulletname="bullet_"+this.getClass().getName();
-				System.out.println("buletname: "+bulletname);
+				//System.out.println("buletname: "+bulletname);
 			}
 			if (projectile.getShooter() instanceof Player
 					&& projectile.getCustomName().equalsIgnoreCase(bulletname)) {
@@ -89,22 +94,26 @@ public abstract class MainWeapon implements Listener {
 	}
 
 	public boolean checkOnInteract(PlayerInteractEvent e){
-		if(getArena(e.getPlayer())==null)return false;
-		Action action = e.getAction();
-		if(action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-			//System.out.println("interact");
-			Player player = e.getPlayer();
-			ItemStack item = player.getInventory().getItemInMainHand();
-			PlayerData data = DataStore.getPlayerData(player.getName());
-			if (!isMyWeapon(data, item)) return false;
+		if(getArena(e.getPlayer())!=null) {
+			Action action = e.getAction();
+			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+				//System.out.println("interact");
+				Player player = e.getPlayer();
+				PlayerData data = DataStore.getPlayerData(player.getName());
+				//System.out.println("suitable action");
+				if (canShoot(data)) {
+					return true;
+				}
+			}
 		}
-		return true;
+		return false;
 	}
 
 	public abstract void doOnInteract(PlayerInteractEvent e,PlayerData pd,Player pe);
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
+		//System.out.println("interact");
 		if(checkOnInteract(e)){
 			Player player = e.getPlayer();
 			PlayerData data = DataStore.getPlayerData(player.getName());
@@ -168,7 +177,21 @@ public abstract class MainWeapon implements Listener {
 	public double getDecayRate(Projectile ball,WeaponData weapon){
 		if(weapon.getFlyDecayTick()==0)return 1;
 		double decay=1-((ball.getTicksLived()-weapon.getFlyDecayTick())*weapon.getFlyDecayRatio()/100);
-		return decay<0?0:decay;
+		return decay<0?0:decay>=1?1:decay;
+	}
+
+	public Vector calculateDirection(Location direction, double angle){
+		Random random = new Random();
+		//double anglediff=random.nextGaussian();
+		//if(anglediff<-1 || anglediff>1)anglediff=0;
+		double anglediff= random.nextDouble()-0.5;
+		anglediff*=angle;
+
+
+		Location loc=direction.clone();
+		loc.setYaw((float) (loc.getYaw()+anglediff));
+		System.out.println(loc.getDirection());
+		return loc.getDirection();
 	}
 	public void shoot(PlayerData data) {}
 	/*

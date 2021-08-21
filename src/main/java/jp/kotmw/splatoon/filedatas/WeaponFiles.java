@@ -176,7 +176,6 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
 			file.set("WeaponInfo.InkCost", 6);
-			file.set("WeaponInfo.Angle", 6);
 			file.set("WeaponInfo.Speed", 0.8);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.zombie.attack_wooden_door");
 			file.set("WeaponInfo.SoundVolume", 0.5);
@@ -184,6 +183,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.AirResistance", 0.0);
 			file.set("WeaponInfo.ManSpeed", 0.8);
 			file.set("WeaponInfo.RecoilTick", 7);
+			file.set("WeaponInfo.NoGravity", true);
 
 			file.set("WeaponInfo.FlyDecayTick", 11);
 			file.set("WeaponInfo.ExplosionDamage", 7);

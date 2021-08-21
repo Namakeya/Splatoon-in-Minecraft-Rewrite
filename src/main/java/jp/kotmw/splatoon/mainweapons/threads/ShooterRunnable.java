@@ -22,18 +22,16 @@ public class ShooterRunnable extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		if(!DataStore.hasPlayerData(name)) {
-			this.cancel();
-			return;
-		}
 		PlayerData data = DataStore.getPlayerData(name);
 		int tick = data.getTick();
-		if(tick > 0) {
+
+		Player player = Bukkit.getPlayer(name);
+
+		if(tick > 0 && weapon.canShoot(data)) {
 			if(!data.isPaint())
 				data.setPaint(true);
 			tick--;
 			data.setTick(tick);
-			Player player = Bukkit.getPlayer(name);
 			if(player.getExp() < DataStore.getWeapondata(data.getWeapon()).getCost())
 				return;
 			weapon.shoot(data);
@@ -41,6 +39,7 @@ public class ShooterRunnable extends BukkitRunnable {
 			this.cancel();
 			if(data.isPaint())
 				data.setPaint(false);
+			return;
 		}
 	}
 }

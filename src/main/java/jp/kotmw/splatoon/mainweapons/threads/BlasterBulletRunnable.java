@@ -5,6 +5,8 @@ import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.mainweapons.Blaster;
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
+import jp.kotmw.splatoon.mainweapons.Shooter;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.util.MaterialUtil;
 import jp.kotmw.splatoon.util.SplatColor;
@@ -23,15 +25,17 @@ public class BlasterBulletRunnable extends BukkitRunnable {
 
     private String playerName;
     private Projectile bullet;
+    private MainWeapon blaster;
 
     private int paintInterval=5;
     private int paintTimer=0;
 
 
 
-    public BlasterBulletRunnable(String name, Projectile bullet) {
+    public BlasterBulletRunnable(String name, Projectile bullet, MainWeapon mainWeapon) {
         this.playerName = name;
         this.bullet=bullet;
+        this.blaster=mainWeapon;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class BlasterBulletRunnable extends BukkitRunnable {
             bullet.setVelocity(bullet.getVelocity().multiply((speed-weapon.getAirResistance())/speed));
         }
         if(paintTimer>=paintInterval){
-            Paint.UnderPaint(bullet.getLocation(), weapon.getFlyingPaintRadius()* Blaster.getDecayRate(bullet,weapon), data);
+            Paint.UnderPaint(bullet.getLocation(), weapon.getFlyingPaintRadius()* blaster.getDecayRate(bullet,weapon), data);
             paintInterval= (int) (3/speed);
             paintTimer=0;
         }else{

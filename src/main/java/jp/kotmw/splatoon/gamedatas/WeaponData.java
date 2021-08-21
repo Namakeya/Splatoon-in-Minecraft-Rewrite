@@ -32,6 +32,8 @@ public class WeaponData {
 	/**硬直時間*/
 	private int RecoilTick;
 
+	private boolean NoGravity;
+
 	//Shooter
 	private int Firespeed;
 	private double radius;
@@ -75,6 +77,7 @@ public class WeaponData {
 
 		this.ManSpeed=file.getDouble("WeaponInfo.ManSpeed",1.0);
 		this.RecoilTick=file.getInt("WeaponInfo.RecoilTick");
+		this.NoGravity=file.getBoolean("WeaponInfo.NoGravity");
 
 
 		this.InkSplash = file.getInt("WeaponInfo.InkSplash");
@@ -89,6 +92,9 @@ public class WeaponData {
 
 		this.ExplosionDamage=file.getInt("WeaponInfo.ExplosionDamage");
 		this.ExplosionRadius=file.getDouble("WeaponInfo.ExplosionRadius");
+	}
+	public boolean NoGravity(){
+		return NoGravity;
 	}
 	public boolean isBowItem(){
 		return isBowItem;

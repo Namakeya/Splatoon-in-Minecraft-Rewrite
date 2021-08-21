@@ -55,7 +55,7 @@ public class BattleRunnable extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		System.out.println("call");
+		//System.out.println("call");
 		if(tick > 0) {
 			if(tick%20 == 0) {
 				if(tick > (second+5)*20) {//転送後のTitle表示

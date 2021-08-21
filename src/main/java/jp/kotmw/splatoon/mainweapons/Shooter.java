@@ -29,8 +29,13 @@ import jp.kotmw.splatoon.manager.Paint;
 public class Shooter extends MainWeapon {
 
 
+	public Shooter() {
+		super("bullet_shooter", WeaponType.Shooter);
+	}
+
 	@Override
 	public void doOnInteract(PlayerInteractEvent e, PlayerData pd, Player pe) {
+		//System.out.println("do on interact");
 		WeaponData weapondata = DataStore.getWeapondata(pd.getWeapon());
 		if(pe.getExp() < weapondata.getCost()) {
 			MainGame.sendActionBar(pd, ChatColor.RED+"インクがありません!");
@@ -67,10 +72,12 @@ public class Shooter extends MainWeapon {
 
 		double damage=data.getDamage()*getDecayRate(ball,data);
 		e.setDamage(damage);
-		System.out.println(ball.toString()+" damage : "+damage);
+		//System.out.println(ball.toString()+" damage : "+damage);
 		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 		pe.playSound(e.getEntity().getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS,1,1);
 	}
+
+
 
 @Override
 	public void shoot(PlayerData data) {
@@ -78,25 +85,15 @@ public class Shooter extends MainWeapon {
 		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
 		player.setExp((float) (player.getExp()-weapon.getCost()));
 		Paint.SpherePaint(player.getLocation(), DataStore.getWeapondata(data.getWeapon()).getRadius(), data);
-		double x,z;
-		//精度
-		if(weapon.getAngle()>0){
-			Random random = new Random();
-			int angle = weapon.getAngle()*100;
-			x= Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
-			z = Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
-		}else{
-			x=0;
-			z=0;
-		}
 
-		Vector direction = player.getLocation().getDirection().clone();
+
+		Vector direction = calculateDirection(player.getLocation(), weapon.getAngle());
 		MainGame.sync(() -> {
 			Snowball snowball = player.launchProjectile(Snowball.class);
 			snowball.setCustomName(bulletname);
-			System.out.println(bulletname);
-			Vector vec = new Vector(x,0,z), vec2 = new Vector(direction.getX()*weapon.getSpeed(), direction.getY()*weapon.getSpeed(), direction.getZ()*weapon.getSpeed());
-			vec2.add(vec);
+			//System.out.println(bulletname);
+			Vector vec2 = new Vector(direction.getX()*weapon.getSpeed(), direction.getY()*weapon.getSpeed(), direction.getZ()*weapon.getSpeed());
+			snowball.setGravity(!weapon.NoGravity());
 			snowball.setVelocity(vec2);
 			BukkitRunnable task = new ShooterBulletRunnable(player.getName(),snowball,this);
 			task.runTaskTimer(Main.main, 0, 1);
