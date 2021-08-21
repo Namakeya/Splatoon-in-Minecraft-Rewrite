@@ -17,15 +17,17 @@ public class ShooterBulletRunnable extends BukkitRunnable {
 
     private String playerName;
     private Projectile bullet;
+    private Shooter shooter;
 
     private int paintInterval=5;
     private int paintTimer=0;
 
 
 
-    public ShooterBulletRunnable(String name,Projectile bullet) {
+    public ShooterBulletRunnable(String name,Projectile bullet,Shooter shooter) {
         this.playerName = name;
         this.bullet=bullet;
+        this.shooter=shooter;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class ShooterBulletRunnable extends BukkitRunnable {
             bullet.setVelocity(vel.setZ(vel.getZ()*(1-weapon.getAirResistance())));
         }
         if(paintTimer>=paintInterval){
-            Paint.UnderPaint(bullet.getLocation(), weapon.getFlyingPaintRadius()* Shooter.getDecayRate(bullet,weapon), data);
+            Paint.UnderPaint(bullet.getLocation(), weapon.getFlyingPaintRadius()* shooter.getDecayRate(bullet,weapon), data);
             paintInterval= (int) (3/speed);
             paintTimer=0;
         }else{

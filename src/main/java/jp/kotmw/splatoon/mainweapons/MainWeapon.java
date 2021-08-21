@@ -73,8 +73,13 @@ public abstract class MainWeapon implements Listener {
 	}
 
 	public boolean isMyBullet(Entity entity){
+
 		if(entity instanceof Projectile) {
 			Projectile projectile=(Projectile) entity;
+			if(bulletname==null){
+				bulletname="bullet_"+this.getClass().getName();
+				System.out.println("buletname: "+bulletname);
+			}
 			if (projectile.getShooter() instanceof Player
 					&& projectile.getCustomName().equalsIgnoreCase(bulletname)) {
 				return true;
@@ -159,12 +164,14 @@ public abstract class MainWeapon implements Listener {
 		}
 	}
 
-	public static double getDecayRate(Projectile ball,WeaponData weapon){
+	/**距離減衰*/
+	public double getDecayRate(Projectile ball,WeaponData weapon){
 		if(weapon.getFlyDecayTick()==0)return 1;
 		double decay=1-((ball.getTicksLived()-weapon.getFlyDecayTick())*weapon.getFlyDecayRatio()/100);
 		return decay<0?0:decay;
 	}
-
+	public void shoot(PlayerData data) {}
+	/*
 	public static void shoot(PlayerData data) {
 		Player player = Bukkit.getPlayer(data.getName());
 		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
@@ -196,6 +203,7 @@ public abstract class MainWeapon implements Listener {
 		player.getWorld().playSound(player.getLocation(),weapon.getSoundId(), SoundCategory.PLAYERS,weapon.getSoundVolume(),weapon.getSoundPitch());
 		//player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,0.5f,1.2f);
 	}
+	*/
 
 	/*
 	 * シューター仕様のまとめ

@@ -30,7 +30,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
 			file.set("WeaponInfo.InkCost", 3);
 			file.set("WeaponInfo.Angle", 6);
-			file.set("WeaponInfo.Speed", 0.8);
+			file.set("WeaponInfo.Speed", 1);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.zombie.attack_wooden_door");
 			file.set("WeaponInfo.SoundVolume", 0.5);
 			file.set("WeaponInfo.SoundPitch", 1.5);
@@ -52,7 +52,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
 			file.set("WeaponInfo.InkCost", 1);
 			file.set("WeaponInfo.Angle", 15);
-			file.set("WeaponInfo.Speed", 1);
+			file.set("WeaponInfo.Speed", 0.9);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.snowball.throw");
 			file.set("WeaponInfo.SoundVolume", 0.5);
 			file.set("WeaponInfo.SoundPitch", 0.8);
