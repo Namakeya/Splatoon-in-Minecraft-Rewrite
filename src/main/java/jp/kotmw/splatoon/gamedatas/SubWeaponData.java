@@ -14,15 +14,15 @@ public class SubWeaponData {
 	private float cost;
 	private int cooltime;
 
-	public SubWeaponData(String param1, Material param2, BombType param3, double param4, double param5, double param6, double param7, int param8) {
-		this.name = param1;
-		this.itemtype = param2;
-		this.type = param3;
-		this.maxdamage = param4;
-		this.mindamage = param5;
-		this.critical = param6;
-		this.cost = (float) (param7/100);
-		this.cooltime = param8;
+	public SubWeaponData(String name, Material material, BombType bombtype, double maxdamage, double mindamage, double critical, double ink, int inkcooltime) {
+		this.name = name;
+		this.itemtype = material;
+		this.type = bombtype;
+		this.maxdamage = maxdamage;
+		this.mindamage = mindamage;
+		this.critical = critical;
+		this.cost = (float) (ink/100);
+		this.cooltime = inkcooltime;
 	}
 
 	public String getName() {return name;}

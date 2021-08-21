@@ -29,10 +29,9 @@ public class ConfigData {
 		this.canpaintcolors = (file.getStringList("CanPaintColors").isEmpty() 
 				? Arrays.stream(DyeColor.values()).map(color -> color.toString()).collect(Collectors.toList())
 						: file.getStringList("CanPaintColors"));
-		this.canslipblocks = (file.getStringList("CanSlipBlocks").isEmpty() 
-				? Arrays.asList("IRON_FENCE", "IRON_TRAPDOOR")
-						: file.getStringList("CanSlipBlocks"));
-		//TODO 今後可変するようにした場合、上2つのArrays部分をArrayListでラップしないとエラー出る可能性
+		this.canslipblocks = file.getStringList("CanSlipBlocks");
+		// 今後可変するようにした場合、上2つのArrays部分をArrayListでラップしないとエラー出る可能性
+		//直しました sesamugi
 	}
 
 	public String getConfigversion() {

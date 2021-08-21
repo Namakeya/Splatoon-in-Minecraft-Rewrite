@@ -1,6 +1,9 @@
 package jp.kotmw.splatoon.maingame.threads;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import jp.kotmw.splatoon.gamedatas.ArenaData;
@@ -29,15 +32,20 @@ public class ResultRunnable extends BukkitRunnable {
 		ArenaData data = battle.getArena();
 		if(tick >= 20) {
 			for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
+				Player enpl=Bukkit.getPlayer(player.getName());
+				if(tick == 45)enpl.playSound(enpl.getLocation(), Sound.ENTITY_CREEPER_PRIMED,1,0.8f);
 				MainGame.sendTitle(player, 0, 5, 0, " ", MeterText(data, i, ii));
 			}
 			i++;
 			ii--;
 		} else if(tick < 20 && tick >= 15){
 			for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
+				Player enpl= Bukkit.getPlayer(player.getName());
+				if(tick == 19)enpl.playSound(enpl.getLocation(), Sound.ENTITY_GENERIC_EXPLODE,1,0.8f);
 				MainGame.sendTitle(player, 0, 5, 0, " ", MeterText2(data, (int)parcent-2, (int)parcent-1));//ここで良くエラーでる
 			}
 		} else if(tick < 15 && tick >= 11) {
+
 			battle.sendResult();
 		} else if(tick < 0) {
 			MainGame.end(data, false);
@@ -48,11 +56,20 @@ public class ResultRunnable extends BukkitRunnable {
 
 	private static String MeterText(ArenaData data, int i, int ii)
 	{
+		i=i<0?0:i;
+		ii=ii<i?i+1:ii;
+		ii=ii>98?98:ii;
+		i=i>ii?ii-1:i;
+
 		return data.getSplatColor(1).getChatColor()+base.substring(0, i)+ ChatColor.GRAY +base.substring(i + 1, ii)+ data.getSplatColor(2).getChatColor()+base.substring(ii + 1, 99)+ space;
 	}
 
 	private static String MeterText2(ArenaData data, int i, int ii)
 	{
+		i=i<0?0:i;
+		ii=ii<i?i+1:ii;
+		ii=ii>98?98:ii;
+		i=i>ii?ii-1:i;
 		return data.getSplatColor(1).getChatColor()+base.substring(0, i)+ data.getSplatColor(2).getChatColor()+base.substring(ii, 99)+ space;
 	}
 

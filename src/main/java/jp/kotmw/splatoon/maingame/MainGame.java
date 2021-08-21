@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jp.kotmw.splatoon.gamedatas.*;
+import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,22 +22,19 @@ import jp.kotmw.splatoon.event.BattleStartEvent;
 import jp.kotmw.splatoon.event.PlayerGameJoinEvent;
 import jp.kotmw.splatoon.event.PlayerGameLeaveEvent;
 import jp.kotmw.splatoon.filedatas.PlayerFiles;
-import jp.kotmw.splatoon.gamedatas.ArenaData;
-import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.BattleType;
 import jp.kotmw.splatoon.gamedatas.DataStore.GameStatusEnum;
-import jp.kotmw.splatoon.gamedatas.PlayerData;
-import jp.kotmw.splatoon.gamedatas.PlayerStatusData;
-import jp.kotmw.splatoon.gamedatas.SubWeaponData;
-import jp.kotmw.splatoon.gamedatas.WaitRoomData;
 import jp.kotmw.splatoon.maingame.threads.AnimationRunnable;
 import jp.kotmw.splatoon.maingame.threads.TransferRunnable;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.util.MessageUtil;
+import org.bukkit.util.BoundingBox;
 
 public class MainGame extends MessageUtil {
 
 	public static String Prefix = "[ "+ChatColor.GREEN+"Splatoon"+ChatColor.WHITE+" ] ";
+
+	public static final int minPlayer=8;
 
 	public static void join(Player player, WaitRoomData data) {
 		if(DataStore.hasPlayerData(player.getName()))
@@ -72,16 +72,20 @@ public class MainGame extends MessageUtil {
 				data.getZ(),
 				(float)data.getYaw(),
 				(float)data.getPitch()));
-		player.getInventory().clear();
-		player.getInventory().setItem(0, GameItems.getSelectItem());
-		player.getInventory().setItem(8, GameItems.getLeaveItem());
+		chooseWeapon(player);
 		for(PotionEffect effect : player.getActivePotionEffects())
 			player.removePotionEffect(effect.getType());
 		DataStore.addPlayerData(player.getName(), playerdata);
 		GameSigns.UpdateJoinSign(data.getName());
-		if(DataStore.getRoomPlayersList(data.getName()).size() < 8)
+		if(DataStore.getRoomPlayersList(data.getName()).size() < minPlayer)
 			return;
 		start(data);
+	}
+
+	public static void chooseWeapon(Player player){
+		player.getInventory().clear();
+		player.getInventory().setItem(0, GameItems.getSelectItem());
+		player.getInventory().setItem(8, GameItems.getLeaveItem());
 	}
 
 	public static PlayerData leave(Player player) {
@@ -146,8 +150,20 @@ public class MainGame extends MessageUtil {
 		player.getInventory().clear();
 		if(data.getWeapon() == null)
 			data.setWeapon(DataStore.getStatusData(data.getName()).getWeapons().get(0));
-		player.getInventory().setItem(0, GameItems.getWeaponItem(DataStore.getWeapondata(data.getWeapon())));
-		player.getInventory().setItem(1, GameItems.getSubWeaponItem(DataStore.getWeapondata(data.getWeapon())));
+		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
+		ArenaData arena = DataStore.getArenaData(data.getArena());
+		SplatColor color=arena.getSplatColor(data.getTeamid());
+		player.getInventory().setItem(0, GameItems.getWeaponItem(weapon));
+		player.getInventory().setItem(1, GameItems.getSubWeaponItem(weapon));
+		player.getInventory().setItem(EquipmentSlot.HEAD,GameItems.getHelmetItem(weapon,color));
+		for(int i=0;i<9;i++){
+			if(player.getInventory().getItem(i) == null){
+				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));
+			}
+		}
+		if(weapon.isBowItem()){
+			player.getInventory().setItem(9,new ItemStack(Material.ARROW,64));
+		}
 	}
 
 	/**
@@ -231,19 +247,23 @@ public class MainGame extends MessageUtil {
 
 	public static void Damager(PlayerData player, int x, int y, int z, int damage) {
 		for(PlayerData data : DataStore.getArenaPlayersList(player.getArena())) {
-			if(data.getName() == player.getName())
-				continue;
-			if(player.getTeamid() == data.getTeamid())
-				continue;
 			Player target = Bukkit.getPlayer(data.getName());
 			Location loc = target.getLocation();
 			int target_x = loc.getBlockX(),
 					target_y = loc.getBlockY(),
 					target_z = loc.getBlockZ();
 			if(x == target_x && y == target_y && z == target_z) {
-				target.damage(damage);
+				damageTarget(player,target,damage);
 			}
 		}
+		Player playere = Bukkit.getPlayer(player.getName());
+		for(Entity e: playere.getWorld().getNearbyEntities(new BoundingBox(x,y,z,x+1,y+0.5,z+1))){
+			if(e instanceof Creeper){
+				Creeper target=((Creeper)e);
+				damageTarget(player,target,damage);
+			}
+		}
+
 	}
 
 	/*public static void SphereDamager(PlayerData player, Location center, SubWeaponData subWeaponData, double radius) {
@@ -257,24 +277,88 @@ public class MainGame extends MessageUtil {
 			if(radius > distance) target.damage(subWeaponData.getMaxDamage());
 		}
 	}*/
-	
+
 	public static void SphereDamager(PlayerData player, Location center, SubWeaponData subWeaponData, double radius, boolean crit) {
+		SphereDamager(player, center, subWeaponData.getCriticalDamage(), subWeaponData.getMaxDamage(), radius, crit);
+	}
+	
+	public static void SphereDamager(PlayerData player, Location center, double critDamage,double maxDamage, double radius, boolean crit) {
 		for(PlayerData data : DataStore.getArenaPlayersList(player.getArena())) {
-			if(data.getName() == player.getName())
-				continue;
-			if(player.getTeamid() == data.getTeamid())
-				continue;
+
 			Player target = Bukkit.getPlayer(data.getName());
 			double distance = center.distance(target.getLocation());
 			if(radius > distance) {
 				if(crit && 0.5 > distance) {
-					target.damage(subWeaponData.getCriticalDamage());
+					damageTarget(player,target,critDamage);
 					continue;
 				}
 				//距離減衰式を入れる
-				target.damage(subWeaponData.getMaxDamage());
+				damageTarget(player,target,maxDamage);
 			}
 		}
+		Player playere = Bukkit.getPlayer(player.getName());
+		for(Entity e: playere.getWorld().getNearbyEntities
+				(new BoundingBox(center.getX()-radius, center.getY()-radius,center.getZ()-radius
+						,center.getX()+radius, center.getY()+radius,center.getZ()+radius))){
+			if(e instanceof Creeper){
+				Creeper target=(Creeper) e;
+				double distance = center.distance(target.getLocation());
+				if(radius > distance) {
+					if(crit && 0.5 > distance) {
+						damageTarget(player,target,critDamage);
+						continue;
+					}
+					//距離減衰式を入れる
+					damageTarget(player,target,maxDamage);
+				}
+			}
+		}
+	}
+
+	/**Mainly for Debugging*/
+	public static void damageTarget(PlayerData pd, LivingEntity target, double amount){
+		if(canDamage(pd,target)) {
+			System.out.println(pd.getName() + " damaged " + target.getName());
+			target.damage(amount);
+			target.setMaximumNoDamageTicks(1);
+		}else{
+			System.out.println(pd.getName() + " cannot damage " + target.getName());
+		}
+	}
+
+	public static boolean canDamage(PlayerData pd, LivingEntity target){
+		Player pe = Bukkit.getPlayer(pd.getName());
+		return canDamage(pe,pd,target);
+	}
+/** @param attacker should be Player
+ * @param defender should be LivingEntity*/
+	public static boolean canDamage(Entity attacker,Entity defender){
+		if(attacker instanceof Player && defender instanceof LivingEntity) {
+			Player pe=(Player)attacker;
+			LivingEntity target=(LivingEntity) defender;
+			if (DataStore.hasPlayerData(pe.getName())) {
+				PlayerData pd = DataStore.getPlayerData(pe.getName());
+
+				return canDamage(pe, pd, target);
+			}
+		}
+		return false;
+
+	}
+
+	private static boolean canDamage(Player pe,PlayerData pd,LivingEntity target){
+		if(target instanceof Creeper){
+			return true;
+		}else if(target instanceof Player){
+			Player tpe= (Player) target;
+			PlayerData tpd=DataStore.getPlayerData(tpe.getName());
+			if(tpd!=null){
+				if(pd.getTeamid() != tpd.getTeamid()){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 

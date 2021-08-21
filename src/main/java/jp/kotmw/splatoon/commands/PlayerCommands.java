@@ -1,15 +1,13 @@
 package jp.kotmw.splatoon.commands;
 
+import jp.kotmw.splatoon.gamedatas.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import jp.kotmw.splatoon.gamedatas.ArenaData;
-import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.RankingPattern;
-import jp.kotmw.splatoon.gamedatas.WaitRoomData;
 import jp.kotmw.splatoon.maingame.MainGame;
 
 public class PlayerCommands extends CommandLib {
@@ -26,6 +24,8 @@ public class PlayerCommands extends CommandLib {
 			,"/splat leave"
 			,"/splat roomlist"
 			,"/splat arenalist"
+					,"/splat getweapon [player]"
+					,"/splat setweapon <weapon> [player]"
 			,"/splat rank <win/lose/rank/rate/totalpaint/maxwinstreak>"
 			,"------------------------------");
 			return true;
@@ -41,6 +41,15 @@ public class PlayerCommands extends CommandLib {
 			} else if("arenalist".equalsIgnoreCase(args[0])) {
 				sendPMsg(ChatColor.GREEN+"ステージ一覧");
 				for(ArenaData room : DataStore.getArenaList()) sendMsg("- "+room.getName()+" "+room.getGameStatus().getStats());
+			} else if("getweapon".equalsIgnoreCase(args[0])) {
+				PlayerStatusData psd=DataStore.getStatusData(player.getName());
+				if(psd!=null) {
+					sendPMsg(ChatColor.GREEN + player.getName() + "の指定ブキ");
+					sendPMsg(psd.getCurrentWeapon());
+
+				}else{
+					sendPMsg(ChatColor.RED + player.getName() + "はデータにありません");
+				}
 			}
 		} else if(args.length == 2) {
 			if("join".equalsIgnoreCase(args[0])) {
@@ -68,13 +77,30 @@ public class PlayerCommands extends CommandLib {
 				sendMsg(ChatColor.GREEN.toString()+ChatColor.STRIKETHROUGH+"----------------------------------------");
 			} else if("spectate".equalsIgnoreCase(args[0])) {
 				
+			}else if("setweapon".equalsIgnoreCase(args[0])) {
+				PlayerStatusData psd=DataStore.getStatusData(player.getName());
+				if(psd!=null) {
+					if(DataStore.hasWeaponData(args[1])){
+						psd.setCurrentWeapon(args[1]);
+						sendPMsg(ChatColor.GREEN + player.getName() + " のブキを "+args[1]+" に変更しました。");
+
+					}else{
+						sendPMsg(ChatColor.RED + args[1] + " というブキはデータにありません");
+					}
+
+				}else{
+					sendPMsg(ChatColor.RED + player.getName() + " はデータにありません");
+				}
 			}
 		} else if(args.length == 3) {
 			if("join".equalsIgnoreCase(args[0])) {
+
 				if(!DataStore.hasRoomData(args[1])) {
 					sendPMsg(ChatColor.RED+"その待機部屋は存在しません");
 					return false;
 				}
+
+
 				String target = args[2];
 				Player targetPlayer = getPlayer(target);
 				if(target.equalsIgnoreCase("@p"))
@@ -92,6 +118,8 @@ public class PlayerCommands extends CommandLib {
 				}
 				MainGame.join(targetPlayer, DataStore.getRoomData(args[1]));
 				return false;
+
+
 			}
 		}
 		return false;

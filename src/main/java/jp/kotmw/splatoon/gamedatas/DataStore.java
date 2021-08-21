@@ -232,7 +232,8 @@ public class DataStore {
 
 	public enum SignType {
 		JOIN("Join"),
-		STATUS("Stauts"),
+		STATUS("Status"),
+		CHOOSE("Choose"),
 		SHOP("Shop");
 
 		private final String type;
@@ -266,7 +267,7 @@ public class DataStore {
 	}
 
 	public enum WeaponType {
-		Shooter, Roller, Charger
+		Shooter, Roller, Charger , Blaster
 	}
 
 	public enum BombType {

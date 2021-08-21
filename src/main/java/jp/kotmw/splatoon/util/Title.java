@@ -24,10 +24,20 @@ public class Title extends NMSBase{
 	}
 
 	public static void sendTitle(Player p, int fadein, int stay, int fadeout, String main, String sub) {
+		fadein = fadein*20;
+		stay = stay*20;
+		fadeout = fadeout*20;
+
+		//String msg="TITLE = main : "+main+" , sub : "+sub+" , fadein : "+fadein+" , stay : "+stay+" , fadeout : "+fadeout;
+		//p.sendRawMessage("/title @p title "+main);
+		//p.sendRawMessage("/title @p subtitle "+sub);
+		//p.sendRawMessage("/title @p times "+fadein+" "+stay+" "+fadeout);
+		p.sendTitle(main,sub,fadein,stay,fadeout);
+
+		/*
 		try {
-			fadein = fadein*20;
-			stay = stay*20;
-			fadeout = fadeout*20;
+
+
 			Object mainPacket;
 			Object subPacket;
 			Object time = getNMSClass("PacketPlayOutTitle").getDeclaredClasses()[0].getField("TIMES").get(null);
@@ -56,17 +66,19 @@ public class Title extends NMSBase{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 	public static void sendActionBar(Player p, String msg) {
 		msg = ChatColor.translateAlternateColorCodes('&', msg);
+		p.sendRawMessage(msg);
+		/*
 		try {
 			Object IBComponent = getNMSClass("IChatBaseComponent").getDeclaredClasses()[0].getMethod("a", String.class).invoke(getNMSClass("IChatBaseComponent"), "{\"text\":\""+msg+"\"}");
 			Object packet = getNMSClass("PacketPlayOutChat").getConstructor(getNMSClass("IChatBaseComponent"), (isCMT() ? getNMSClass("ChatMessageType") : byte.class)).newInstance(IBComponent, (isCMT() ? getNMSClass("ChatMessageType").getDeclaredMethod("a", byte.class).invoke(getNMSClass("ChatMessageType"), (byte)2) : (byte)2));
 			sendPacket(p, packet);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 }

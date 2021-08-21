@@ -3,6 +3,7 @@ package jp.kotmw.splatoon.maingame;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -41,7 +42,7 @@ public class SplatZones extends Turf_War {
 					if((x == x1 || x == x2) || (z == z1 || z == z2)) {
 						Location l = new Location(Bukkit.getWorld(data.getWorld()), x+0.5, y, z+0.5);
 						ArmorStand stand = (ArmorStand) Bukkit.getWorld(data.getWorld()).spawnEntity(l, EntityType.ARMOR_STAND);
-						ItemStack item = new ItemStack(Material.STAINED_GLASS, 1, (short)0);
+						ItemStack item = new ItemStack(Material.WHITE_STAINED_GLASS, 1);
 						ItemMeta meta = item.getItemMeta();
 						meta.setDisplayName(ChatColor.RESET+"SplatPluginItem ["+data.getName()+"]");
 						item.setItemMeta(meta);
@@ -153,14 +154,15 @@ public class SplatZones extends Turf_War {
 				Paint.addRollBack(data, block);
 				Paint.ColorChange(block, data.getSplatColor(ensureteam));
 			}
-		data.getAreastands().forEach(stand -> stand.setHelmet(new ItemStack(Material.STAINED_GLASS, 1, (byte)data.getSplatColor(ensureteam).getColorID())));
+		data.getAreastands().forEach(stand -> stand.setHelmet(new ItemStack(MaterialUtil.fromColorIdToStainedGlass(data.getSplatColor(ensureteam).getColorID()), 1)));
 	}
 
 	public static void clearAreaStand(ArenaData data) {
 		for(Entity entity : Bukkit.getWorld(data.getWorld()).getEntities()) {
 			if(entity.getType() != EntityType.ARMOR_STAND)
 				return;
-			if(((ArmorStand)entity).getHelmet().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RESET+"SplatPluginItem ["+data.getName()+"]"))
+			ItemMeta meta=((ArmorStand)entity).getHelmet().getItemMeta();
+			if(meta!=null && meta.getDisplayName().equalsIgnoreCase(ChatColor.RESET+"SplatPluginItem ["+data.getName()+"]"))
 				entity.remove();
 		}
 	}

@@ -1,9 +1,7 @@
 package jp.kotmw.splatoon.maingame;
 
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import jp.kotmw.splatoon.superjump.Superjump;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -20,9 +18,14 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 
 import jp.kotmw.splatoon.Main;
@@ -36,7 +39,11 @@ import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.WaitRoomData;
 import jp.kotmw.splatoon.maingame.threads.RespawnRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Listeners implements Listener {
+
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlace(BlockPlaceEvent e) {
@@ -75,28 +82,33 @@ public class Listeners implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onHung(FoodLevelChangeEvent e) {
+		//System.out.println(e.getFoodLevel());
 		if(!(e.getEntity() instanceof Player))
 			return;
-		if(DataStore.hasPlayerData(e.getEntity().getName()))
-			e.setCancelled(true);
+		if(DataStore.hasPlayerData(e.getEntity().getName())){
+			//e.setCancelled(true);
+			e.setFoodLevel(4);
+		}
+			//e.setCancelled(true);
+			//e.getEntity().setFoodLevel();
 	}
+
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInvClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player))
 			return;
-		if(DataStore.hasPlayerData(e.getWhoClicked().getName()))
+		if(DataStore.hasPlayerData(e.getWhoClicked().getName())){
 			e.setCancelled(true);
+		}
+
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onDrop(PlayerDropItemEvent e) {
-		if(DataStore.hasPlayerData(e.getPlayer().getName()))
-			e.setCancelled(true);
-	}
+
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onMove(PlayerMoveEvent e) {
+		//System.out.println(e.getPlayer().getItemInUse()!=null);
 		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
 			return;
 		Player player = e.getPlayer();
@@ -108,17 +120,23 @@ public class Listeners implements Listener {
 			e.setCancelled(true);
 			return;
 		}
+		player.setFoodLevel(4);
 		Location location = player.getLocation();
 		if(location.getBlock().getType() == Material.WATER ||
-				location.getBlock().getType() == Material.STATIONARY_WATER) {
-			player.damage(20);
+				location.getBlock().getType() == Material.WATER) {
+			player.damage(100);
+			Bukkit.getPluginManager().callEvent(new EntityDamageEvent(player, DamageCause.DROWNING, 100));
 		}
 		if(DataStore.getPlayerData(player.getName()).getArena() == null)
 			return;
 		ArenaData data = DataStore.getArenaData(DataStore.getPlayerData(player.getName()).getArena());
-		if(location.getBlockY() <= (data.getStagePosition2().getBlockY()-1))
-			player.damage(20);
+		if(location.getBlockY() <= (data.getStagePosition2().getBlockY()-1)) {
+			player.damage(100);
+			Bukkit.getPluginManager().callEvent(new EntityDamageEvent(player, DamageCause.VOID, 100));
+		}
+
 	}
+
 
 	@EventHandler
 	public void onDamage(EntityDamageEvent e) {
@@ -129,7 +147,8 @@ public class Listeners implements Listener {
 			return;
 		if(DataStore.getPlayerData(p.getName()).isAllCancel()
 				|| e.getCause() == DamageCause.FALL
-				|| e.getCause() == DamageCause.ENTITY_ATTACK)
+				|| e.getCause() == DamageCause.ENTITY_ATTACK
+				|| e.getCause() == DamageCause.ENTITY_EXPLOSION)
 			e.setCancelled(true);
 	}
 

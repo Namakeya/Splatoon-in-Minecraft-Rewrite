@@ -27,6 +27,7 @@ public class PlayerFiles extends PluginFiles{
 		file.set("Status.TotalExp", 0);
 		file.set("Status.TotalPaint", 0);
 		file.set("Status.Weapons", setWeapon());
+		file.set("Status.CurrentWeapon", "WakabaShooter");
 		file.set("Friends", new ArrayList<String>());
 		file.set("Invites", new ArrayList<String>());
 		SettingFiles(file, DirFile(filedir, uuid));
@@ -68,6 +69,11 @@ public class PlayerFiles extends PluginFiles{
 	private static List<String> setWeapon() {
 		List<String> list = new ArrayList<String>();
 		list.add("SplatShooter");
+		list.add("SplatRoller");
+		list.add("SplatCharger");
+		list.add("3k-Scope");
+		list.add("CrafBlaster");
+		list.add("WakabaShooter");
 		return list;
 	}
 	

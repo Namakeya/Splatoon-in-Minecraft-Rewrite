@@ -3,6 +3,11 @@ package jp.kotmw.splatoon.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.annotation.Selection;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.World;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,8 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
+
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 
 import jp.kotmw.splatoon.filedatas.OtherFiles;
 import jp.kotmw.splatoon.filedatas.StageFiles;
@@ -29,6 +34,7 @@ import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.manager.SplatScoreBoard;
 
+
 public class SettingCommands extends CommandLib {
 
 	List<ArmorStand> stands = new ArrayList<ArmorStand>();
@@ -42,15 +48,22 @@ public class SettingCommands extends CommandLib {
 			sendMsg(MainGame.Prefix);
 			sendMsgs("-----Setting Command List-----"
 			,"/splatsetting setlobby"
-			,"/splatsetting <room> setroom"
-			,"/splatsetting <room> removeroom"
-			,"/splatsetting <room> addarena <arena>"
-			,"/splatsetting <room> removearena <arena>"
-			,"/splatsetting <arena> setarena"
-			,"/splatsetting <arena> setarea"
-			,"/splatsetting <arena> finish"
-			,"/splatsetting <arena> setspawn <1/2> <1/2/3/4>"
-			,"/splatsetting <arena> editmode"
+					,"/splatsetting configreload"
+					,"/splatsetting start"
+					,"/splatsetting endbattle"
+					,"/splatsetting allview"
+					,"/splatsetting addweapon <weapon>"
+
+			,"/splatsetting setroom <room>"
+			,"/splatsetting removeroom <room>"
+			,"/splatsetting addarena <room> <arena>"
+			,"/splatsetting removearena <room> <arena>"
+			,"/splatsetting setarena <arena>"
+			,"/splatsetting setarea <arena>"
+			,"/splatsetting finish <arena>"
+			,"/splatsetting setspawn <arena> <1/2> <1/2/3/4>"
+			,"/splatsetting editmode <arena>"
+					,"/splatsetting rollback <arena>"
 			,"------------------------------");
 			return true;
 		} else if(args.length == 1) {
@@ -60,6 +73,7 @@ public class SettingCommands extends CommandLib {
 				return true;
 			} else if("configreload".equalsIgnoreCase(args[0])) {
 				OtherFiles.ConfigReload();
+
 				sendPMsg("Config.ymlを再読み込みしました");
 				return true;
 			} else if("start".equalsIgnoreCase(args[0])) {
@@ -70,6 +84,18 @@ public class SettingCommands extends CommandLib {
 				}
 				sendPMsg(ChatColor.RED+"参加してからコマンド実行をしてくださいな");
 				return false;
+
+			} else if("endbattle".equalsIgnoreCase(args[0])) {
+				if(DataStore.hasPlayerData(player.getName())) {
+					PlayerData playerdata = DataStore.getPlayerData(player.getName());
+					ArenaData arena=DataStore.getArenaData(playerdata.getArena());
+					if(arena.getGameStatus() == GameStatusEnum.INGAME && arena.getTask()!=null){
+						arena.getTask().setTick(30);
+					}
+					return true;
+				}
+				sendPMsg(ChatColor.RED+"ゲームを行っていません");
+				return false;
 			} else if("allview".equalsIgnoreCase(args[0])) {
 				if(DataStore.hasPlayerData(player.getName())) {
 					PlayerData playerdata = DataStore.getPlayerData(player.getName());
@@ -79,15 +105,19 @@ public class SettingCommands extends CommandLib {
 				return false;
 			}
 		} else if(args.length == 2) {
+			String name = args[1];
 			if("rollback".equalsIgnoreCase(args[0])) {
-				if(!DataStore.hasArenaData(args[1]))
+				if(!DataStore.hasArenaData(name)){
+					sendPMsg(ChatColor.RED+"そのステージは存在しません");
 					return false;
-				ArenaData data = DataStore.getArenaData(args[1]);
+				}
+
+				ArenaData data = DataStore.getArenaData(name);
 				Paint.RollBack(data);
 				return true;
 			}
-			String name = args[0];
-			if("setarena".equalsIgnoreCase(args[1])) {
+
+			if("setarena".equalsIgnoreCase(args[0])) {
 				if(StageFiles.AlreadyCreate(name)) {
 					sendPMsgs(ChatColor.RED+"そのステージは既に存在します"
 					,ChatColor.GREEN+"ステージ範囲の再設定をしたい場合は "
@@ -99,19 +129,25 @@ public class SettingCommands extends CommandLib {
 					return false;
 				}
 				WorldEditPlugin worldEdit = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
-				Selection selection = worldEdit.getSelection(player);
+				Region selection = null;
+				try {
+					selection = worldEdit.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));
+				} catch (IncompleteRegionException e) {
+					selection=null;
+				}
 				if(selection == null)
 					return false;
-				if(!StageFiles.createArena(name, selection.getWorld(), selection.getMinimumPoint(), selection.getMaximumPoint())) {
+				if(!StageFiles.createArena(name, player.getWorld(),
+						BukkitAdapter.adapt(player.getWorld(),selection.getMinimumPoint()), BukkitAdapter.adapt(player.getWorld(),selection.getMaximumPoint()))) {
 					sendPMsg(ChatColor.RED+"着色可能ブロックを1つ以上設置してください");
 					return false;
 				}
 				sendPMsgs(ChatColor.GREEN+"ステージの範囲設定が完了しました"
 				,ChatColor.YELLOW+"以下のコマンドで設定を終えてから、finishコマンドを実行してください"
-				,ChatColor.YELLOW+"/splatsetting "+name+" setspawn <1/2> <1/2/3/4>"
-				,ChatColor.YELLOW+"/splatsetting "+name+" setarea");
+				,ChatColor.YELLOW+"/splatsetting setspawn "+name+" <1/2> <1/2/3/4>"
+				,ChatColor.YELLOW+"/splatsetting setarea "+name+"");
 				return true;
-			} else if("setarea".equalsIgnoreCase(args[1])) {
+			} else if("setarea".equalsIgnoreCase(args[0])) {
 				if(!StageFiles.AlreadyCreateFile(name)) {
 					sendPMsg(ChatColor.RED+"そのステージは存在しません");
 					return false;
@@ -123,13 +159,18 @@ public class SettingCommands extends CommandLib {
 					return false;
 				}
 				WorldEditPlugin worldEdit = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
-				Selection selection = worldEdit.getSelection(player);
+				Region selection = null;
+				try {
+					selection = worldEdit.getSession(player).getSelection(BukkitAdapter.adapt(player.getWorld()));
+				} catch (IncompleteRegionException e) {
+					selection=null;
+				}
 				if(selection == null)
 					return false;
-				StageFiles.setArea(name, selection.getMinimumPoint(), selection.getMaximumPoint());
+				StageFiles.setArea(name, BukkitAdapter.adapt(player.getWorld(),selection.getMinimumPoint()), BukkitAdapter.adapt(player.getWorld(),selection.getMaximumPoint()));
 				sendPMsg(ChatColor.GREEN+"エリア範囲を設定しました");
 				return true;
-			} else if("finish".equalsIgnoreCase(args[1])) {
+			} else if("finish".equalsIgnoreCase(args[0])) {
 				int total = 0;
 				boolean update = false;
 				if(DataStore.hasArenaData(name)) {
@@ -159,7 +200,7 @@ public class SettingCommands extends CommandLib {
 				data.setScoreBoard(new SplatScoreBoard(data));
 				sendPMsg(ChatColor.GREEN+"設定完了を確認し、使用可能になりました！");
 				return true;
-			} else if("setroom".equalsIgnoreCase(args[1])) {
+			} else if("setroom".equalsIgnoreCase(args[0])) {
 				if(name.getBytes().length > 16) {
 					sendPMsg(ChatColor.RED+"待機部屋名は16バイト以下にしてください");
 					return false;
@@ -179,7 +220,7 @@ public class SettingCommands extends CommandLib {
 				}
 				WaitRoomFiles.creareWaitRoom(name, player.getLocation(), BattleType.Turf_War);
 				return true;
-			} else if("loadroom".equalsIgnoreCase(args[1])) {
+			} else if("loadroom".equalsIgnoreCase(args[0])) {
 				boolean already = DataStore.hasRoomData(name);
 				if(!WaitRoomFiles.RoomLoad(name)) {
 					sendPMsg(ChatColor.RED+"対象の待機部屋データファイルが存在しません");
@@ -188,7 +229,7 @@ public class SettingCommands extends CommandLib {
 				sendPMsg(ChatColor.GREEN+"対象の待機部屋データを"+(already ? "再" : "")+"読み込みました");
 				GameSigns.UpdateJoinSign(name);
 				return true;
-			} else if("removeroom".equalsIgnoreCase(args[1])){
+			} else if("removeroom".equalsIgnoreCase(args[0])){
 				if(!DataStore.hasRoomData(name)) {
 					sendPMsg(ChatColor.RED+"その待機部屋は存在していません");
 					return false;
@@ -199,7 +240,8 @@ public class SettingCommands extends CommandLib {
 				}
 				DataStore.removeRoomData(name);
 				GameSigns.disableJoinSign(name);
-			} else if("editmode".equalsIgnoreCase(args[1])) {
+				return true;
+			} else if("editmode".equalsIgnoreCase(args[0])) {
 				if(!DataStore.hasArenaData(name)) {
 					sendPMsg(ChatColor.RED+"セットアップが完了しているステージでのみ使用可能です");
 					return false;
@@ -215,8 +257,8 @@ public class SettingCommands extends CommandLib {
 				return true;
 			}
 		} else if(args.length == 3) {
-			String name = args[0];
-			if("addweapon".equalsIgnoreCase(args[1])) {
+			String name = args[1];
+			if("addweapon".equalsIgnoreCase(args[0])) {
 				String weaponname = args[2];
 				Player target = getPlayer(name);
 				if(target == null) {
@@ -234,7 +276,7 @@ public class SettingCommands extends CommandLib {
 				DataStore.getStatusData(player.getName()).addWeapon(weaponname);
 				sendPMsg( ChatColor.YELLOW+target.getName()+ChatColor.WHITE+" に "+ChatColor.GREEN+weaponname+ChatColor.WHITE+" を追加しました");
 				return true;
-			} else if("setroom".equalsIgnoreCase(args[1])) {
+			} else if("setroom".equalsIgnoreCase(args[0])) {
 				BattleType type = getType(args[2]);
 				if(name.length() > 16) {
 					sendPMsg(ChatColor.RED+"待機部屋名は16文字以下にしてください");
@@ -259,7 +301,7 @@ public class SettingCommands extends CommandLib {
 				}
 				WaitRoomFiles.creareWaitRoom(name, player.getLocation(), type);
 				return true;
-			} else if("addarena".equalsIgnoreCase(args[1])) {
+			} else if("addarena".equalsIgnoreCase(args[0])) {
 				String arena = args[2];
 				if(!DataStore.hasArenaData(arena)) {
 					sendPMsg(ChatColor.RED+"そのステージは存在しません。一覧確認コマンドは"+ChatColor.GOLD+"/splat arenalist");
@@ -274,7 +316,7 @@ public class SettingCommands extends CommandLib {
 				WaitRoomFiles.editSelectList(DataStore.getRoomData(name), arena, true);
 				sendPMsg(ChatColor.AQUA+name+ChatColor.GREEN+" という待機部屋に "+ChatColor.YELLOW+arena+" を選択ステージとして追加しました");
 				return true;
-			} else if("removearena".equalsIgnoreCase(args[1])) {
+			} else if("removearena".equalsIgnoreCase(args[0])) {
 				String arena = args[2];
 				if(!DataStore.hasRoomData(name)) {
 					sendPMsg(ChatColor.RED+"その待機部屋は存在しません。一覧確認コマンドは"+ChatColor.GOLD+"/splat roomlist");
@@ -288,8 +330,8 @@ public class SettingCommands extends CommandLib {
 				return true;
 			}
 		} else if(args.length == 4) {
-			String name = args[0];
-			if("setspawn".equalsIgnoreCase(args[1])) {
+			String name = args[1];
+			if("setspawn".equalsIgnoreCase(args[0])) {
 				if(!StageFiles.AlreadyCreateFile(name)) {
 					sendPMsg(ChatColor.RED + "そのステージは存在しません");
 					return false;

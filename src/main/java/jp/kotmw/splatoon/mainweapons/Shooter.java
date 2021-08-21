@@ -2,10 +2,10 @@ package jp.kotmw.splatoon.mainweapons;
 
 import java.util.Random;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Snowball;
+import jp.kotmw.splatoon.maingame.threads.SquidRunnable;
+import jp.kotmw.splatoon.mainweapons.threads.ShooterBulletRunnable;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -27,6 +27,8 @@ import jp.kotmw.splatoon.manager.Paint;
 
 public class Shooter implements Listener {
 
+	public static final String bulletname="bullet_shooter";
+
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
@@ -38,6 +40,7 @@ public class Shooter implements Listener {
 				|| action == Action.LEFT_CLICK_BLOCK
 				|| action == Action.PHYSICAL)
 			return;
+		//System.out.println("interact");
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
 		PlayerData data = DataStore.getPlayerData(player.getName());
@@ -58,7 +61,7 @@ public class Shooter implements Listener {
 		int tick = 1;
 		if(weapondata.getFirespeed() < 5)
 			tick=tick+(5-weapondata.getFirespeed());
-		if(data.getTask() == null) {
+		if(data.getTask() == null || data.getTask().isCancelled()) {
 			BukkitRunnable task = new ShooterRunnable(player.getName());
 			task.runTaskTimer(Main.main, 0, weapondata.getFirespeed());
 			data.setTask(task);
@@ -69,7 +72,8 @@ public class Shooter implements Listener {
 	@EventHandler
 	public void onHit(ProjectileHitEvent e) {
 		if(!(e.getEntity() instanceof Snowball)
-				|| !(e.getEntity().getShooter() instanceof Player))
+				|| !(e.getEntity().getShooter() instanceof Player)
+		|| !(e.getEntity().getCustomName().equalsIgnoreCase(bulletname)))
 			return;
 		Player player = (Player) e.getEntity().getShooter();
 		if(!DataStore.hasPlayerData(player.getName()))
@@ -79,27 +83,53 @@ public class Shooter implements Listener {
 		PlayerData data = DataStore.getPlayerData(player.getName());
 		if(DataStore.getWeapondata(data.getWeapon()).getType() != WeaponType.Shooter)
 			return;
-		Paint.SpherePaint(e.getEntity().getLocation(), DataStore.getWeapondata(data.getWeapon()).getRadius(), data);
+		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
+		double radius=weapon.getRadius() * getDecayRate(e.getEntity(),weapon);
+		//System.out.println("radius: "+radius);
+		radius=radius<0.8?0.8:radius;
+		if(e.getHitBlock()!=null && SquidRunnable.isSlipBlock(e.getHitBlock().getLocation())){
+			radius+=1.5;
+		}
+		Paint.SpherePaint(e.getEntity().getLocation(),radius, data);
 	}
 
 	@EventHandler
 	public void onDamage(EntityDamageByEntityEvent e) {
-		if(e.getDamager() instanceof Snowball && DataStore.hasPlayerData(e.getEntity().getName())) {
+		//System.out.println("call");
+		if(e.getDamager() instanceof Snowball
+		&& e.getDamager().getCustomName()!=null
+				&&(e.getDamager().getCustomName().equalsIgnoreCase(bulletname))
+		&&(e.getEntity() instanceof Player || e.getEntity() instanceof Creeper)) {
 			Snowball ball = (Snowball) e.getDamager();
+			//System.out.println("call2");
 			if(!(ball.getShooter() instanceof Player))
 				return;
-			if(!(e.getEntity() instanceof Player))
-				return;
-			Player player = (Player) e.getEntity(), shooter = (Player) ball.getShooter();
-			if(!DataStore.hasPlayerData(shooter.getName())
-					|| player.getName() == shooter.getName()
-					|| DataStore.getPlayerData(player.getName()).getTeamid() == DataStore.getPlayerData(shooter.getName()).getTeamid())
-				return;
+			//System.out.println("call3");
+			Player shooter = (Player) ball.getShooter();
+			if(e.getEntity() instanceof Player) {
+				Player player = (Player) e.getEntity();
+				if (!DataStore.hasPlayerData(shooter.getName())
+						|| player.getName() == shooter.getName()
+						|| DataStore.getPlayerData(player.getName()).getTeamid() == DataStore.getPlayerData(shooter.getName()).getTeamid())
+					return;
+			}
+			//System.out.println("call4");
 			WeaponData data = DataStore.getWeapondata(DataStore.getPlayerData(shooter.getName()).getWeapon());
 			if(data.getType() != WeaponType.Shooter)
 				return;
-			e.setDamage(data.getDamage());
+			//System.out.println("call5");
+
+			e.setDamage(data.getDamage()*getDecayRate(ball,data));
+			((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
+			shooter.playSound(e.getEntity().getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS,1,1);
+
 		}
+	}
+
+	public static double getDecayRate(Projectile ball,WeaponData weapon){
+		if(weapon.getFlyDecayTick()==0)return 1;
+		double decay=1-((ball.getTicksLived()-weapon.getFlyDecayTick())*weapon.getFlyDecayRatio()/100);
+		return decay<0?0:decay;
 	}
 
 	public static void shoot(PlayerData data) {
@@ -107,17 +137,31 @@ public class Shooter implements Listener {
 		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
 		player.setExp((float) (player.getExp()-weapon.getCost()));
 		Paint.SpherePaint(player.getLocation(), DataStore.getWeapondata(data.getWeapon()).getRadius(), data);
-		Random random = new Random();
-		int angle = weapon.getAngle()*100;
-		double x = Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
-		double z = Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
+		double x,z;
+		//精度
+		if(weapon.getAngle()>0){
+			Random random = new Random();
+			int angle = weapon.getAngle()*100;
+			x= Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
+			z = Math.toRadians((random.nextInt(angle)/100)-((weapon.getAngle()-1)/2));
+		}else{
+			x=0;
+			z=0;
+		}
+
 		Vector direction = player.getLocation().getDirection().clone();
 		MainGame.sync(() -> {
 			Snowball snowball = player.launchProjectile(Snowball.class);
-			Vector vec = new Vector(x,0,z), vec2 = new Vector(direction.getX()*0.75, direction.getY()*0.75, direction.getZ()*0.75);
+			snowball.setCustomName(bulletname);
+			Vector vec = new Vector(x,0,z), vec2 = new Vector(direction.getX()*weapon.getSpeed(), direction.getY()*weapon.getSpeed(), direction.getZ()*weapon.getSpeed());
 			vec2.add(vec);
 			snowball.setVelocity(vec2);
+			BukkitRunnable task = new ShooterBulletRunnable(player.getName(),snowball);
+			task.runTaskTimer(Main.main, 0, 1);
 		});
+		//MessageUtil.playSoundAt(player,weapon.getSoundId(),weapon.getSoundVolume(),0.05f,weapon.getSoundPitch());
+		player.getWorld().playSound(player.getLocation(),weapon.getSoundId(), SoundCategory.PLAYERS,weapon.getSoundVolume(),weapon.getSoundPitch());
+		//player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,0.5f,1.2f);
 	}
 
 	/*

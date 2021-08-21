@@ -36,13 +36,13 @@ public class OtherFiles extends PluginFiles {
 			return;
 		FileConfiguration file = new YamlConfiguration();
 		file.set("ConfigVersion", 4);
-		file.set("TransfarCount", 10);
+		file.set("TransfarCount", 5);
 		file.set("Time.Turf_War", 180);
 		file.set("Time.Splat_Zones", 300);
 		file.set("FinishTeleportLobby", false);
 		file.set("UseDatabase", false);
 		file.set("CanPaintColors", Arrays.stream(DyeColor.values()).map(color -> color.toString()).collect(Collectors.toList()));
-		file.set("CanSliplocks", Arrays.asList("IRON_FENCE", "IRON_TRAPDOOR"));
+		file.set("CanSlipBlocks", Arrays.asList("IRON_BARS", "IRON_TRAPDOOR"));
 		SettingFiles(file, new File(filepath+"Config.yml"));
 	}
 
@@ -154,6 +154,7 @@ public class OtherFiles extends PluginFiles {
 		WeaponFiles.createTemplateShooterFile();
 		WeaponFiles.createTemplateRollerFile();
 		WeaponFiles.createTemplateChargerFile();
+		WeaponFiles.createTemplateBlasterFile();
 		OtherFiles.SignDir().mkdir();
 	}
 }

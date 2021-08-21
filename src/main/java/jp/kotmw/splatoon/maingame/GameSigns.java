@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.maingame;
 
+import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,9 +26,11 @@ import jp.kotmw.splatoon.gamedatas.WeaponData;
 
 public class GameSigns implements Listener {
 
-	String joinsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"Splatoon"+ChatColor.DARK_GRAY+"]";
+	String joinsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"SplatoonJoin"+ChatColor.DARK_GRAY+"]";
 	String statussign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_BLUE+"SplatoonStatus"+ChatColor.DARK_GRAY+"]";
 	String weaponsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_RED+"SplatWeaponShop"+ChatColor.DARK_GRAY+"]";
+
+	String chooseweaponsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"SplatoonChoose"+ChatColor.DARK_GRAY+"]";
 
 	@EventHandler
 	public void onClickSign(PlayerInteractEvent e) {
@@ -35,9 +38,7 @@ public class GameSigns implements Listener {
 				&& e.getAction() != Action.LEFT_CLICK_BLOCK)
 			return;
 		Block block = e.getClickedBlock();
-		if(block.getType() != Material.SIGN
-				&& block.getType() != Material.SIGN_POST
-				&& block.getType() != Material.WALL_SIGN)
+		if(!MaterialUtil.isSign(block.getType() ))
 			return;
 		if(e.getPlayer().isSneaking()
 				&& e.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -66,20 +67,26 @@ public class GameSigns implements Listener {
 			else
 				player.sendMessage(MainGame.Prefix+ChatColor.RED+"その武器は既に持っています");
 			return;
+		} else if(sign.getLine(0).equalsIgnoreCase(chooseweaponsign)) {
+			if(!DataStore.hasStatusData(player.getName())) {
+				player.sendMessage(MainGame.Prefix+ChatColor.RED+"1回でも待機部屋に参加しないとブキ設定は出来ません");
+				return;
+			}
+			MainGame.chooseWeapon(player);
+			return;
 		}
 	}
 
 	@EventHandler
 	public void breakSign(BlockBreakEvent e) {
 		Block block = e.getBlock();
-		if(block.getType() != Material.SIGN
-				&& block.getType() != Material.SIGN_POST
-				&& block.getType() != Material.WALL_SIGN)
+		if(!MaterialUtil.isSign(block.getType() ))
 			return;
 		Sign sign = (Sign)block.getState();
 		if(!sign.getLine(0).equalsIgnoreCase(joinsign)
 				&& !sign.getLine(0).equalsIgnoreCase(statussign)
-				&& !sign.getLine(0).equalsIgnoreCase(weaponsign))
+				&& !sign.getLine(0).equalsIgnoreCase(weaponsign)
+				&& !sign.getLine(0).equalsIgnoreCase(chooseweaponsign))
 			return;
 		if(!e.getPlayer().isSneaking()) {
 			e.setCancelled(true);
@@ -140,6 +147,11 @@ public class GameSigns implements Listener {
 				WeaponData data = DataStore.getWeapondata(name);
 				e.setLine(0, weaponsign);
 				e.setLine(1, data.getName());
+				e.setLine(2, ""+0);
+			}else if(pattern.equalsIgnoreCase("choose")) {
+				type = SignType.CHOOSE;
+				e.setLine(0, chooseweaponsign);
+				e.setLine(1, ""+0);
 				e.setLine(2, ""+0);
 			}
 			OtherFiles.saveSignLoc(name, e.getBlock().getLocation(), type);

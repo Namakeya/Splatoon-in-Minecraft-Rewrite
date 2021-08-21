@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -51,14 +52,7 @@ public class Turf_War {
 					Block aboveBlock = world.getBlockAt(x, (y+1), z);
 					if(block.getType() != Material.AIR
 							&& isAbobe(aboveBlock.getLocation()))
-						if(block.getType() == Material.WOOL
-								|| block.getType() == Material.GLASS
-								|| block.getType() == Material.THIN_GLASS
-								|| block.getType() == Material.HARD_CLAY
-								|| block.getType() == Material.STAINED_GLASS
-								|| block.getType() == Material.STAINED_GLASS_PANE
-								|| block.getType() == Material.STAINED_CLAY
-								|| block.getType() == Material.CARPET)
+						if(MaterialUtil.isCarpet(block.getType()))
 							count++;
 				}
 			}
@@ -98,8 +92,9 @@ public class Turf_War {
 				result.put(team, result_i);
 			}
 			//////////////////////////////////////////////////////////////////
-			//TODO 後に多分この範囲全部消して、戦闘中に集計するようにしていくと思うかな・・・？
+			//後に多分この範囲全部消して、戦闘中に集計するようにしていくと思うかな・・・？
 			//ただ若干の負荷が不安
+			//不明ですがおそらくすでにやってあった sesamugi
 		}
 		result = data.getScores();
 		shiftScore();
@@ -123,8 +118,10 @@ public class Turf_War {
 		int winner = getMaximunScoreTeam(parcent);
 		String win = ChatColor.GOLD.toString()+ChatColor.BOLD+"You Win!";
 		String lose = ChatColor.BLUE.toString()+ChatColor.ITALIC+"You Lose...";
-		for(int team = 1; team <= data.getMaximumTeamNum(); team++)
+		for(int team = 1; team <= data.getMaximumTeamNum(); team++) {
 			MainGame.sendTitleforTeam(data, team, 0, 5, 0, winner == team ? win : lose, result);
+			MainGame.sendMessageforTeam(data.getName(),   winner == team ? win : lose, team);
+		}
 		data.setTeamWin(winner);
 	}
 	
@@ -164,22 +161,24 @@ public class Turf_War {
 			while(result_shift.containsValue(entry.getValue()))
 				result.put(entry.getKey(), entry.getValue()+0.01);
 		});
-		//TODO この記法だと乱数が入らないから同じスコアだったときに数字の大きいチームの方が必ず勝つ
+		// この記法だと乱数が入らないから同じスコアだったときに数字の大きいチームの方が必ず勝つ
+		//本家でも同じなので問題ないと思います sesamugi
 	}
 	
 	private static boolean isAbobe(Location location) {
+
+		if(MaterialUtil.isStainedGlassPane(location.getBlock().getType()))return true;
+
 		switch(location.getBlock().getType()) {
 		case AIR:
-		case IRON_FENCE:
+			case IRON_BARS:
 		case IRON_TRAPDOOR:
-		case STAINED_GLASS_PANE:
-		case THIN_GLASS:
-		case FENCE:
+
 		case ACACIA_FENCE:
 		case BIRCH_FENCE:
 		case DARK_OAK_FENCE:
 		case JUNGLE_FENCE:
-		case NETHER_FENCE:
+			case NETHER_BRICK_FENCE:
 		case SPRUCE_FENCE:
 			return true;
 		default:

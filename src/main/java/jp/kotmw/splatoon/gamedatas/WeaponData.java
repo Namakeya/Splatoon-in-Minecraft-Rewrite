@@ -14,18 +14,44 @@ public class WeaponData {
 	private int damage;
 	private float cost;
 	private String subweaponname;
+	private double speed;
+
+	private String soundId;
+	private float soundVolume;
+	private float soundPitch;
+
+	private double airResistance;
+	private double flyingPaintRadius;
+	/**威力減衰(爆発)までの時間*/
+	private int flyDecayTick;
+	/**威力減衰の速さ*/
+	private double flyDecayRatio;
+
+	/**ヒト速*/
+	private double ManSpeed;
+	/**硬直時間*/
+	private int RecoilTick;
 
 	//Shooter
 	private int Firespeed;
-	private int radius;
+	private double radius;
 	private int angle;
+
 	//Roller
 	private int InkSplash;
 	private int InkSplashDamage;
 	private int InkSplashAngle;
+	private double InkSplashPaintRadius;
+	private double InkSplashCost;
 	private int SlowLevel;
 	//Charger
 	private int fullcharge;
+	private double range;
+	private boolean isBowItem;
+
+	//Blaster
+	private double ExplosionRadius;
+	private int ExplosionDamage;
 
 	public WeaponData(String name, FileConfiguration file) {
 		this.name = name;
@@ -36,13 +62,82 @@ public class WeaponData {
 		this.cost = (float) (file.getDouble("WeaponInfo.InkCost")/100);
 		this.subweaponname = file.getString("WeaponInfo.SubWeapon");
 		this.Firespeed = file.getInt("WeaponInfo.FireSpeed");
-		this.radius = file.getInt("WeaponInfo.Radius");
+		this.speed = file.getDouble("WeaponInfo.Speed");
+		this.radius = file.getDouble("WeaponInfo.Radius");
 		this.angle = file.getInt("WeaponInfo.Angle");
+		this.soundId=file.getString("WeaponInfo.SoundId");
+		this.soundVolume = (float) file.getDouble("WeaponInfo.SoundVolume");
+		this.soundPitch = (float) file.getDouble("WeaponInfo.SoundPitch");
+		this.airResistance = file.getDouble("WeaponInfo.AirResistance");
+		this.flyingPaintRadius=file.getDouble("WeaponInfo.FlyingPaintRadius");
+		this.flyDecayRatio=file.getDouble("WeaponInfo.FlyDecayRatio");
+		this.flyDecayTick=file.getInt("WeaponInfo.FlyDecayTick");
+
+		this.ManSpeed=file.getDouble("WeaponInfo.ManSpeed",1.0);
+		this.RecoilTick=file.getInt("WeaponInfo.RecoilTick");
+
+
 		this.InkSplash = file.getInt("WeaponInfo.InkSplash");
 		this.InkSplashDamage = file.getInt("WeaponInfo.InkSplashDamage");
 		this.InkSplashAngle = file.getInt("WeaponInfo.InkSplashAngle");
+		this.InkSplashPaintRadius = file.getDouble("WeaponInfo.InkSplashPaintRadius");
+		this.InkSplashCost = file.getDouble("WeaponInfo.InkSplashCost")/100;
 		this.SlowLevel = file.getInt("WeaponInfo.SlowLevel");
 		this.fullcharge = file.getInt("WeaponInfo.FullCharge");
+		this.range = file.getDouble("WeaponInfo.Range");
+		this.isBowItem =file.getBoolean("WeaponInfo.isBowItem");
+
+		this.ExplosionDamage=file.getInt("WeaponInfo.ExplosionDamage");
+		this.ExplosionRadius=file.getDouble("WeaponInfo.ExplosionRadius");
+	}
+	public boolean isBowItem(){
+		return isBowItem;
+	}
+	public double getManSpeed() {
+		return ManSpeed;
+	}
+
+	public int getRecoilTick() {
+		return RecoilTick;
+	}
+
+	public double getExplosionRadius() {
+		return ExplosionRadius;
+	}
+
+	public int getExplosionDamage() {
+		return ExplosionDamage;
+	}
+
+	public double getRange() {return range;}
+	public int getFlyDecayTick() {return flyDecayTick;}
+	public double getFlyDecayRatio() {return flyDecayRatio;}
+
+	public double getFlyingPaintRadius() {
+		return flyingPaintRadius;
+	}
+	public double getAirResistance() {
+		return airResistance;
+	}
+	public double getInkSplashCost() {
+		return InkSplashCost;
+	}
+	public double getInkSplashPaintRadius() {
+		return InkSplashPaintRadius;
+	}
+
+
+	public String getSoundId() {
+		return soundId;
+	}
+
+
+	public float getSoundVolume() {
+		return soundVolume;
+	}
+
+	public float getSoundPitch() {
+		return soundPitch;
 	}
 
 	public String getName() {return name;}
@@ -57,7 +152,9 @@ public class WeaponData {
 
 	public int getFirespeed() {return Firespeed;}
 
-	public int getRadius() {return radius;}
+	public double getSpeed(){return speed;}
+
+	public double getRadius() {return radius;}
 
 	public int getAngle() {return angle;}
 

@@ -1,7 +1,7 @@
 package jp.kotmw.splatoon.manager;
 
+import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
@@ -22,22 +22,23 @@ public class SplatColorManager {
 	 */
 	@SuppressWarnings("deprecation")
 	public static int getColorID(Block b) {
+		//System.out.println("call");
 		if(b == null)
 			return 0;
 		MaterialData materialdata = b.getState().getData();
-		if(materialdata.getItemType() == Material.WOOL
-				|| materialdata.getItemType() == Material.STAINED_GLASS
-				|| materialdata.getItemType() == Material.STAINED_GLASS_PANE
-				|| materialdata.getItemType() == Material.STAINED_CLAY
-				|| materialdata.getItemType() == Material.CARPET)
+		//System.out.println("name : "+materialdata.getItemType().name()+" at "+b.getLocation());
+		if(MaterialUtil.isPaintable(materialdata.getItemType())){
+			//System.out.println("colorId : "+materialdata.getData()+" at "+b.getLocation());
 			return materialdata.getData();
+		}
+
 		return 0;
 	}
 
 	/**
 	 * 足元のブロックを取得して、それがチームカラーと一緒だったらtrue
 	 *
-	 * @param p 対象のプレイヤー
+	 * @param player 対象のプレイヤー
 	 * @param myteam 自チームか
 	 * 
 	 * @return チームカラーかどうか
@@ -46,9 +47,10 @@ public class SplatColorManager {
 		PlayerData data = DataStore.getPlayerData(player.getName());
 		ArenaData data2 = DataStore.getArenaData(data.getArena());
 		Location loc = player.getLocation().clone();
-		if(loc.getBlock().getType() != Material.CARPET)
+		if(!MaterialUtil.isCarpet(loc.getBlock().getType()))
 			loc.add(0, -1, 0);
 		int belowColorID = getColorID(loc.getBlock());
+		//System.out.println(loc.getBlock()+" is "+belowColorID);
 		if(belowColorID == 0)
 			return false;
 		if(myteam)

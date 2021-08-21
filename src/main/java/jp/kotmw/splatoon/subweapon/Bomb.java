@@ -144,17 +144,17 @@ public class Bomb implements Listener {
 		case ARROW:
 			return Material.ARROW;
 		case THROWN_EXP_BOTTLE:
-			return Material.EXP_BOTTLE;
+			return Material.EXPERIENCE_BOTTLE;
 		case ENDER_PEARL:
 			return Material.ENDER_PEARL;
 		case ENDER_SIGNAL:
-			return Material.EYE_OF_ENDER;
+			return Material.ENDER_EYE;
 		case SPLASH_POTION:
 			return Material.SPLASH_POTION;
 		case FISHING_HOOK:
 			return Material.FISHING_ROD;
 		case SNOWBALL:
-			return Material.SNOW_BALL;
+			return Material.SNOWBALL;
 		case EGG:
 			return Material.EGG;
 		default:

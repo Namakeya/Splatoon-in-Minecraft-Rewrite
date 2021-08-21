@@ -6,6 +6,8 @@ import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.maingame.MainGame;
+import org.bukkit.GameRule;
+import org.bukkit.entity.Player;
 
 public class MessageUtil extends Title {
 
@@ -48,4 +50,5 @@ public class MessageUtil extends Title {
 			if(player.getTeamid() == team)
 				sendActionBar(player, msg);
 	}
+
 }

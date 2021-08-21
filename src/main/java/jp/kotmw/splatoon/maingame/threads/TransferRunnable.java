@@ -3,6 +3,8 @@ package jp.kotmw.splatoon.maingame.threads;
 import java.util.Collections;
 import java.util.List;
 
+import jp.kotmw.splatoon.superjump.Superjump;
+import jp.kotmw.splatoon.superjump.SuperjumpRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -73,6 +75,8 @@ public class TransferRunnable extends BukkitRunnable {
 				Player player = Bukkit.getPlayer(playerdata.getName());
 				player.setGameMode(GameMode.ADVENTURE);
 				player.setExp(0.99f);//1.12.2対応のため
+				player.setHealth(20);
+				player.setFoodLevel(4);
 				data.getScoreboard().DefaultScoreBoard(type);
 				data.getScoreboard().setTeam(playerdata);
 				data.getScoreboard().showBoard(playerdata);
@@ -104,5 +108,8 @@ public class TransferRunnable extends BukkitRunnable {
 		BattleRunnable task = new BattleRunnable(data, MainGame.getTime(type), type);
 		task.runTaskTimer(Main.main, 0, 1);
 		data.setTask(task);
+
+		Superjump sj = new Superjump(data);
+		data.setSuperjump(sj);
 	}
 }

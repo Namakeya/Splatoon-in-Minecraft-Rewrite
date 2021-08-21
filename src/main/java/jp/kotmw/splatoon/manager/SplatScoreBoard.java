@@ -22,6 +22,9 @@ public class SplatScoreBoard {
 
 	private Scoreboard scoreboard;
 	private ArenaData data;
+
+	private String timeScoreLast;
+
 	
 	public SplatScoreBoard(ArenaData data) {
 		this.data = data;
@@ -82,10 +85,13 @@ public class SplatScoreBoard {
 		if(tick%20 != 0)
 			tick -= tick%20;
 		int scorevalue = obj.getScore(ChatColor.GREEN+"-Time left-").getScore()-1;
-		Score score = obj.getScore(conversionTime((tick/20)+1));
-		score.setScore(0);
-		scoreboard.resetScores(conversionTime((tick/20)+1));
-		score = obj.getScore(conversionTime(tick/20));
+		if(timeScoreLast != null) {
+			Score score = obj.getScore(timeScoreLast);
+			score.setScore(0);
+			scoreboard.resetScores(timeScoreLast);
+		}
+		timeScoreLast=conversionTime(tick/20);
+		Score score = obj.getScore(timeScoreLast);
 		score.setScore(scorevalue);
 	}
 

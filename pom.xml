@@ -2,15 +2,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>kotmw.plugin</groupId>
   <artifactId>Splatoon_in_minecraft-Rewrite</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.4.0-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>8</source>
+          <target>8</target>
         </configuration>
       </plugin>
     </plugins>
@@ -20,12 +20,22 @@
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
+    <repository>
+    <id>sk89q-snapshots</id>
+    <url>http://maven.sk89q.com/artifactory/repo</url>
+    <releases>
+      <enabled>true</enabled> <!-- releases enabled: this specific repository also hosts release versions -->
+    </releases>
+    <snapshots>
+      <enabled>true</enabled> <!-- snapshots enabled: we declare a SNAPSHOT repository because we need to download a SNAPSHOT dependency -->
+    </snapshots>
+  </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.9.4-R0.1-SNAPSHOT</version>
+      <version>1.17.1-R0.1-SNAPSHOT</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>
@@ -34,5 +44,11 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.39</version>
     </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
   </dependencies>
 </project>

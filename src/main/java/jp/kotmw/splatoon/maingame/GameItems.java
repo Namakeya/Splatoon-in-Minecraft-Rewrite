@@ -2,9 +2,14 @@ package jp.kotmw.splatoon.maingame;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -12,18 +17,19 @@ import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.WeaponType;
 import jp.kotmw.splatoon.gamedatas.SubWeaponData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class GameItems {
 
 	public static String weaponselector = ChatColor.GREEN
 			+ ChatColor.BOLD.toString()
 			+ "WeaponSelector"
-			+ ChatColor.RESET.toString() + ChatColor.GRAY
+			+ ChatColor.GRAY
 			+ " [Right Click]";
 	public static String leave = ChatColor.YELLOW
 			+ ChatColor.BOLD.toString()
 			+ "Leave"
-			+ ChatColor.RESET.toString() + ChatColor.GRAY
+			+ ChatColor.GRAY
 			+ " [Right Click]";
 
 	public static ItemStack getSelectItem() {
@@ -63,6 +69,9 @@ public class GameItems {
 		else if(data.getType() == WeaponType.Roller)
 			lore.add("SlowLevel: "+data.getSlowLevel());
 		meta.setLore(lore);
+		//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+				//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
+
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -81,6 +90,26 @@ public class GameItems {
 		lore.add("Bomb!!!");
 		lore.add("Bomb!!!!");
 		meta.setLore(lore);
+		//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+				//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
+		item.setItemMeta(meta);
+		return item;
+	}
+	public static ItemStack getFillerItem(WeaponData data) {
+		ItemStack item=new ItemStack(Material.STONE_BUTTON,64);
+		ItemMeta meta = item.getItemMeta();
+		//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+				//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getHelmetItem(WeaponData data, SplatColor color) {
+		ItemStack item=new ItemStack(Material.LEATHER_HELMET,1);
+		LeatherArmorMeta meta = (LeatherArmorMeta)item.getItemMeta();
+		meta.setColor(color.getColor());
+		//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+		//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
 		item.setItemMeta(meta);
 		return item;
 	}

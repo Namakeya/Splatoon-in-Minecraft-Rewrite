@@ -167,6 +167,7 @@ public class StageFiles extends PluginFiles {
 	}
 
 	public static boolean AlreadyCreateFile(String arena) {
+		//System.out.println("arena : "+arena);
 		return DirFile(filedir, arena).exists();
 	}
 
@@ -190,6 +191,8 @@ public class StageFiles extends PluginFiles {
 			file = replacePosition(arena, file);
 			ArenaData data = new ArenaData(arena, file);
 			data.setGameStatus(GameStatusEnum.ENABLE);
+			System.out.println(file.getName());
+
 			if(!data.isStatus())
 				continue;
 			data.updateTeamColor();

@@ -20,7 +20,6 @@ public class PluginFiles {
 	 *
 	 * @param fileconfiguration ファイルコンフィグを指定
 	 * @param file ファイル指定
-	 * @param save 上書きをするかリセットするか
 	 */
 	protected static void SettingFiles(FileConfiguration fileconfiguration, File file) {
 		try {
@@ -65,12 +64,17 @@ public class PluginFiles {
 	 */
 	protected static List<String> getFileList(File dir) {
 		List<String> names = new ArrayList<>();
-		for(File file : Arrays.asList(dir.listFiles())) {
-			if(file.isDirectory())
-				continue;
-			names.add(getName(file.getName()));
+		if(dir != null && dir.listFiles()!=null) {
+			for (File file : dir.listFiles()) {
+				//System.out.println(file.getName());
+				if (file.isDirectory())
+					continue;
+				names.add(getName(file.getName()));
+			}
+			return names;
+		}else{
+			return new ArrayList<String>();
 		}
-		return names;
 	}
 
 	protected static void setData(File file, String path, Object param) {

@@ -18,6 +18,7 @@ import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.mainweapons.threads.ChargerRunnable;
 
+/**UNUSED*/
 public class Charger implements Listener {
 
 	@EventHandler
@@ -33,28 +34,28 @@ public class Charger implements Listener {
 			return;
 		Player p = e.getPlayer();
 		ItemStack item = p.getInventory().getItemInMainHand();
-		PlayerData player = DataStore.getPlayerData(p.getName());
-		if(DataStore.getWeapondata(player.getWeapon()).getType() != WeaponType.Charger)
+		PlayerData data = DataStore.getPlayerData(p.getName());
+		if(DataStore.getWeapondata(data.getWeapon()).getType() != WeaponType.Charger)
 			return;
-		if(player.isAllCancel()
+		if(data.isAllCancel()
 				|| item == null
 				|| item.getType() == Material.AIR
 				|| !item.hasItemMeta()
 				|| item.getItemMeta().getLore().size() < 5
-				|| !item.getItemMeta().getDisplayName().equalsIgnoreCase(player.getWeapon()))
+				|| !item.getItemMeta().getDisplayName().equalsIgnoreCase(data.getWeapon()))
 			return;
-		WeaponData weapon = DataStore.getWeapondata(player.getWeapon());
-		if(p.getExp() < weapon.getCost() && player.getCharge() <= 0) {
-			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
+		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
+		if(p.getExp() < weapon.getCost() && data.getCharge() <= 0) {
+			MainGame.sendActionBar(data, ChatColor.RED+"インクがありません!");
 			return;
 		}
-		if(player.getCharge() <= 0)
+		if(data.getCharge() <= 0)
 			p.setExp((float) (p.getExp()-weapon.getCost()));
-		if(player.getTask() == null) {
-			BukkitRunnable task = new ChargerRunnable(p.getName());
-			task.runTaskTimer(Main.main, 0, 5);
-			player.setTask(task);
+		if(data.getTask() == null|| data.getTask().isCancelled()) {
+			BukkitRunnable task = new ChargerRunnable(p.getName(),weapon.getFullcharge()/4);
+			task.runTaskTimer(Main.main, 0, weapon.getFullcharge()/4);
+			data.setTask(task);
 		}
-		player.setTick(1);
+		data.setTick(1);
 	}
 }

@@ -32,11 +32,21 @@ public class PlayerData {
 	private boolean paint = false; //ローラー使用の時の塗れる時間かどうか
 	private boolean invincible = false; //無敵状態かどうか
 	private boolean dead = false;
-	private String Weapon;
 	private int charge;//チャージャーで使う
 	private int inkcooltime;
+	private int superjumpStatus;// 0:何もない 1:待機中 2:上昇中 3:下降中
+
+	private int recoilTick;//硬直状態かどうか
 
 	public PlayerData(String name) {this.name = name;}
+
+	public int getSuperjumpStatus() {
+		return superjumpStatus;
+	}
+
+	public void setSuperjumpStatus(int superjumpStatus) {
+		this.superjumpStatus = superjumpStatus;
+	}
 
 	public String getName() {return name;}
 
@@ -86,7 +96,9 @@ public class PlayerData {
 
 	public boolean isDead() {return dead;}
 
-	public String getWeapon() {return Weapon;}
+	public String getWeapon() {
+		return this.getPlayerStatus().getCurrentWeapon();
+	}
 
 	public int getCharge() {return charge;}
 
@@ -99,6 +111,14 @@ public class PlayerData {
 	
 	public PlayerStatusData getPlayerStatus() {
 		return DataStore.getStatusData(name);
+	}
+
+	public int getRecoilTick() {
+		return recoilTick;
+	}
+
+	public void setRecoilTick(int recoilTick) {
+		this.recoilTick = recoilTick;
 	}
 
 	public void setName(String name) {this.name = name;}
@@ -149,7 +169,9 @@ public class PlayerData {
 
 	public void setDead(boolean dead) {this.dead = dead;}
 
-	public void setWeapon(String weapon) {this.Weapon = weapon;}
+	public void setWeapon(String weapon) {
+		this.getPlayerStatus().setCurrentWeapon(weapon);
+	}
 
 	public void setCharge(int charge) {this.charge = charge;}
 

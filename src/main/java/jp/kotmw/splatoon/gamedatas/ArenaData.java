@@ -1,16 +1,16 @@
 package jp.kotmw.splatoon.gamedatas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.IntStream;
 
+import jp.kotmw.splatoon.superjump.Superjump;
+import jp.kotmw.splatoon.superjump.SuperjumpRunnable;
 import org.bukkit.Bukkit;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ArmorStand;
 
@@ -40,11 +40,12 @@ public class ArenaData {
 	private Map<Integer, Double> scores = new HashMap<>();
 	private int totalscore;
 	private BattleRunnable runtask;
+	private Superjump superjump;
 	private GameStatusEnum gameStatus;
 	private SplatScoreBoard scoreboard;
 	private SplatBossBar bossBar;
 	private Turf_War battle;
-	private List<BlockState> rollbackblocks = new ArrayList<BlockState>();
+	private Map<org.bukkit.Location,BlockData> rollbackblocks = new HashMap<org.bukkit.Location,BlockData>();
 	private TeamCountManager team1_count, team2_count;
 	private int totalareablock;
 	private List<ArmorStand> areastands = new ArrayList<ArmorStand>();
@@ -100,6 +101,14 @@ public class ArenaData {
 		this.team2_count = new TeamCountManager();
 	}
 
+	public Superjump getSuperjump() {
+		return superjump;
+	}
+
+	public void setSuperjump(Superjump superjump) {
+		this.superjump = superjump;
+	}
+
 	public String getName() {return arena;}
 	public boolean isStatus() {return status;}
 	public String getWorld() {return world;}
@@ -139,7 +148,7 @@ public class ArenaData {
 	public int getWinTeam() {return winteam;}
 	
 	public SplatColor getSplatColor(int team) {
-		if(team > teamscount)
+		if(team > teamscount || team>teamcolor.size())
 			return SplatColor.WHITE;
 		return teamcolor.get(team);
 	}
@@ -163,7 +172,7 @@ public class ArenaData {
 
 	public Turf_War getBattleClass() {return battle;}
 
-	public List<BlockState> getRollbackblocks() {return rollbackblocks;}
+	public Map<org.bukkit.Location,BlockData> getRollbackblocks() {return rollbackblocks;}
 
 	public TeamCountManager getTeam1_count() {return team1_count;}
 
@@ -223,20 +232,26 @@ public class ArenaData {
 	
 	public void setBattleClass(Turf_War battle) {this.battle = battle;}
 
-	public void addRollBackBlock(BlockState block) {this.rollbackblocks.add(block);}
+	public void addRollBackBlock(org.bukkit.Location loc, BlockData data) {this.rollbackblocks.put(loc,data);}
 
 	public void setTotalareablock(int totalareablock) {this.totalareablock = totalareablock;}
 
 	public void setAreastands(List<ArmorStand> areastands) {this.areastands = areastands;}
 
 	public void updateTeamColor(){
-		List<SplatColor> colors = new ArrayList<>(Arrays.asList(SplatColor.values()));
-		colors.remove(SplatColor.WHITE);
+		List<SplatColor> colors = SplatColor.teamColor;
+		Collections.shuffle(colors);
+		//System.out.println(colors.size()+" colors exists");
+		for(int i=0;i<teamscount;i++){
+			//System.out.println(i+" color is "+colors.get(i));
+			teamcolor.put(i+1, colors.get(i));
+		}
+		/*
 		IntStream.rangeClosed(1, teamscount).forEach(team -> {
 			Collections.shuffle(colors);
 			teamcolor.put(team, colors.get(0));
 			colors.remove(0);
-		});
+		});*/
 	}
 	
 	/**
@@ -248,7 +263,7 @@ public class ArenaData {
 	 */
 	public void addTeamScore(int team, int beforeteam) {
 		double param = (scores.containsKey(team) ? scores.get(team) : 0.0), param2;
-		if(beforeteam != 0) {
+		if(beforeteam != 0 && scores.get(beforeteam) != null) {
 			param2 = scores.get(beforeteam);
 			scores.put(beforeteam, --param2);
 		}

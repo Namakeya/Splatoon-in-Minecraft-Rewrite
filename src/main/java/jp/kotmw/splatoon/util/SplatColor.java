@@ -6,15 +6,18 @@ import org.bukkit.DyeColor;
 
 import jp.kotmw.splatoon.util.DetailsColor.DetailsColorType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public enum SplatColor {
 	BLUE(DyeColor.BLUE, ChatColor.BLUE, Color.fromRGB(0, 0, 255), DetailsColorType.WoolColor_BLUE.getColor(), 11), 
-	LIGHT_BLUE(DyeColor.LIGHT_BLUE, ChatColor.AQUA, Color.AQUA, DetailsColorType.WoolColor_AQUA.getColor(), 3), 
-	GREEN(DyeColor.GREEN, ChatColor.DARK_GREEN, Color.fromRGB(0, 255, 0), DetailsColorType.WoolColor_GREEN.getColor(), 13), 
-	LIME(DyeColor.LIME, ChatColor.GREEN, Color.LIME, DetailsColorType.WoolColor_LIME.getColor(), 5), 
-	YELLOW(DyeColor.YELLOW, ChatColor.YELLOW, Color.YELLOW, DetailsColorType.WoolColor_YELLOW.getColor(), 4), 
+	LIGHT_BLUE(DyeColor.LIGHT_BLUE, ChatColor.AQUA, Color.AQUA, DetailsColorType.WoolColor_AQUA.getColor(), 3),
+	GREEN(DyeColor.GREEN, ChatColor.DARK_GREEN, Color.fromRGB(0, 255, 0), DetailsColorType.WoolColor_GREEN.getColor(), 13),
+	LIME(DyeColor.LIME, ChatColor.GREEN, Color.LIME, DetailsColorType.WoolColor_LIME.getColor(), 5),
+	YELLOW(DyeColor.YELLOW, ChatColor.YELLOW, Color.YELLOW, DetailsColorType.WoolColor_YELLOW.getColor(), 4),
 	ORANGE(DyeColor.ORANGE, ChatColor.GOLD, Color.fromRGB(255, 170, 0), DetailsColorType.WoolColor_ORANGE.getColor(), 1), 
-	PURPLE(DyeColor.PURPLE, ChatColor.DARK_PURPLE, Color.BLUE, DetailsColorType.WoolColor_PURPLE.getColor(), 10), 
+	PURPLE(DyeColor.PURPLE, ChatColor.DARK_PURPLE, Color.BLUE, DetailsColorType.WoolColor_PURPLE.getColor(), 10),
 	PINK(DyeColor.PINK, ChatColor.LIGHT_PURPLE, Color.FUCHSIA, DetailsColorType.WoolColor_PINK.getColor(), 6),
 	WHITE(DyeColor.WHITE, ChatColor.WHITE, Color.WHITE, DetailsColorType.WoolColor_WHITE.getColor(), 0);
 	
@@ -23,7 +26,14 @@ public enum SplatColor {
 	private final Color color;
 	private final DetailsColor detailsColor;
 	private final int colornum;
-	
+	public static List<SplatColor> teamColor;
+
+	static{
+		teamColor=new ArrayList<SplatColor>();
+		teamColor.add(ORANGE);
+		teamColor.add(BLUE);
+	}
+
 	private SplatColor(final DyeColor dyeColor, final ChatColor chatColor, final Color color, final DetailsColor detailsColor, final int colornum) {
 		this.dyeColor = dyeColor;
 		this.chatColor = chatColor;
@@ -31,6 +41,8 @@ public enum SplatColor {
 		this.detailsColor = detailsColor;
 		this.colornum = colornum;
 	}
+
+
 	
 	public DyeColor getDyeColor() {return dyeColor;}
 	public ChatColor getChatColor() {return chatColor;}

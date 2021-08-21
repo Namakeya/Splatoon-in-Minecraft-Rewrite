@@ -3,6 +3,8 @@ package jp.kotmw.splatoon.maingame;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.kotmw.splatoon.util.MessageUtil;
+import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,8 +31,10 @@ public class InvMenu implements Listener {
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
+		//System.out.println("interact");
 		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
 			return;
+		//System.out.println("player data exists");
 		Player player = e.getPlayer();
 		ItemStack item = player.getInventory().getItemInMainHand();
 		Action action = e.getAction();
@@ -44,14 +48,18 @@ public class InvMenu implements Listener {
 				|| !item.getItemMeta().hasLore())
 			return;
 		String itemname = item.getItemMeta().getDisplayName();
-		if(itemname.equalsIgnoreCase(GameItems.weaponselector))
+		//System.out.println("itemname : "+itemname+" weaponselector : "+GameItems.weaponselector);
+		if(itemname.equalsIgnoreCase(GameItems.weaponselector)) {
+			//System.out.println("Opening Inventory");
 			player.openInventory(openMenu());
+		}
 		else if(itemname.equalsIgnoreCase(GameItems.leave))
 			MainGame.leave(player);
 	}
 
 	@EventHandler
 	public void onInvClick(InventoryClickEvent e) {
+		//System.out.println(e.getView().getTitle());
 		if(!DataStore.hasPlayerData(e.getWhoClicked().getName()))
 			return;
 		PlayerData data = DataStore.getPlayerData(e.getWhoClicked().getName());
@@ -60,16 +68,22 @@ public class InvMenu implements Listener {
 				|| e.getCurrentItem().getType() == Material.AIR
 				|| !e.getCurrentItem().hasItemMeta())
 			return;
-		if(e.getInventory().getName().equalsIgnoreCase(selectinv)) {
+		//System.out.println("inventoryname: "+e.getView().getTitle()+" selectinv: "+selectinv);
+		if(e.getView().getTitle().equalsIgnoreCase(selectinv)) {
 			if(!isType(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName())))
 				return;
 			WeaponType type = WeaponType.valueOf(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
+
+			//System.out.println("type : "+type.name());
+
 			e.getWhoClicked().openInventory(getWeaponSelector(type, data.getName()));
-		} else if(e.getInventory().getName().equalsIgnoreCase(selectweapon)) {
+		} else if(e.getView().getTitle().equalsIgnoreCase(selectweapon)) {
+			//System.out.println("selectweapon");
 			String weapon = e.getCurrentItem().getItemMeta().getDisplayName();
 			if(!DataStore.hasWeaponData(weapon))
 				return;
 			data.setWeapon(weapon);
+			MessageUtil.sendMessage(data,"You chose "+ ChatColor.AQUA+weapon+" !");
 			e.getWhoClicked().closeInventory();
 		}
 	}
@@ -77,7 +91,7 @@ public class InvMenu implements Listener {
 	public Inventory openMenu() {
 		Inventory inv = Bukkit.createInventory(null, 9, selectinv);
 
-		ItemStack shooter = new ItemStack(Material.WOOD_HOE);
+		ItemStack shooter = new ItemStack(Material.WOODEN_HOE);
 		ItemMeta shootermeta = shooter.getItemMeta();
 		shootermeta.setDisplayName(ChatColor.GREEN+"Shooter");
 		shootermeta.setLore(getDescriptionLore(WeaponType.Shooter));
@@ -95,9 +109,16 @@ public class InvMenu implements Listener {
 		chargermeta.setLore(getDescriptionLore(WeaponType.Charger));
 		charger.setItemMeta(chargermeta);
 
-		inv.setItem(1, shooter);
-		inv.setItem(4, roller);
-		inv.setItem(7, charger);
+		ItemStack blaster = new ItemStack(Material.GOLDEN_HOE);
+		ItemMeta blastermeta = blaster.getItemMeta();
+		blastermeta.setDisplayName(ChatColor.RED+"Blaster");
+		blastermeta.setLore(getDescriptionLore(WeaponType.Blaster));
+		blaster.setItemMeta(blastermeta);
+
+		inv.setItem(0, shooter);
+		inv.setItem(2, roller);
+		inv.setItem(4, charger);
+		inv.setItem(6, blaster);
 
 		return inv;
 	}
@@ -106,8 +127,10 @@ public class InvMenu implements Listener {
 		Inventory inv = Bukkit.createInventory(null, 9, selectweapon);
 		int i = 0;
 		for(WeaponData weapon : getPlayerWeapons(player)) {
+			//System.out.println(weapon.getName());
 			if(!weapon.getType().equals(type))
 				continue;
+			//System.out.println(weapon.getName()+"is type");
 			ItemStack item = new ItemStack(weapon.getItemtype());
 			ItemMeta meta = item.getItemMeta();
 			meta.setDisplayName(weapon.getName());

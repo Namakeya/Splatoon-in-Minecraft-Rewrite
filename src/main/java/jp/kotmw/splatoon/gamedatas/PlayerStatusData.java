@@ -24,6 +24,8 @@ public class PlayerStatusData extends PlayerFiles {
 	private int totalpaint;
 	private List<String> weapons = new ArrayList<String>();
 
+	private String currentWeapon;
+
 	public PlayerStatusData(String uuid, FileConfiguration file) {
 		this.uuid = uuid;
 		this.name = file.getString("Name");
@@ -37,6 +39,15 @@ public class PlayerStatusData extends PlayerFiles {
 		this.totalexp = file.getDouble("Status.TotalExp");
 		this.totalpaint = file.getInt("Status.TotalPaint");
 		this.weapons = file.getStringList("Status.Weapons");
+		this.currentWeapon=file.getString("Status.CurrentWeapon");
+	}
+
+	public String getCurrentWeapon() {
+		return currentWeapon;
+	}
+
+	public void setCurrentWeapon(String currentWeapon) {
+		this.currentWeapon = currentWeapon;
 	}
 
 	public String getUuid() {

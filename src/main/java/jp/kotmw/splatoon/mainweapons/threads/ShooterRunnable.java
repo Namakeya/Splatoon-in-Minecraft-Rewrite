@@ -34,6 +34,7 @@ public class ShooterRunnable extends BukkitRunnable {
 				return;
 			Shooter.shoot(data);
 		} else {
+			this.cancel();
 			if(data.isPaint())
 				data.setPaint(false);
 		}
