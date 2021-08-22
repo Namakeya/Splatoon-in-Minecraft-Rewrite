@@ -104,7 +104,7 @@ public class SquidMode implements Listener {
 				1,
 				0).sendParticle(player);*/
 	}
-
+/*
 	@EventHandler
 	public void onItemHeld(PlayerItemHeldEvent e) {
 		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
@@ -113,7 +113,7 @@ public class SquidMode implements Listener {
 			return;
 		if(e.getNewSlot() < 3)
 			e.setCancelled(true);
-	}
+	}*/
 
 	private void spawnSquid(Player player) {
 		PlayerData data = DataStore.getPlayerData(player.getName());
@@ -155,16 +155,16 @@ public class SquidMode implements Listener {
 
 	public static void toSquid(Player player,PlayerData data,boolean doFlight){
 		player.addPotionEffect(invisible);
-		player.getInventory().setHeldItemSlot(3);
+		//player.getInventory().setHeldItemSlot(3);
 
 		data.setSquidMode(true);
-		player.getInventory().setItem(EquipmentSlot.HEAD,null);
 		if(doFlight && SplatColorManager.isTargetBlockTeamColor(player)) {
 			data.setClimb(true);
 			player.setAllowFlight(true);
 			player.setFlying(true);
 			player.setFlySpeed(0.08f);
 		}
+		MainGame.setSquidInv(data);
 	}
 
 	public static void toMan(Player player,PlayerData data){
@@ -176,13 +176,13 @@ public class SquidMode implements Listener {
 		data.setClimb(false);
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		player.getInventory().setHeldItemSlot(0);
+		//player.getInventory().setHeldItemSlot(0);
 		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 		player.removePotionEffect(PotionEffectType.SPEED);
 		player.setFoodLevel(4);
 		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		SplatColor color=arena.getSplatColor(data.getTeamid());
-		player.getInventory().setItem(EquipmentSlot.HEAD, GameItems.getHelmetItem(weapon,color));
+		MainGame.setInv(data);
 	}
 }

@@ -3,6 +3,7 @@ package jp.kotmw.splatoon.gamedatas;
 import org.bukkit.Material;
 
 import jp.kotmw.splatoon.gamedatas.DataStore.BombType;
+import org.bukkit.entity.Creeper;
 
 public class SubWeaponData {
 	private String name;
@@ -11,19 +12,22 @@ public class SubWeaponData {
 	private double maxdamage;
 	private double mindamage;
 	private double critical;
+	private double explRadius;
 	private float cost;
 	private int cooltime;
 
-	public SubWeaponData(String name, Material material, BombType bombtype, double maxdamage, double mindamage, double critical, double ink, int inkcooltime) {
+	public SubWeaponData(String name, Material material, BombType bombtype, double maxdamage, double mindamage,double critical, double explRadius, double ink, int inkcooltime) {
 		this.name = name;
 		this.itemtype = material;
 		this.type = bombtype;
 		this.maxdamage = maxdamage;
 		this.mindamage = mindamage;
 		this.critical = critical;
+		this.explRadius=explRadius;
 		this.cost = (float) (ink/100);
 		this.cooltime = inkcooltime;
 	}
+	public double getExplRadius() {return explRadius;}
 
 	public String getName() {return name;}
 	public Material getItemtype() {return itemtype;}

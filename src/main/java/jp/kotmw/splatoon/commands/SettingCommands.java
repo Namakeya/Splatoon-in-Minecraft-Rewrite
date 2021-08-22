@@ -121,7 +121,7 @@ public class SettingCommands extends CommandLib {
 				if(StageFiles.AlreadyCreate(name)) {
 					sendPMsgs(ChatColor.RED+"そのステージは既に存在します"
 					,ChatColor.GREEN+"ステージ範囲の再設定をしたい場合は "
-					+ChatColor.YELLOW+"/splatsetting "+name+" editmode"+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
+					+ChatColor.YELLOW+"/splatsetting editmode "+name+" "+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
 					return false;
 				}
 				if(name.getBytes().length > 16) {
@@ -155,7 +155,7 @@ public class SettingCommands extends CommandLib {
 				if(StageFiles.AlreadyCreate(name) && DataStore.getArenaData(name).isStatus()) {
 					sendPMsg(ChatColor.RED + "そのステージは既に有効化されています");
 					sendPMsg(ChatColor.GREEN + "エリア範囲の再設定をしたい場合は "
-					+ChatColor.YELLOW+"/splatsetting "+name+" editmode"+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
+					+ChatColor.YELLOW+"/splatsetting editmode "+name+" "+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
 					return false;
 				}
 				WorldEditPlugin worldEdit = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
@@ -248,7 +248,7 @@ public class SettingCommands extends CommandLib {
 				}
 				ArenaData data = DataStore.getArenaData(name);
 				if(!data.isStatus()) {
-					sendPMsg(ChatColor.RED+"再有効化の場合は /splatsetting "+name+" finishのコマンドを実行してください");
+					sendPMsg(ChatColor.RED+"再有効化の場合は /splatsetting finish "+name+" のコマンドを実行してください");
 					return false;
 				}
 				data.setStatus(false);
@@ -339,7 +339,7 @@ public class SettingCommands extends CommandLib {
 				if(StageFiles.AlreadyCreate(name) && DataStore.getArenaData(name).isStatus()) {
 					sendPMsg(ChatColor.RED + "そのステージは既に有効化されています");
 					sendPMsg(ChatColor.GREEN + "スポーン地点の再設定をしたい場合は "
-					+ChatColor.YELLOW+"/settingfiles "+name+" editmode"+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
+					+ChatColor.YELLOW+"/settingfiles editmode "+name+" "+ChatColor.GREEN+"のコマンドを使用してステージを無効化してからsetarenaのコマンドを再実行してください");
 					return false;
 				}
 				if(!NumberUtils.isNumber(args[2].replaceAll("@", ""))

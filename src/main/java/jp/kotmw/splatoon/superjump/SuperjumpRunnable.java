@@ -54,6 +54,13 @@ public class SuperjumpRunnable extends BukkitRunnable {
     public void run() {
         Player pe=Bukkit.getPlayer(playerData.getName());
         Vector diff=this.destination.clone().subtract(startpoint).toVector();
+        if(DataStore.getArenaData(playerData.getArena()).getGameStatus() != DataStore.GameStatusEnum.INGAME){
+            pe.setInvulnerable(false);
+            playerData.setSuperjumpStatus(0);
+            marker.remove();
+            this.cancel();
+            return;
+        }
         if(playerData.getSuperjumpStatus() == 1){
 
 
@@ -97,6 +104,8 @@ public class SuperjumpRunnable extends BukkitRunnable {
             marker.setHelmet(itembanner);
             playerData.setSuperjumpStatus(2);
 
+            pe.setInvulnerable(true);
+
             pe.playSound(pe.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH,1,1);
             pe.playSound(pe.getLocation(), Sound.ENTITY_GENERIC_EXPLODE,0.5f,1);
         }else if(playerData.getSuperjumpStatus() == 2){
@@ -124,6 +133,7 @@ public class SuperjumpRunnable extends BukkitRunnable {
             this.calculatePos(pe);
             if(this.idealPosition.getY()<destination.getY()
             ||tick>200) {
+                pe.setInvulnerable(false);
                 destination.setDirection(pe.getLocation().getDirection());
                 pe.teleport(destination.clone());
                 playerData.setSuperjumpStatus(0);

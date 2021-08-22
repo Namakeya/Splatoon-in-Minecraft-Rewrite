@@ -44,7 +44,7 @@ public class ChargerBulletRunnable extends BukkitRunnable {
         PlayerData data = DataStore.getPlayerData(playerName);
         WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
         SplatColor color = DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid());
-        this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,bullet.getLocation(),5, MaterialUtil.fromColorIdToWool(color.getColorID()).createBlockData());
+
         double speed=bullet.getVelocity().length();
         if(speed>weapon.getAirResistance()){
             bullet.setVelocity(bullet.getVelocity().multiply((speed-weapon.getAirResistance())/speed));
@@ -65,9 +65,17 @@ public class ChargerBulletRunnable extends BukkitRunnable {
                 for(int i=0;i<n;i++){
                     Location loc=bullet.getLocation().subtract(bullet.getVelocity().multiply((double)i/n));
                     Paint.UnderCylinderPaint(loc , radius*charge/fullcharge,4, data);
+                    this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,loc,2,
+                            MaterialUtil.fromColorIdToWool(color.getColorID()).createBlockData());
+                    this.bullet.getWorld().spawnParticle(Particle.REDSTONE,loc,2,
+                            0.5,0.5,0.5, new Particle.DustOptions(color.getColor(),1.5f));
                 }
             }else{
                 Paint.UnderCylinderPaint(bullet.getLocation(), radius*charge/fullcharge,4, data);
+                this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,bullet.getLocation(),2,
+                        MaterialUtil.fromColorIdToWool(color.getColorID()).createBlockData());
+                this.bullet.getWorld().spawnParticle(Particle.REDSTONE,bullet.getLocation(),1,
+                        0.5,0.5,0.5, new Particle.DustOptions(color.getColor(),1.5f));
             }
             paintInterval= (int) (3/speed);
             paintTimer=0;

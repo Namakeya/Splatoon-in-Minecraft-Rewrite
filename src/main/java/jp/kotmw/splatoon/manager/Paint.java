@@ -32,17 +32,22 @@ public class Paint {
 			return false;
 		if(SplatColorManager.getColorID(block) == arena.getSplatColor(data.getTeamid()).getColorID())
 			return false;
-		int bonus = 0;//塗ったブロックが敵チームのカラーだったら、この変数に敵チームの番号が入る
-		for(int team = 1; team <= arena.getMaximumTeamNum(); team++)
-			if((data.getTeamid() != team) && SplatColorManager.getColorID(block) == arena.getSplatColor(team).getColorID()) {
-				bonus = team;
-				break;
-			}
+		//カーペットのみカウントする。将来的に「上が開いているブロック」という基準でカウントする可能性もあり sesamugi
+		if(MaterialUtil.isCarpet(block.getType())) {
+			int bonus = 0;//塗ったブロックが敵チームのカラーだったら、この変数に敵チームの番号が入る
+			for (int team = 1; team <= arena.getMaximumTeamNum(); team++)
+				if ((data.getTeamid() != team) && SplatColorManager.getColorID(block) == arena.getSplatColor(team).getColorID()) {
+					bonus = team;
+					break;
+				}
+
+			addScore(data, (bonus != 0));//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
+			arena.addTeamScore(data.getTeamid(), bonus);//TODO ここ
+		}
 		BlockPaintEvent event = new BlockPaintEvent(block, data, arena);
 		Bukkit.getPluginManager().callEvent(event);
-		addScore(data, (bonus != 0));//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
 		addRollBack(arena, block);
-		arena.addTeamScore(data.getTeamid(), bonus);//TODO ここ
+
 		ColorChange(block, DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()));
 		return true;
 	}
@@ -108,9 +113,9 @@ public class Paint {
 		//boolean hollow = false;
 		int painted=0;
 		if(radius>30)return 0;
-		for(double x = center_X - radius; x <= center_X + radius ;x++)
-			for(double y = center_Y - radius; y <= center_Y + radius ;y++)
-				for(double z = center_Z - radius; z <= center_Z + radius ;z++) {
+		for(double x = center_X - radius; x <= center_X + radius +0.1 ;x++)
+			for(double y = center_Y - radius; y <= center_Y + radius +0.1 ;y++)
+				for(double z = center_Z - radius; z <= center_Z + radius +0.1 ;z++) {
 					double distance = ((center_X - x)*(center_X - x)) + ((center_Y - y)*(center_Y - y)) + ((center_Z - z)*(center_Z - z));
 					if(distance < (radius*radius)) {
 						Location l = new Location(center.getWorld(), x, y, z);
@@ -130,9 +135,9 @@ public class Paint {
 		//boolean hollow = false;
 		int painted=0;
 		if(radius>30)return 0;
-		for(double x = center_X - radius; x <= center_X + radius ;x++)
-			for(double y = center_Y - height; y <= center_Y ;y++)
-				for(double z = center_Z - radius; z <= center_Z + radius ;z++) {
+		for(double x = center_X - radius; x <= center_X + radius +0.1 ;x++)
+			for(double y = center_Y - height; y <= center_Y +0.1 ;y++)
+				for(double z = center_Z - radius; z <= center_Z + radius +0.1 ;z++) {
 					double distance = ((center_X - x)*(center_X - x)) + ((center_Z - z)*(center_Z - z));
 					if(distance < (radius*radius)) {
 						Location l = new Location(center.getWorld(), x, y, z);
@@ -154,8 +159,8 @@ public class Paint {
 		//System.out.println(radius);
 		if(radius>30)return 0;
 		for(double y_ = - radius; y_ <= 0 ;y_++)
-			for(double x = center_X - radius - y_; x <= center_X + radius + y_;x++)
-				for(double z = center_Z - radius - y_; z <= center_Z + radius + y_ ;z++) {
+			for(double x = center_X - radius - y_; x <= center_X + radius +0.1 + y_;x++)
+				for(double z = center_Z - radius - y_; z <= center_Z + radius +0.1 + y_ ;z++) {
 					double y=center_Y+y_;
 
 					Location l = new Location(center.getWorld(), x, y, z);

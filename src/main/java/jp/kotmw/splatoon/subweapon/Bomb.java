@@ -27,10 +27,11 @@ import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 
+/**Unused*/
 public class Bomb implements Listener {
 
 	@EventHandler
-	public void onClick(PlayerInteractEvent e) {
+	public void onInteract(PlayerInteractEvent e) {
 		if(!DataStore.hasPlayerData(e.getPlayer().getName())
 				|| DataStore.getPlayerData(e.getPlayer().getName()).getArena() == null)
 			return;
@@ -123,6 +124,7 @@ public class Bomb implements Listener {
 	@EventHandler
 	public void onExplode(ExplosionPrimeEvent e) {
 		Entity entity = e.getEntity();
+		//Suckerbombは、ArmorStandにプレイヤーの名前を付けて管理する
 		Entity stand = entity.getVehicle();
 		if(entity.getVehicle() == null)
 			return;

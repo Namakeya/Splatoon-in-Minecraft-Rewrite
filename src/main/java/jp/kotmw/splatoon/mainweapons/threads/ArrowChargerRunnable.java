@@ -6,6 +6,7 @@ import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.mainweapons.ArrowCharger;
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import jp.kotmw.splatoon.mainweapons.Shooter;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.util.MaterialUtil;
@@ -25,18 +26,20 @@ public class ArrowChargerRunnable extends BukkitRunnable {
 
 	private String name;
 	private ItemStack weaponItem;
+	private MainWeapon mainWeapon;
 
 	private int period;
 	private int chargeTimer=10000;
 	//private String[] blockmeter = {" ▝", " ▌", "▟","█"};
 	private String[] blockmeter = {"╵", "└", "├","┼"};
 	private PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 20, 1, false, false);
-	private PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 20, 1, false, false);
+	private PotionEffect glow = new PotionEffect(PotionEffectType.GLOWING, 10, 1, false, false);
 
-	public ArrowChargerRunnable(String name, int period, ItemStack weaponItem) {
+	public ArrowChargerRunnable(String name, int period, ItemStack weaponItem,MainWeapon mainWeapon) {
 		this.name = name;
 		this.period=period;
 		this.weaponItem=weaponItem;
+		this.mainWeapon=mainWeapon;
 	}
 
 	@Override
@@ -50,7 +53,7 @@ public class ArrowChargerRunnable extends BukkitRunnable {
 		int tick = data.getTick();
 		int charge = data.getCharge();
 		Player player=Bukkit.getPlayer(data.getName());
-		//System.out.println("call");
+		//System.out.println("charge: "+charge+" timer: "+chargeTimer);
 		//System.out.println(player.getItemInUse().equals(weaponItem));
 		if(player.getItemInUse()!=null && player.getItemInUse().equals(weaponItem)) {
 			//System.out.println("charge");
@@ -73,24 +76,30 @@ public class ArrowChargerRunnable extends BukkitRunnable {
 				}
 				sendCharge(data, charge);
 				//Bukkit.getPlayer(data.getName()).addPotionEffect(slow);
-				player.addPotionEffect(glow);
+
 				chargeTimer=0;
 			}else{
 				chargeTimer++;
 			}
+			if(charge==fullcharge){
+				player.addPotionEffect(glow);
+			}
 
 		}else {
 
-			float ink=player.getExp() - weapon.getCost()*charge/fullcharge;
-			if (ink < 0) {
-				ink=0;
+			if(charge>0) {
+				float ink = player.getExp() - weapon.getCost() * charge / fullcharge;
+				if (ink < 0) {
+					ink = 0;
+				}
+
+				player.setExp(ink);
+				//System.out.println(charge);
+				mainWeapon.shoot(data);
+
+				sendCharge(data, 0);
+
 			}
-
-			player.setExp(ink);
-
-			ArrowCharger.shoot(data);
-
-			sendCharge(data, 0);
 			this.cancel();
 			return;
 		}

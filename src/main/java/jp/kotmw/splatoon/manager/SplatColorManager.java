@@ -2,6 +2,7 @@ package jp.kotmw.splatoon.manager;
 
 import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
@@ -43,10 +44,9 @@ public class SplatColorManager {
 	 * 
 	 * @return チームカラーかどうか
 	 */
-	public static boolean isBelowBlockTeamColor(Player player, boolean myteam) {
-		PlayerData data = DataStore.getPlayerData(player.getName());
+	public static boolean isBelowBlockTeamColor(Location loc,PlayerData data, boolean myteam) {
+
 		ArenaData data2 = DataStore.getArenaData(data.getArena());
-		Location loc = player.getLocation().clone();
 		if(!MaterialUtil.isCarpet(loc.getBlock().getType()))
 			loc.add(0, -1, 0);
 		int belowColorID = getColorID(loc.getBlock());
@@ -62,9 +62,14 @@ public class SplatColorManager {
 		return false;
 	}
 
+	public static boolean isBelowBlockTeamColor(Player player, boolean myteam) {
+		return isBelowBlockTeamColor(player.getLocation(),DataStore.getPlayerData(player.getName()),myteam);
+	}
+
 	public static boolean isTargetBlockTeamColor(Player p) {
 		PlayerData data = DataStore.getPlayerData(p.getName());
-		return SplatColorManager.getColorID(getTargetBlock(p)) ==
+		Block b=getTargetBlock(p);
+		return  !MaterialUtil.isCarpet(b.getType()) && SplatColorManager.getColorID(getTargetBlock(p)) ==
 				DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()).getColorID();
 	}
 

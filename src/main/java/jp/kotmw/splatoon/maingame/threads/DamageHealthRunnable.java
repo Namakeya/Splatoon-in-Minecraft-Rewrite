@@ -28,10 +28,13 @@ public class DamageHealthRunnable extends BukkitRunnable {
 		}
 		PlayerData data = DataStore.getPlayerData(name);
 		Player player = Bukkit.getPlayer(name);
+
+
 		if(SplatColorManager.isBelowBlockTeamColor(player, true)) {
-			double health=player.getHealth()+3.0;
-			health=health<20?health:20;
+
 			if(player.getHealth() < 20.0 && data.isSquidMode()){
+				double health=player.getHealth()+3.0;
+				health=health<20?health:20;
 				player.setHealth(health);
 			}
 		}

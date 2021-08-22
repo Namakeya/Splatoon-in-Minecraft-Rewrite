@@ -20,7 +20,7 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.Random;
-
+/** One class = One instance = Few types of mainweapons (may also multiple users)*/
 public abstract class MainWeapon implements Listener {
 
 	public String bulletname;
@@ -86,7 +86,8 @@ public abstract class MainWeapon implements Listener {
 				//System.out.println("buletname: "+bulletname);
 			}
 			if (projectile.getShooter() instanceof Player
-					&& projectile.getCustomName().equalsIgnoreCase(bulletname)) {
+					&& projectile.getCustomName() !=null
+					&&projectile.getCustomName().equalsIgnoreCase(bulletname)) {
 				return true;
 			}
 		}
@@ -186,11 +187,11 @@ public abstract class MainWeapon implements Listener {
 		//if(anglediff<-1 || anglediff>1)anglediff=0;
 		double anglediff= random.nextDouble()-0.5;
 		anglediff*=angle;
-
+		//System.out.println(anglediff);
 
 		Location loc=direction.clone();
 		loc.setYaw((float) (loc.getYaw()+anglediff));
-		System.out.println(loc.getDirection());
+		//System.out.println(loc.getDirection());
 		return loc.getDirection();
 	}
 	public void shoot(PlayerData data) {}

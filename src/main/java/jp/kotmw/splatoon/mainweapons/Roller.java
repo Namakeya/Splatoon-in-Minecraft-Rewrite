@@ -27,130 +27,87 @@ import jp.kotmw.splatoon.mainweapons.threads.RollerRunnable;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.util.Polar_coodinates;
 
-public class Roller implements Listener {
+public class Roller extends MainWeapon {
 
-	public static final String bulletname="bullet_roller";
+	public Roller() {
+		super("bullet_roller", WeaponType.Roller);
+	}
 
-	@EventHandler
-	public void onInteract(PlayerInteractEvent e) {
-		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
-			return;
-		if(DataStore.getPlayerData(e.getPlayer().getName()).getArena() == null)
-			return;
-		Action action = e.getAction();
-		if(action == Action.LEFT_CLICK_AIR
-				|| action == Action.LEFT_CLICK_BLOCK
-				|| action == Action.PHYSICAL)
-			return;
-		Player player = e.getPlayer();
-		ItemStack item = player.getInventory().getItemInMainHand();
-		PlayerData data = DataStore.getPlayerData(player.getName());
-		if(DataStore.getWeapondata(data.getWeapon()).getType() != WeaponType.Roller)
-			return;
-		if(data.isAllCancel()
-				|| item == null
-				|| item.getType() != DataStore.getWeapondata(data.getWeapon()).getItemtype()
-				|| !item.hasItemMeta()
-				|| item.getItemMeta().getLore().size() < 5
-				|| !item.getItemMeta().getDisplayName().equalsIgnoreCase(data.getWeapon()))
-			return;
-		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
-		if(player.getExp() < weapon.getInkSplashCost()) {
-			MainGame.sendActionBar(data, ChatColor.RED+"インクがありません!");
+	@Override
+	public void doOnInteract(PlayerInteractEvent e, PlayerData pd, Player pe) {
+		WeaponData weapon = DataStore.getWeapondata(pd.getWeapon());
+		if(pe.getExp() < weapon.getInkSplashCost()) {
+			MainGame.sendActionBar(pd, ChatColor.RED+"インクがありません!");
 			return;
 		}
-		if(data.getTask() == null) {
-			BukkitRunnable task = new RollerRunnable(player.getName());
+		if(pd.getTask() == null) {
+			BukkitRunnable task = new RollerRunnable(pe.getName(),this);
 			task.runTaskTimer(Main.main, 0, 1);
-			data.setTask(task);
+			pd.setTask(task);
 		}
-		data.setTick(5);
-		player.setExp((float) (player.getExp()-weapon.getInkSplashCost()));
-		if(!data.isPaint()) {
-			data.setPaint(true);
+		//System.out.println("tick : "+pd.getTick());
+		if(pd.getTick()<5){
+			pd.setTick(weapon.getFirespeed()+5);
+			shoot(pd);
+			pe.setExp((float) (pe.getExp()-weapon.getInkSplashCost()));
+			pe.getWorld().playSound(pe.getLocation(), weapon.getSoundId(), SoundCategory.PLAYERS, weapon.getSoundVolume(), weapon.getSoundPitch());
+
+		}
+
+		if(!pd.isPaint()) {
+			pd.setPaint(true);
 			//p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 2, 5));
-			player.getWorld().playSound(player.getLocation(),weapon.getSoundId(), SoundCategory.PLAYERS,weapon.getSoundVolume(),weapon.getSoundPitch());
-			RollerSplash(player, weapon);
-			/*
-			Color color = DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()).getColor();
-			Location location = player.getLocation();
-			float yaw = -player.getLocation().getYaw();
-			Polar_coodinates pc, pc2 = new Polar_coodinates(player.getWorld(), 2, Math.toRadians(yaw), 0);
-			for(double i = -weapon.getRadius()/2; i <= weapon.getRadius()/2; i+=0.5) {
-				for(int j = 0; j <= 1; j++) {
-					pc = new Polar_coodinates(player.getWorld(), i, Math.toRadians(yaw)+(Math.PI/2), 0);
-					Location judgeloc = location.clone().add(0, j-0.5, 0).add(pc2.convertLocation()).add(pc.convertLocation());
-					Paint.PaintWool(data, judgeloc.getBlock());
-					MainGame.Damager(data, judgeloc, DataStore.getWeapondata(data.getWeapon()).getDamage());
-					player.getWorld().spawnParticle(Particle.REDSTONE,judgeloc,1,
-							0.5,0.5,0.5, new Particle.DustOptions(color,1.0f));
-				}
-			}*/
+
 		}
 	}
-	
-	/*@EventHandler
-	public void onInteract2(PlayerInteractEvent e) {
-		Action action = e.getAction();
-		if(action == Action.LEFT_CLICK_AIR
-				|| action == Action.LEFT_CLICK_BLOCK
-				|| action == Action.PHYSICAL)
-			return;
-		Player player = e.getPlayer();
-		Location location = player.getLocation();
-		float yaw = -player.getLocation().getYaw();
-		Polar_coodinates pc, pc2 = new Polar_coodinates(player.getWorld(), 2, Math.toRadians(yaw), 0);
-		for(double i = -2.5; i <= 2.5; i+=0.5) {
-			for(int j = 0; j <= 1; j++) {
-				pc = new Polar_coodinates(player.getWorld(), i, Math.toRadians(yaw)+(Math.PI/2), 0);
-				new ParticleAPI.Particle(EnumParticle.REDSTONE, 
-						location.clone().add(0, j-0.5, 0).add(pc2.convertLocation()).add(pc.convertLocation()),
-						0.1f, 
-						0.1f, 
-						0.1f, 
-						1,
-						0).sendParticle(player);
+
+	@Override
+	public void doOnHit(ProjectileHitEvent e, PlayerData pd, Player pe) {
+
+		WeaponData weapon=DataStore.getWeapondata(pd.getWeapon());
+		//System.out.println("radius : "+weapon.getInkSplashPaintRadius()+" decay : "+getDecayRate(e.getEntity(),weapon));
+		double radius=weapon.getInkSplashPaintRadius() * getDecayRate(e.getEntity(),weapon);
+
+		radius=radius<0.8?0.8:radius;
+		if(e.getHitBlock()!=null && SquidRunnable.isSlipBlock(e.getHitBlock().getLocation())){
+			radius+=1.5;
+		}
+		Paint.SpherePaint(e.getEntity().getLocation(),radius, pd);
+	}
+
+	public boolean checkOnMove(PlayerMoveEvent e){
+		if(getArena(e.getPlayer())!=null) {
+
+			Player player = e.getPlayer();
+			PlayerData data = DataStore.getPlayerData(player.getName());
+			//System.out.println("suitable action");
+			if (canShoot(data)) {
+				return true;
+
 			}
 		}
-	}*/
+		return false;
+	}
 
-	@EventHandler
-	public void onMove(PlayerMoveEvent e) {
-		Player player = e.getPlayer();
-		if(!DataStore.hasPlayerData(player.getName()))
-			return;
-		if(DataStore.getPlayerData(e.getPlayer().getName()).getArena() == null)
-			return;
-		PlayerData data = DataStore.getPlayerData(player.getName());
-		ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+	public void doOnMove(PlayerMoveEvent e,PlayerData data,Player pe){
 		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
-		if(weapon.getType() != WeaponType.Roller)
-			return;
-		if(data.isAllCancel()
-				|| item == null
-				|| item.getType() != weapon.getItemtype()
-				|| !item.hasItemMeta()
-				|| item.getItemMeta().getLore().size() < 5
-				|| !item.getItemMeta().getDisplayName().equalsIgnoreCase(data.getWeapon()))
-			return;
-		//if(!data.isPaint())return;
-		if(player.getExp() < weapon.getCost()) {
+		if(pe.getExp() < weapon.getCost()) {
 			MainGame.sendActionBar(data, ChatColor.RED+"インクがありません!");
 			return;
 		}
-		player.setExp((float) (player.getExp()-weapon.getCost()));
+		pe.setExp((float) (pe.getExp()-weapon.getCost()));
 		Color color = DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()).getColor();
-		Location location = player.getLocation();
-		float yaw = -player.getLocation().getYaw();
-		Polar_coodinates pc, pc2 = new Polar_coodinates(player.getWorld(), weapon.getRadius()/2, Math.toRadians(yaw), 0);
+		Location location = pe.getLocation();
+		float yaw = -pe.getLocation().getYaw();
+		Polar_coodinates pc, pc2 = new Polar_coodinates(pe.getWorld(), weapon.getRadius()/2, Math.toRadians(yaw), 0);
 		for(double i = -weapon.getRadius()/2; i <= weapon.getRadius()/2; i+=0.5) {
 			for(int j = 0; j <= 1; j++) {
-				pc = new Polar_coodinates(player.getWorld(), i, Math.toRadians(yaw)+(Math.PI/2), 0);
+				pc = new Polar_coodinates(pe.getWorld(), i, Math.toRadians(yaw)+(Math.PI/2), 0);
 				Location judgeloc = location.clone().add(0, j-0.5, 0).add(pc2.convertLocation()).add(pc.convertLocation());
 				Paint.PaintWool(data, judgeloc.getBlock());
 				MainGame.Damager(data, judgeloc, DataStore.getWeapondata(data.getWeapon()).getDamage());
 
-				player.getWorld().spawnParticle(Particle.REDSTONE,judgeloc,1,
+				pe.getWorld().spawnParticle(Particle.REDSTONE,judgeloc,1,
 						0.5,0.5,0.5, new Particle.DustOptions(color,1.0f));
 
 			}
@@ -158,90 +115,62 @@ public class Roller implements Listener {
 	}
 
 	@EventHandler
-	public void onHit(ProjectileHitEvent e) {
-		if(!(e.getEntity() instanceof Snowball)
-				|| !(e.getEntity().getShooter() instanceof Player)
-				|| !(e.getEntity().getCustomName().equalsIgnoreCase(bulletname)))
-			return;
-		Player player = (Player) e.getEntity().getShooter();
-		if(!DataStore.hasPlayerData(player.getName()))
-			return;
-		if(DataStore.getPlayerData(player.getName()).getArena() == null)
-			return;
+	public void onMove(PlayerMoveEvent e) {
+		Player player = e.getPlayer();
+
 		PlayerData data = DataStore.getPlayerData(player.getName());
-		if(DataStore.getWeapondata(data.getWeapon()).getType() != WeaponType.Roller)
-			return;
-		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
 
-		double radius=weapon.getInkSplashPaintRadius() * getDecayRate(e.getEntity(),weapon);
-
-		radius=radius<0.8?0.8:radius;
-		if(e.getHitBlock()!=null && SquidRunnable.isSlipBlock(e.getHitBlock().getLocation())){
-			radius+=1.5;
+		//if(!data.isPaint())return;
+		if(this.checkOnMove(e)){
+			doOnMove(e,data,player);
 		}
-		Paint.SpherePaint(e.getEntity().getLocation(),radius, data);
+
 	}
 
-	@EventHandler
-	public void onDamage(EntityDamageByEntityEvent e) {
-		//System.out.println("call");
-		if(e.getDamager() instanceof Snowball
-				&& e.getDamager().getCustomName()!=null
-				&& (e.getDamager().getCustomName().equalsIgnoreCase(bulletname))
-				&&(e.getEntity() instanceof Player || e.getEntity() instanceof Creeper)) {
-			Snowball ball = (Snowball) e.getDamager();
-			//System.out.println("call2");
-			if(!(ball.getShooter() instanceof Player))
-				return;
-			//System.out.println("call3");
-			Player shooter = (Player) ball.getShooter();
-			if(e.getEntity() instanceof Player) {
-				Player player = (Player) e.getEntity();
-				if (!DataStore.hasPlayerData(shooter.getName())
-						|| player.getName() == shooter.getName()
-						|| DataStore.getPlayerData(player.getName()).getTeamid() == DataStore.getPlayerData(shooter.getName()).getTeamid())
-					return;
-			}
-			//System.out.println("call4");
-			WeaponData data = DataStore.getWeapondata(DataStore.getPlayerData(shooter.getName()).getWeapon());
-			if(data.getType() != WeaponType.Roller)
-				return;
-			//System.out.println("call5");
-			e.setDamage(data.getInkSplashDamage()*getDecayRate(ball,data));
-			((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
-
-
-		}
+	@Override
+	public void doOnDamage(EntityDamageByEntityEvent e, PlayerData pd, Player pe) {
+		Projectile ball= (Projectile) e.getDamager();
+		WeaponData data = DataStore.getWeapondata(pd.getWeapon());
+		//System.out.println("call5");
+		e.setDamage(data.getInkSplashDamage()*getDecayRate(ball,data));
+		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 	}
 
-	public static void RollerSplash(Player player, WeaponData weapon) {
+	@Override
+	public void shoot(PlayerData pd) {
+		WeaponData weapon=DataStore.getWeapondata(pd.getWeapon());
+		Player player=Bukkit.getPlayer(pd.getName());
 		for(int i = 0; i<weapon.getInkSplash(); i++) {
 			Location loc=player.getLocation().clone();
 			loc.setYaw(loc.getYaw()+(float)weapon.getInkSplashAngle()*((float)i/weapon.getInkSplash()-0.5f));
-			loc.setPitch(-15);
+			float pitch;
+			if(loc.getPitch()>30){
+				pitch=30;
+			}else if(loc.getPitch()<-20){
+				pitch=-20;
+			}else{
+				pitch=loc.getPitch();
+			}
+			//System.out.println(pitch);
+			loc.setPitch(pitch);
 			Vector direction = loc.getDirection().multiply(weapon.getSpeed());
-			Snowball ball = player.launchProjectile(Snowball.class);
+			Location loc2=player.getLocation().clone();
+			loc2.setPitch(0);
+			loc2=loc2.add(0,2.5,0);
+			Snowball ball=player.getWorld().spawn(loc2,Snowball.class);
 
 			ball.setVelocity(direction);
 			ball.setShooter(player);
 			ball.setCustomName(bulletname);
-			Location loc2=player.getLocation().clone();
-			loc2.setPitch(0);
-			loc2.add(0,2,0);
-			ball.teleport(loc2, PlayerTeleportEvent.TeleportCause.PLUGIN);
-			BukkitRunnable task = new RollerBulletRunnable(player.getName(),ball);
+
+			BukkitRunnable task = new RollerBulletRunnable(player.getName(),ball,this);
 			task.runTaskTimer(Main.main, 0, 1);
-			//System.out.println(loc2);
+			//System.out.println(ball.getLocation());
 
 		}
 	}
 
 
-	public static double getDecayRate(Projectile ball, WeaponData weapon){
-		if(weapon.getFlyDecayTick()==0)return 1;
-		double decay=1-((ball.getTicksLived()-weapon.getFlyDecayTick())*weapon.getFlyDecayRatio()/100);
-		return decay<0?0:decay;
-	}
 
 	public static int PlayerDirectionID_Eight(Float dir) {
 		int id = -1;

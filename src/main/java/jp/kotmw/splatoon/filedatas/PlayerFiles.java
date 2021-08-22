@@ -88,6 +88,7 @@ public class PlayerFiles extends PluginFiles{
 		file.set("Status.Exp", data.getExp());
 		file.set("Status.TotalExp", data.getTotalexp());
 		file.set("Status.TotalPaint", data.getTotalPaint());
+		file.set("Status.CurrentWeapon", data.getCurrentWeapon());
 		SettingFiles(file, DirFile(filedir, data.getUuid()));
 	}
 }

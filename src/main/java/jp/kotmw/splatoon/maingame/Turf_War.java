@@ -52,7 +52,7 @@ public class Turf_War {
 					Block aboveBlock = world.getBlockAt(x, (y+1), z);
 					if(block.getType() != Material.AIR
 							&& isAbobe(aboveBlock.getLocation()))
-						if(MaterialUtil.isCarpet(block.getType()))
+						if(MaterialUtil.isPaintable(block.getType()))
 							count++;
 				}
 			}
@@ -75,11 +75,12 @@ public class Turf_War {
 						Block block = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y, z);
 						Block aboveBlock = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y+1, z);
 						if(block.getType() != Material.AIR
-								&& isAbobe(aboveBlock.getLocation())) {
+								&& isAbobe(aboveBlock.getLocation()) && MaterialUtil.isPaintable(block.getType())) {
+
 							int colorID = SplatColorManager.getColorID(Bukkit.getWorld(data.getWorld()).getBlockAt(x, y, z));
 							if(colorID == 0)
 								continue;
-							int team = data.getColorTeam(colorID);
+							int team = data.getTeamFromColor(colorID);
 							if(team == 0)
 								continue;
 							teamresult[team-1]++;
@@ -94,8 +95,8 @@ public class Turf_War {
 			//////////////////////////////////////////////////////////////////
 			//後に多分この範囲全部消して、戦闘中に集計するようにしていくと思うかな・・・？
 			//ただ若干の負荷が不安
-			//不明ですがおそらくすでにやってあった sesamugi
 		}
+		//TODO 上で集計したresultをここで書き換えているので上の集計は無意味？ sesamugi
 		result = data.getScores();
 		shiftScore();
 		BukkitRunnable task = null;

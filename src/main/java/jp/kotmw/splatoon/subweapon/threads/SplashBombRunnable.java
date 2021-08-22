@@ -26,8 +26,8 @@ public class SplashBombRunnable extends BukkitRunnable {
 		}
 		if(tick == 0) {
 			SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
-			Paint.SpherePaint(bomb.getLocation(), 4, data);
-			MainGame.SphereDamager(data, bomb.getLocation(), subweapon, 4, false);
+			Paint.SpherePaint(bomb.getLocation(), subweapon.getExplRadius(), data);
+			MainGame.SphereDamager(data, bomb.getLocation(), subweapon, subweapon.getExplRadius(), false);
 			this.cancel();
 		}
 	}

@@ -3,7 +3,8 @@ package jp.kotmw.splatoon.mainweapons.threads;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 
-import org.bukkit.Bukkit;
+import jp.kotmw.splatoon.gamedatas.WeaponData;
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -11,9 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class RollerRunnable extends BukkitRunnable {
 
 	String name;
+	MainWeapon mainWeapon;
 
-	public RollerRunnable(String name) {
+	public RollerRunnable(String name,MainWeapon weapon) {
 		this.name = name;
+		this.mainWeapon =weapon;
 	}
 
 	@Override
@@ -32,15 +35,16 @@ public class RollerRunnable extends BukkitRunnable {
 		if(tick > 0) {
 			if(!data.isPaint()) {
 				data.setPaint(true);
-				Bukkit.getPlayer(name).addPotionEffect(potion);
+				//Bukkit.getPlayer(name).addPotionEffect(potion);
 			}
 			tick--;
 			data.setTick(tick);
 		} else {
 			if(data.isPaint()) {
 				data.setPaint(false);
-				Bukkit.getPlayer(name).removePotionEffect(PotionEffectType.SLOW);
+				//Bukkit.getPlayer(name).removePotionEffect(PotionEffectType.SLOW);
 			}
 		}
+
 	}
 }

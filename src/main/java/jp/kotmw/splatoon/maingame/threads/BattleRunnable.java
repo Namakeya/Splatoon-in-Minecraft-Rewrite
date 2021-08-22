@@ -1,6 +1,5 @@
 package jp.kotmw.splatoon.maingame.threads;
 
-import jp.kotmw.splatoon.util.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -19,18 +18,17 @@ import jp.kotmw.splatoon.gamedatas.DataStore.GameStatusEnum;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.maingame.SplatZones;
-import org.bukkit.util.Vector;
 
 public class BattleRunnable extends BukkitRunnable {
 
-	private ArenaData data;
+	private ArenaData arenaData;
 	private int tick;
 	private int second;
 	private BattleType type;
 	private String main, sub;
 
 	public BattleRunnable(ArenaData data, int second, BattleType type) {
-		this.data = data;
+		this.arenaData = data;
 		this.tick = (second+10)*20;
 		this.second = second;
 		this.type = type;
@@ -57,9 +55,14 @@ public class BattleRunnable extends BukkitRunnable {
 	public void run() {
 		//System.out.println("call");
 		if(tick > 0) {
+			for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
+				if (data.getSubCooldown() > 0) {
+					data.setSubCooldown(data.getSubCooldown() - 1);
+				}
+			}
 			if(tick%20 == 0) {
 				if(tick > (second+5)*20) {//転送後のTitle表示
-					for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName())) {
+					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						MainGame.sendTitle(data, 0, 2, 0, main, sub);
 						Player player=Bukkit.getPlayer(data.getName());
 						player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1,2f);
@@ -67,20 +70,20 @@ public class BattleRunnable extends BukkitRunnable {
 
 				} else if(tick <= (second+5)*20&&tick > second*20) {//カウントダウン
 					int count = tick/20-second;
-					for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName())) {
+					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						MainGame.sendTitle(data,
 								0,
 								2,
 								0,
 								ChatColor.WHITE+"["+count+"]   >>> Ready? <<<   ["+count+"]",
-								this.data.getSplatColor(data.getTeamid()).getChatColor()+"[味方カラー]");
-						MainGame.sendActionBarforTeam(this.data, getColorText(data.getTeamid()), data.getTeamid());
+								this.arenaData.getSplatColor(data.getTeamid()).getChatColor()+"[味方カラー]");
+						MainGame.sendActionBarforTeam(this.arenaData, getColorText(data.getTeamid()), data.getTeamid());
 						Player player=Bukkit.getPlayer(data.getName());
 						player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING,1,1.5f);
 					}
 
 				} else if(tick == second*20) {//戦闘開始
-					for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName())) {
+					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						data.setMove(true);
 						data.setAllCansel(false);
 						MainGame.sendTitle(data, 0, 2, 0, ChatColor.WHITE.toString()+ChatColor.BOLD+"GO!", " ");
@@ -102,48 +105,48 @@ public class BattleRunnable extends BukkitRunnable {
 				}
 				//ここでスパジャンチャットを送る
 				if(tick <= second*20) {
-					data.getScoreboard().changeTime(tick);
-					data.getSuperjump().setSuperjumpItems();
+					arenaData.getScoreboard().changeTime(tick);
+					arenaData.getSuperjump().setSuperjumpItems();
 					if((tick/20)%60 == 0)
-						MainGame.sendMessageforArena(data.getName(), ChatColor.YELLOW+"残り時間 "+ChatColor.AQUA.toString()+ChatColor.BOLD+(tick/20)/60+ChatColor.YELLOW+" 分");
+						MainGame.sendMessageforArena(arenaData.getName(), ChatColor.YELLOW+"残り時間 "+ChatColor.AQUA.toString()+ChatColor.BOLD+(tick/20)/60+ChatColor.YELLOW+" 分");
 					if(tick/20 <= 10) {
-						for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName()))
+						for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName()))
 							MainGame.sendTitle(data, 0, 2, 0, ChatColor.GRAY.toString()+ChatColor.BOLD+tick/20, " ");
 					}
 				}
 			}
 			if(type == BattleType.Splat_Zones) {
 				if(tick%10 == 0)
-					((SplatZones)data.getBattleClass()).checkArea();
-				int team1_count = data.getTeam1_count().getcount();
-				int team2_count = data.getTeam2_count().getcount();
+					((SplatZones) arenaData.getBattleClass()).checkArea();
+				int team1_count = arenaData.getTeam1_count().getcount();
+				int team2_count = arenaData.getTeam2_count().getcount();
 				if(team1_count == 0 || team2_count == 0) {
 					ResetPlayerData();
-					for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName())) {
+					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						MainGame.sendTitle(data, 0, 2, 0, ChatColor.GRAY.toString()+ChatColor.BOLD+"Finish!", " ");
 						MainGame.sendMessage(data, ChatColor.RED+"開発途中のため、リザルトはスキップします");
 					}
-					for(ArmorStand stand : data.getAreastands())
+					for(ArmorStand stand : arenaData.getAreastands())
 						stand.remove();
-					MainGame.end(data, true);
+					MainGame.end(arenaData, true);
 					this.cancel();
 					return;
 				}
 			}
 		} else {
-			for(PlayerData data : DataStore.getArenaPlayersList(this.data.getName())) {
+			for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 				Player player=Bukkit.getPlayer(data.getName());
 				player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE,1,1f);
 				MainGame.sendTitle(data, 1, 2, 1, ChatColor.GREEN.toString() + "～現在集計中～", ChatColor.YELLOW + "しばらくお待ち下さい|･ω･)ﾉ");
 			}
 			ResetPlayerData();
-			data.setGameStatus(GameStatusEnum.RESULT);
+			arenaData.setGameStatus(GameStatusEnum.RESULT);
 			if(type == BattleType.Turf_War)
-				data.getBattleClass().resultBattle();// ここ 直しました sesamugi
+				arenaData.getBattleClass().resultBattle();// TODO ここ 直しました sesamugi
 			else if(type == BattleType.Splat_Zones) {
-				for(ArmorStand stand : data.getAreastands())
+				for(ArmorStand stand : arenaData.getAreastands())
 					stand.remove();
-				MainGame.end(data, false);
+				MainGame.end(arenaData, false);
 			}
 			this.cancel();
 		}
@@ -152,16 +155,16 @@ public class BattleRunnable extends BukkitRunnable {
 	
 	private String getColorText(int myteam) {
 		String text = "   ";
-		for(int team = 1; team <= data.getMaximumTeamNum(); team++) {
+		for(int team = 1; team <= arenaData.getMaximumTeamNum(); team++) {
 			if(team == myteam)
 				continue;
-			text += data.getSplatColor(team).getChatColor()+"█チーム"+team+"█"+"   "+ChatColor.RESET;
+			text += arenaData.getSplatColor(team).getChatColor()+"█チーム"+team+"█"+"   "+ChatColor.RESET;
 		}
 		return text;
 	}
 
 	private void ResetPlayerData() {
-		for(PlayerData pdata : DataStore.getArenaPlayersList(data.getName())) {
+		for(PlayerData pdata : DataStore.getArenaPlayersList(arenaData.getName())) {
 			pdata.setSquidMode(false);
 			if(pdata.getPlayerSquid() != null)
 				pdata.getPlayerSquid().remove();
@@ -178,7 +181,8 @@ public class BattleRunnable extends BukkitRunnable {
 			}
 			pdata.setTask(null);
 			pdata.setSquidTask(null);
-			data.getScoreboard().hideBoard(pdata);
+			pdata.setSubCount(0);
+			arenaData.getScoreboard().hideBoard(pdata);
 			Player player = Bukkit.getPlayer(pdata.getName());
 			player.getInventory().clear();
 			player.removePotionEffect(PotionEffectType.SPEED);

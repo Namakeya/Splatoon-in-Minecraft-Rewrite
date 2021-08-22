@@ -53,12 +53,15 @@ public class SquidRunnable extends BukkitRunnable {
 
 
 		Player player = Bukkit.getPlayer(name);
+		float ink = player.getExp();
 		if((SplatColorManager.isBelowBlockTeamColor(Bukkit.getPlayer(name), true)) || data.isClimb()) {
 
-
-			float ink = player.getExp();
 			if (ink <= 0.983) {
 				player.setExp(ink + 0.016f);
+			}
+		}else{
+			if (ink <= 0.997) {
+				player.setExp(ink + 0.002f);
 			}
 		}
 		//player.setFoodLevel(2);

@@ -29,14 +29,34 @@ public class PlayerData {
 	private BukkitRunnable squidtask;
 	private BukkitRunnable healthtask;
 	private int runnableTick; //武器のRunnableのtick
-	private boolean paint = false; //ローラー使用の時の塗れる時間かどうか
+	private boolean paint = false; //ローラー使用の時の塗れる時間かどうか 現在使われておりません sesamugi
 	private boolean invincible = false; //無敵状態かどうか
 	private boolean dead = false;
 	private int charge;//チャージャーで使う
 	private int inkcooltime;
 	private int superjumpStatus;// 0:何もない 1:待機中 2:上昇中 3:下降中
 
+	private int subCooldown;//サブ武器のクールダウン期間
+
+	private int subCount;//トラップのような設置個数に制限のあるサブをいくつ置いているか
+
 	private int recoilTick;//硬直状態かどうか
+
+	public int getSubCount() {
+		return subCount;
+	}
+
+	public void setSubCount(int subCount) {
+		this.subCount = subCount;
+	}
+
+	public int getSubCooldown() {
+		return subCooldown;
+	}
+
+	public void setSubCooldown(int subCooldown) {
+		this.subCooldown = subCooldown;
+	}
 
 	public PlayerData(String name) {this.name = name;}
 

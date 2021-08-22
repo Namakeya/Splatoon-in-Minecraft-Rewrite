@@ -6,14 +6,11 @@ import java.util.List;
 
 import jp.kotmw.splatoon.gamedatas.*;
 import jp.kotmw.splatoon.util.SplatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -156,13 +153,29 @@ public class MainGame extends MessageUtil {
 		player.getInventory().setItem(0, GameItems.getWeaponItem(weapon));
 		player.getInventory().setItem(1, GameItems.getSubWeaponItem(weapon));
 		player.getInventory().setItem(EquipmentSlot.HEAD,GameItems.getHelmetItem(weapon,color));
+		/*for(int i=0;i<9;i++){
+			if(player.getInventory().getItem(i) == null){
+				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));
+			}
+		}*/
+		if(weapon.isBowItem()){
+			player.getInventory().setItem(9,new ItemStack(Material.ARROW,64));
+		}
+	}
+
+	public static void setSquidInv(PlayerData data) {
+		Player player = Bukkit.getPlayer(data.getName());
+		player.getInventory().clear();
+		if(data.getWeapon() == null)
+			data.setWeapon(DataStore.getStatusData(data.getName()).getWeapons().get(0));
+		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
+		ArenaData arena = DataStore.getArenaData(data.getArena());
+		SplatColor color=arena.getSplatColor(data.getTeamid());
+		player.getInventory().setItem(EquipmentSlot.HEAD,null);
 		for(int i=0;i<9;i++){
 			if(player.getInventory().getItem(i) == null){
 				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));
 			}
-		}
-		if(weapon.isBowItem()){
-			player.getInventory().setItem(9,new ItemStack(Material.ARROW,64));
 		}
 	}
 
@@ -280,10 +293,10 @@ public class MainGame extends MessageUtil {
 	}*/
 
 	public static void SphereDamager(PlayerData player, Location center, SubWeaponData subWeaponData, double radius, boolean crit) {
-		SphereDamager(player, center, subWeaponData.getCriticalDamage(), subWeaponData.getMaxDamage(), radius, crit);
+		SphereDamager(player, center, subWeaponData.getCriticalDamage(), subWeaponData.getMaxDamage(),subWeaponData.getMinDamage(), radius, crit);
 	}
 	
-	public static void SphereDamager(PlayerData player, Location center, double critDamage,double maxDamage, double radius, boolean crit) {
+	public static void SphereDamager(PlayerData player, Location center, double critDamage,double maxDamage,double minDamage, double radius, boolean crit) {
 		for(PlayerData data : DataStore.getArenaPlayersList(player.getArena())) {
 
 			Player target = Bukkit.getPlayer(data.getName());
@@ -295,6 +308,8 @@ public class MainGame extends MessageUtil {
 				}
 				//距離減衰式を入れる
 				damageTarget(player,target,maxDamage);
+			}else if(1.5*radius > distance && minDamage>0.1) {
+				damageTarget(player,target,minDamage);
 			}
 		}
 		Player playere = Bukkit.getPlayer(player.getName());
@@ -311,6 +326,8 @@ public class MainGame extends MessageUtil {
 					}
 					//距離減衰式を入れる
 					damageTarget(player,target,maxDamage);
+				}else if(1.5*radius > distance && minDamage>0.1) {
+					damageTarget(player,target,minDamage);
 				}
 			}
 		}
@@ -319,9 +336,10 @@ public class MainGame extends MessageUtil {
 	/**Mainly for Debugging*/
 	public static void damageTarget(PlayerData pd, LivingEntity target, double amount){
 		if(canDamage(pd,target)) {
-			System.out.println(pd.getName() + " damaged " + target.getName());
-			target.damage(amount);
+			System.out.println(pd.getName() + " dealt "+String.format("%.0f",amount)+" damage to " + target.getName());
 			target.setMaximumNoDamageTicks(1);
+			target.damage(amount);
+
 		}else{
 			System.out.println(pd.getName() + " cannot damage " + target.getName());
 		}
@@ -360,6 +378,19 @@ public class MainGame extends MessageUtil {
 			}
 		}
 		return false;
+	}
+
+	public static void fireworkExplosion(Location location, SplatColor color){
+		FireworkEffect effect=FireworkEffect.builder().withColor(color.getColor()).with(FireworkEffect.Type.BALL).build();
+
+		Firework fw = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+		FireworkMeta fwm = fw.getFireworkMeta();
+
+		fwm.addEffect(effect);
+		fw.setSilent(true);
+
+		fw.setFireworkMeta(fwm);
+		fw.detonate();
 	}
 	
 

@@ -63,7 +63,7 @@ public class Superjump{
         
             for(PlayerData pd2:DataStore.getArenaPlayersList(arenaData.getName())){
                 
-                if(pd2.getTeamid() == pd.getTeamid()){
+                if(pd2.getTeamid() == pd.getTeamid() && !pd2.getName().equals(pd.getName())){
                     slot++;
                     Player pe2= Bukkit.getPlayer(pd2.getName());
                     ItemStack playerHeadItem = new ItemStack(Material.PLAYER_HEAD);

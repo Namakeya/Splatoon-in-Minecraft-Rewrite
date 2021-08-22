@@ -2,6 +2,7 @@ package jp.kotmw.splatoon;
 
 import jp.kotmw.splatoon.commands.*;
 import jp.kotmw.splatoon.mainweapons.*;
+import jp.kotmw.splatoon.subweapon.*;
 import jp.kotmw.splatoon.superjump.SuperjumpListener;
 import org.bukkit.Material;
 import org.bukkit.plugin.PluginManager;
@@ -19,7 +20,6 @@ import jp.kotmw.splatoon.maingame.InvMenu;
 import jp.kotmw.splatoon.maingame.Listeners;
 import jp.kotmw.splatoon.maingame.SquidMode;
 import jp.kotmw.splatoon.manager.Paint;
-import jp.kotmw.splatoon.subweapon.Bomb;
 
 public class Main extends JavaPlugin{
 
@@ -46,7 +46,11 @@ public class Main extends JavaPlugin{
 		//pm.registerEvents(new Charger(), this);
 		pm.registerEvents(new ArrowCharger(), this);
 		pm.registerEvents(new Blaster(), this);
-		pm.registerEvents(new Bomb(), this);
+		//pm.registerEvents(new Bomb(), this);
+		pm.registerEvents(new QuickBomb(), this);
+		pm.registerEvents(new SplashBomb(), this);
+		pm.registerEvents(new SuckerBomb(), this);
+		pm.registerEvents(new Trap(), this);
 		//pm.registerEvents(new Barrier(), this);
 		OtherFiles.AllTemplateFileGenerator();
 		PlayerFiles.AllPlayerFileReload();

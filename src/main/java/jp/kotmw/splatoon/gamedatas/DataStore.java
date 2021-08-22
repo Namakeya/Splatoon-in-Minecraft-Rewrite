@@ -271,6 +271,6 @@ public class DataStore {
 	}
 
 	public enum BombType {
-		QuickBomb, SplashBomb, SuckerBomb
+		QuickBomb, SplashBomb, SuckerBomb , Trap
 	}
 }

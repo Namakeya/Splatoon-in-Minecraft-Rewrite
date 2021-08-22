@@ -85,9 +85,16 @@ public class Listeners implements Listener {
 		//System.out.println(e.getFoodLevel());
 		if(!(e.getEntity() instanceof Player))
 			return;
-		if(DataStore.hasPlayerData(e.getEntity().getName())){
+		PlayerData pd=DataStore.getPlayerData(e.getEntity().getName());
+		if(pd!=null){
+			ArenaData ad=DataStore.getArenaData(pd.getArena());
+			if(ad!=null){
+				if(ad.getGameStatus()==GameStatusEnum.INGAME) {
+					e.setFoodLevel(4);
+				}
+			}
 			//e.setCancelled(true);
-			e.setFoodLevel(4);
+
 		}
 			//e.setCancelled(true);
 			//e.getEntity().setFoodLevel();

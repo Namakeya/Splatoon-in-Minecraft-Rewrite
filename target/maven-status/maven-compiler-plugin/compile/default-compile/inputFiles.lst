@@ -1,17 +1,20 @@
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\threads\ResultRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\Blaster.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\SplashBomb.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\ConsoleCommands.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\SignData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\WaitRoomData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\WeaponData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\MessageUtil.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\NMSBase.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\QuickBomb.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\event\PlayerGameJoinEvent.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\threads\SprinklerRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\threads\DamageHealthRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\SettingCommands.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\GameSigns.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\ArenaData.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\SubWeapon.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\filedatas\WaitRoomFiles.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\Polar_coodinates.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\Listeners.java
@@ -19,6 +22,7 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\Location.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\SubWeaponData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\WoolColorEnum.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\threads\TrapRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\filedatas\WeaponFiles.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\event\BattleEndEvent.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\Charger.java
@@ -27,6 +31,7 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\event\ArenaStatusChangeEvent.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\manager\TeamCountManager.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\ScheduleTest.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\SuckerBomb.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\SettingCompleter.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\PlayerCompleter.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\GameItems.java
@@ -71,6 +76,7 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\Main.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\threads\ChargerRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\threads\BarrierRunnable.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\Trap.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\threads\SquidRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\manager\SplatBossBar.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\Turf_War.java

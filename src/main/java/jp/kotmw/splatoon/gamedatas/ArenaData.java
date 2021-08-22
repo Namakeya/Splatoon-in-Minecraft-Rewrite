@@ -153,7 +153,7 @@ public class ArenaData {
 		return teamcolor.get(team);
 	}
 	
-	public int getColorTeam(int colorID) {
+	public int getTeamFromColor(int colorID) {
 		for(Entry<Integer, SplatColor> colors : teamcolor.entrySet())
 			if(colors.getValue().getColorID() == colorID)
 				return colors.getKey().intValue();
@@ -269,10 +269,11 @@ public class ArenaData {
 		}
 		scores.put(team, ++param);
 		totalscore += (beforeteam != 0 ? 0.0 : 1.0);
-		bossBar.updateBar();
+		//bossBar.updateBar();
 		//負荷が怖い
 		//戦闘の最後に一気に全範囲にfor走らせてやるのに比べれば局所的な重さは軽減されると思うけど、
 		//戦闘中の平均的な重さが予想できない・・・
+		//負荷は非常に軽いです　最後に集計でも問題ないとは思いますがこちらの方がスマートなので採用しました sasamugi
 	}
 	
 	public void clearStatus() {
