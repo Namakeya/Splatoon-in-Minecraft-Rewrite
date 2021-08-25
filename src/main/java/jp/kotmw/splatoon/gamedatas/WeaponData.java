@@ -34,6 +34,9 @@ public class WeaponData {
 
 	private boolean NoGravity;
 
+	private String specialWeapon;
+	private int specialPoint;
+
 	//Shooter
 	private int Firespeed;
 	private double radius;
@@ -54,6 +57,7 @@ public class WeaponData {
 	//Blaster
 	private double ExplosionRadius;
 	private int ExplosionDamage;
+
 
 	public WeaponData(String name, FileConfiguration file) {
 		this.name = name;
@@ -92,7 +96,19 @@ public class WeaponData {
 
 		this.ExplosionDamage=file.getInt("WeaponInfo.ExplosionDamage");
 		this.ExplosionRadius=file.getDouble("WeaponInfo.ExplosionRadius");
+
+		this.specialWeapon=file.getString("WeaponInfo.SpecialWeapon","MultiMissile");
+		this.specialPoint=file.getInt("WeaponInfo.SpecialPoint",200);
 	}
+
+	public String getSpecialWeapon() {
+		return specialWeapon;
+	}
+
+	public int getSpecialPoint() {
+		return specialPoint;
+	}
+
 	public boolean NoGravity(){
 		return NoGravity;
 	}

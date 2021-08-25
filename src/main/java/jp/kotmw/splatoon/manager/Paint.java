@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.manager;
 
+import jp.kotmw.splatoon.specialweapon.SpecialWeapon;
 import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -21,8 +22,11 @@ import java.util.Map;
 
 public class Paint {
 
-	@SuppressWarnings("deprecation")
 	public static boolean PaintWool(PlayerData data, Block block) {
+		return PaintWool( data,  block, true);
+	}
+	@SuppressWarnings("deprecation")
+	public static boolean PaintWool(PlayerData data, Block block,boolean countAsSPP) {
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		if(block == null || block.getType() == Material.AIR)
 			return false;
@@ -41,7 +45,7 @@ public class Paint {
 					break;
 				}
 
-			addScore(data, (bonus != 0));//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
+			addScore(data, countAsSPP);//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
 			arena.addTeamScore(data.getTeamid(), bonus);//TODO ここ
 		}
 		BlockPaintEvent event = new BlockPaintEvent(block, data, arena);
@@ -64,6 +68,24 @@ public class Paint {
 		//System.out.println("change to "+color.name()+" at "+block.getLocation());
 		if(block == null)
 			return;
+		if(MaterialUtil.isWool(block.getType())){
+			//BlockState state = block.getState();
+			block.setBlockData(MaterialUtil.fromColorIdToWool(color.getDyeColor().getWoolData()).createBlockData());
+			//block.getState().update();
+			return;
+		}else if(MaterialUtil.isCarpet(block.getType())){
+			//BlockState state = block.getState();
+			block.setBlockData(MaterialUtil.fromColorIdToCarpet(color.getDyeColor().getWoolData()).createBlockData());
+			//block.getState().update();
+			return;
+		}else{
+			return;
+		}
+		//ここでなぜsyncを使っているか不明だが、これが原因で、1tick中に同じブロックを同じ色で塗ろうとしたときに
+		//PaintWoolメソッド内でのブロックの色の確認と色を塗るタイミングにずれが生じ
+		//塗った場所が二重にカウントされることがあったので廃止
+		//特にローラーで顕著に発生 sesamugi
+		/*
 		else MainGame.sync(() -> {
 
 			if(MaterialUtil.isWool(block.getType())){
@@ -81,7 +103,7 @@ public class Paint {
 			}
 
 			//block.getState().setData(color.getDyeColor().getWoolData());
-		}); 
+		}); */
 	}
 
 	public static void addRollBack(ArenaData data, Block block) {
@@ -96,16 +118,18 @@ public class Paint {
 		data.addRollBackBlock(block.getState());*/
 	}
 
-	private static void addScore(PlayerData data, boolean bonus) {
+	private static void addScore(PlayerData data, boolean countAsSPP) {
 		int score = data.getScore();
-		if(bonus) {
-			data.setScore(score + 2);
-			return;
+		if(SpecialWeapon.SPECIALENABLED && SpecialWeapon.SPPENABLED && countAsSPP) {
+			data.setSpecialPoint(data.getSpecialPoint()+1);
 		}
 		data.setScore(score + 1);
 	}
-
 	public static int SpherePaint(Location center, double radius, PlayerData data) {
+		return SpherePaint( center,  radius,  data,true);
+	}
+
+	public static int SpherePaint(Location center, double radius, PlayerData data,boolean countAsSPP) {
 		double center_X = center.getX();
 		double center_Y = center.getY();
 		double center_Z = center.getZ();
@@ -119,7 +143,7 @@ public class Paint {
 					double distance = ((center_X - x)*(center_X - x)) + ((center_Y - y)*(center_Y - y)) + ((center_Z - z)*(center_Z - z));
 					if(distance < (radius*radius)) {
 						Location l = new Location(center.getWorld(), x, y, z);
-						if(Paint.PaintWool(data, l.getBlock())){
+						if(Paint.PaintWool(data, l.getBlock(),countAsSPP)){
 							painted++;
 						}
 					}
@@ -128,6 +152,10 @@ public class Paint {
 	}
 
 	public static int UnderCylinderPaint(Location center, double radius,double height, PlayerData data) {
+		return UnderCylinderPaint( center,  radius, height,data,true);
+	}
+
+	public static int UnderCylinderPaint(Location center, double radius,double height, PlayerData data,boolean countAsSPP) {
 		double center_X = center.getX();
 		double center_Y = center.getY();
 		double center_Z = center.getZ();
@@ -141,7 +169,7 @@ public class Paint {
 					double distance = ((center_X - x)*(center_X - x)) + ((center_Z - z)*(center_Z - z));
 					if(distance < (radius*radius)) {
 						Location l = new Location(center.getWorld(), x, y, z);
-						if(Paint.PaintWool(data, l.getBlock())){
+						if(Paint.PaintWool(data, l.getBlock(),countAsSPP)){
 							painted++;
 						}
 					}
@@ -149,7 +177,7 @@ public class Paint {
 		return painted;
 	}
 
-	public static int UnderPaint(Location center, double radius, PlayerData data) {
+	public static int UnderPaint(Location center, double radius, PlayerData data,boolean countAsSPP) {
 		double center_X = center.getX();
 		double center_Y = center.getY();
 		double center_Z = center.getZ();
@@ -164,7 +192,7 @@ public class Paint {
 					double y=center_Y+y_;
 
 					Location l = new Location(center.getWorld(), x, y, z);
-					if(Paint.PaintWool(data, l.getBlock())){
+					if(Paint.PaintWool(data, l.getBlock(),countAsSPP)){
 						painted++;
 					}
 

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jp.kotmw.splatoon.gamedatas.*;
+import jp.kotmw.splatoon.specialweapon.SpecialWeapon;
 import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -48,7 +49,7 @@ public class MainGame extends MessageUtil {
 		PlayerFiles.checkPlayerData(player.getUniqueId().toString(), player.getName());
 		if(data.getTask() == null) {
 			BukkitRunnable task = new AnimationRunnable(data);
-			task.runTaskTimer(Main.main, 0, 5);
+			task.runTaskTimer(Main.main, 0, 60);
 			data.setTask(task);
 		}
 		PlayerData playerdata = new PlayerData(player.getName());
@@ -74,9 +75,11 @@ public class MainGame extends MessageUtil {
 			player.removePotionEffect(effect.getType());
 		DataStore.addPlayerData(player.getName(), playerdata);
 		GameSigns.UpdateJoinSign(data.getName());
-		if(DataStore.getRoomPlayersList(data.getName()).size() < minPlayer)
-			return;
-		start(data);
+
+		player.sendMessage("Your Weapon : "+ChatColor.AQUA+playerdata.getWeapon());
+		//if(DataStore.getRoomPlayersList(data.getName()).size() < minPlayer)
+			//return;
+		//start(data);
 	}
 
 	public static void chooseWeapon(Player player){
@@ -133,7 +136,7 @@ public class MainGame extends MessageUtil {
 		roomdata.setTask(null);
 		for(PlayerData data : DataStore.getRoomPlayersList(roomdata.getName())) {
 			sendActionBar(data, " ");
-			sendMessage(data, ChatColor.GOLD+"大変長らくお待たせいたしました、ただいまより転送いたします");
+			//sendMessage(data, ChatColor.GOLD+"大変長らくお待たせいたしました、ただいまより転送いたします");
 		}
 		arenadata.setGameStatus(GameStatusEnum.INGAME);
 		BattleStartEvent event = new BattleStartEvent(roomdata, arenadata);
@@ -151,7 +154,10 @@ public class MainGame extends MessageUtil {
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		SplatColor color=arena.getSplatColor(data.getTeamid());
 		player.getInventory().setItem(0, GameItems.getWeaponItem(weapon));
-		player.getInventory().setItem(1, GameItems.getSubWeaponItem(weapon));
+		//player.getInventory().setItem(1, GameItems.getSubWeaponItem(weapon));
+		if(!SpecialWeapon.SPPENABLED || data.isCanUseSpecial()) {
+			player.getInventory().setItem(2, GameItems.getSpecialWeaponItem(weapon));
+		}
 		player.getInventory().setItem(EquipmentSlot.HEAD,GameItems.getHelmetItem(weapon,color));
 		/*for(int i=0;i<9;i++){
 			if(player.getInventory().getItem(i) == null){
@@ -172,7 +178,7 @@ public class MainGame extends MessageUtil {
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		SplatColor color=arena.getSplatColor(data.getTeamid());
 		player.getInventory().setItem(EquipmentSlot.HEAD,null);
-		for(int i=0;i<9;i++){
+		for(int i=0;i<3;i++){
 			if(player.getInventory().getItem(i) == null){
 				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));
 			}
@@ -256,7 +262,7 @@ public class MainGame extends MessageUtil {
 	public static void Damager(PlayerData data, Location location, int damage) {
 		if(location == null)
 			return;
-		Damager(data, location.getBlockX(), location.getBlockY(), location.getBlockZ(), 20);
+		Damager(data, location.getBlockX(), location.getBlockY(), location.getBlockZ(), damage);
 	}
 
 	public static void Damager(PlayerData player, int x, int y, int z, int damage) {
@@ -266,7 +272,7 @@ public class MainGame extends MessageUtil {
 			int target_x = loc.getBlockX(),
 					target_y = loc.getBlockY(),
 					target_z = loc.getBlockZ();
-			if(x == target_x && y == target_y && z == target_z) {
+			if(x == target_x && (y == target_y) && z == target_z) {
 				damageTarget(player,target,damage);
 			}
 		}
@@ -339,7 +345,16 @@ public class MainGame extends MessageUtil {
 			System.out.println(pd.getName() + " dealt "+String.format("%.0f",amount)+" damage to " + target.getName());
 			target.setMaximumNoDamageTicks(1);
 			target.damage(amount);
+			Player player=Bukkit.getPlayer(pd.getName());
+			if(target.isDead() || ((target instanceof Player) && DataStore.getPlayerData(target.getName()).isDead())) {
+				SplatColor color = DataStore.getArenaData(pd.getArena()).getSplatColor(pd.getTeamid());
+				MessageUtil.sendMessageforArena(pd.getArena(), color.getChatColor() + pd.getWeapon() + " -> " + target.getName());
 
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_SPLASH, 3f, 0.6f);
+				MainGame.fireworkExplosion(target.getLocation(), color);
+				Paint.SpherePaint(target.getLocation(), 4, pd);
+
+			}
 		}else{
 			System.out.println(pd.getName() + " cannot damage " + target.getName());
 		}
@@ -366,14 +381,16 @@ public class MainGame extends MessageUtil {
 	}
 
 	private static boolean canDamage(Player pe,PlayerData pd,LivingEntity target){
-		if(target instanceof Creeper){
-			return true;
-		}else if(target instanceof Player){
-			Player tpe= (Player) target;
-			PlayerData tpd=DataStore.getPlayerData(tpe.getName());
-			if(tpd!=null){
-				if(pd.getTeamid() != tpd.getTeamid()){
-					return true;
+		if(!target.isDead()) {
+			if (target instanceof Creeper) {
+				return true;
+			} else if (target instanceof Player) {
+				Player tpe = (Player) target;
+				PlayerData tpd = DataStore.getPlayerData(tpe.getName());
+				if (tpd != null) {
+					if (pd.getTeamid() != tpd.getTeamid() && !tpd.isDead()) {
+						return true;
+					}
 				}
 			}
 		}

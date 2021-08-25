@@ -16,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.util.Vector;
 
 public class SuckerBomb extends SubWeapon {
 
@@ -24,14 +25,13 @@ public class SuckerBomb extends SubWeapon {
 	}
 
 	@Override
-	public boolean doOnInteract(PlayerInteractEvent e, PlayerData player, Player p) {
+	public boolean doOnUse(PlayerData player, Player p) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
 		if(p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
 		launch(p, subweapon);
-		e.setCancelled(true);
 		return true;
 	}
 
@@ -56,6 +56,7 @@ public class SuckerBomb extends SubWeapon {
 		tntprimed.setCustomName(bulletname);
 		tntprimed.setSource(pe);
 		tntprimed.setGravity(false);
+		tntprimed.setVelocity(new Vector(0,0,0));
 	}
 
 	public boolean checkOnExplode(ExplosionPrimeEvent e){

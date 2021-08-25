@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.maingame;
 
+import jp.kotmw.splatoon.gamedatas.*;
 import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -7,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,12 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import jp.kotmw.splatoon.Main;
 import jp.kotmw.splatoon.filedatas.OtherFiles;
-import jp.kotmw.splatoon.gamedatas.ArenaData;
-import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.SignType;
-import jp.kotmw.splatoon.gamedatas.SignData;
-import jp.kotmw.splatoon.gamedatas.WaitRoomData;
-import jp.kotmw.splatoon.gamedatas.WeaponData;
 
 public class GameSigns implements Listener {
 
@@ -30,7 +27,8 @@ public class GameSigns implements Listener {
 	String statussign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_BLUE+"SplatoonStatus"+ChatColor.DARK_GRAY+"]";
 	String weaponsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_RED+"SplatWeaponShop"+ChatColor.DARK_GRAY+"]";
 
-	String chooseweaponsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"SplatoonChoose"+ChatColor.DARK_GRAY+"]";
+	String chooseweaponsign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"SplatChooseWeapon"+ChatColor.DARK_GRAY+"]";
+	String choosearenasign = ChatColor.DARK_GRAY+"["+ChatColor.DARK_GREEN+"SplatChooseArena"+ChatColor.DARK_GRAY+"]";
 
 	@EventHandler
 	public void onClickSign(PlayerInteractEvent e) {
@@ -74,6 +72,33 @@ public class GameSigns implements Listener {
 			}
 			MainGame.chooseWeapon(player);
 			return;
+		}else if(sign.getLine(0).equalsIgnoreCase(choosearenasign)) {
+			PlayerData pd= DataStore.getPlayerData(player.getName());
+			if (pd!=null && pd.getRoom() != null) {
+				if(sign.getLine(1).equals("")){
+					player.sendMessage(MainGame.Prefix + ChatColor.RED +"試合を開始します");
+					MainGame.start(DataStore.getRoomData(pd.getRoom()));
+				}else {
+					ArenaData arena = DataStore.getArenaData(sign.getLine(1));
+					if (arena != null) {
+						if (arena.getGameStatus() == DataStore.GameStatusEnum.ENABLE) {
+							player.sendMessage(MainGame.Prefix + ChatColor.RED + sign.getLine(1) + " で試合を開始します");
+							MainGame.start(DataStore.getRoomData(pd.getRoom()), arena);
+						} else {
+							player.sendMessage(MainGame.Prefix + ChatColor.RED + sign.getLine(1) + " は使用不能です");
+							return;
+						}
+
+					} else {
+						player.sendMessage(MainGame.Prefix + ChatColor.RED + sign.getLine(1) + " というステージは存在しません");
+						return;
+					}
+				}
+			}else{
+				player.sendMessage(MainGame.Prefix + ChatColor.RED + "待機部屋に参加しないとステージ設定は出来ません");
+				return;
+			}
+			return;
 		}
 	}
 
@@ -86,7 +111,8 @@ public class GameSigns implements Listener {
 		if(!sign.getLine(0).equalsIgnoreCase(joinsign)
 				&& !sign.getLine(0).equalsIgnoreCase(statussign)
 				&& !sign.getLine(0).equalsIgnoreCase(weaponsign)
-				&& !sign.getLine(0).equalsIgnoreCase(chooseweaponsign))
+				&& !sign.getLine(0).equalsIgnoreCase(chooseweaponsign)
+				&& !sign.getLine(0).equalsIgnoreCase(choosearenasign))
 			return;
 		if(!e.getPlayer().isSneaking()) {
 			e.setCancelled(true);
@@ -98,6 +124,7 @@ public class GameSigns implements Listener {
 		Player player = e.getPlayer();
 		player.sendMessage(MainGame.Prefix+ChatColor.GREEN+"看板を消去しました");
 		player.sendMessage(ChatColor.GREEN+"看板のタイプ: "+signdata.getType().getType());
+		block.getWorld().setBlockData(block.getLocation(),Material.AIR.createBlockData());
 	}
 
 	@EventHandler
@@ -152,6 +179,11 @@ public class GameSigns implements Listener {
 				type = SignType.CHOOSE;
 				e.setLine(0, chooseweaponsign);
 				e.setLine(1, ""+0);
+				e.setLine(2, ""+0);
+			}else if(pattern.equalsIgnoreCase("arena")) {
+				type = SignType.ARENA;
+				e.setLine(0, choosearenasign);
+				e.setLine(1, name);
 				e.setLine(2, ""+0);
 			}
 			OtherFiles.saveSignLoc(name, e.getBlock().getLocation(), type);

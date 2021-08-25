@@ -61,17 +61,18 @@ public class ChargerBulletRunnable extends BukkitRunnable {
 
             if(speed>radius){
                 int n= (int) Math.ceil(speed/radius);
+                radius=radius*(1+((double)charge/fullcharge))*0.5;
                 //System.out.println("n="+n);
                 for(int i=0;i<n;i++){
                     Location loc=bullet.getLocation().subtract(bullet.getVelocity().multiply((double)i/n));
-                    Paint.UnderCylinderPaint(loc , radius*charge/fullcharge,4, data);
-                    this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,loc,2,
+                    Paint.UnderCylinderPaint(loc , radius,4, data);
+                    this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,loc,3,
                             MaterialUtil.fromColorIdToWool(color.getColorID()).createBlockData());
-                    this.bullet.getWorld().spawnParticle(Particle.REDSTONE,loc,2,
+                    this.bullet.getWorld().spawnParticle(Particle.REDSTONE,loc,3,
                             0.5,0.5,0.5, new Particle.DustOptions(color.getColor(),1.5f));
                 }
             }else{
-                Paint.UnderCylinderPaint(bullet.getLocation(), radius*charge/fullcharge,4, data);
+                Paint.UnderCylinderPaint(bullet.getLocation(), radius,4, data);
                 this.bullet.getWorld().spawnParticle(Particle.BLOCK_DUST,bullet.getLocation(),2,
                         MaterialUtil.fromColorIdToWool(color.getColorID()).createBlockData());
                 this.bullet.getWorld().spawnParticle(Particle.REDSTONE,bullet.getLocation(),1,

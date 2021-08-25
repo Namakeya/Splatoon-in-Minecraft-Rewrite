@@ -67,11 +67,13 @@ public class ArrowCharger extends MainWeapon{
 			}
 		}
 		//System.out.println("charge in onHit: "+charge);
-		double radius=weapon.getRadius() * getDecayRate(e.getEntity(),weapon)*charge/fullcharge;
+		double radius=weapon.getRadius() * getDecayRate(e.getEntity(),weapon);
+		radius=radius*(1+((double)charge/fullcharge))*0.5;
 		radius=radius<0.8?0.8:radius;
 		if(e.getHitBlock()!=null && SquidRunnable.isSlipBlock(e.getHitBlock().getLocation())){
 			radius*=1.5;
 		}
+
 		Paint.SpherePaint(e.getEntity().getLocation(),radius, pd);
 		e.getEntity().remove();
 	}
@@ -136,7 +138,8 @@ public void shoot(PlayerData data) {
 
 		double damage=data.getDamage()*getDecayRate(arrow,data)*(charge)/(fullcharge);
 		//System.out.println("charge in onDamage: "+charge+" damage: "+damage);
-		e.setDamage(damage);
+		e.setDamage(0);
+		MainGame.damageTarget(pd,((LivingEntity) e.getEntity()),damage);
 		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 		pe.playSound(pe.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, SoundCategory.PLAYERS,1,1);
 

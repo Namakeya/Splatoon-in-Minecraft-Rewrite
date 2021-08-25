@@ -1,7 +1,7 @@
 main: jp.kotmw.splatoon.Main
 name: Splatoon_in_Minecraft
 auther: kotmw0701 sesamugi
-version: 1.4.0
+version: 1.5.0
 load: POSTWORLD
 api-version: 1.17
 

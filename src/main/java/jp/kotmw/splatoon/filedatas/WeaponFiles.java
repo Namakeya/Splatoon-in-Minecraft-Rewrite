@@ -3,6 +3,7 @@ package jp.kotmw.splatoon.filedatas;
 import java.io.File;
 import java.util.List;
 
+import jp.kotmw.splatoon.gamedatas.SpecialWeaponData;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,7 +25,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("ItemInfo.Name", "SplatShooter");
 			file.set("ItemInfo.Type", Material.WOODEN_HOE.toString());
 			file.set("WeaponInfo.Type", WeaponType.Shooter.toString());
-			file.set("WeaponInfo.Damage", 3);
+			file.set("WeaponInfo.Damage", 4);
 			file.set("WeaponInfo.FireSpeed", 4);
 			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
@@ -37,6 +38,9 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.AirResistance", 0.0);
 			file.set("WeaponInfo.ManSpeed", 0.8);
 			file.set("WeaponInfo.SubWeapon", "QuickBomb");
+
+			file.set("WeaponInfo.SpecialWeapon", "MultiMissile");
+			file.set("WeaponInfo.SpecialPoint", 200);
 			SettingFiles(file, DirFile(filedir, "SplatShooter"));
 		}
 
@@ -48,7 +52,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.Type", WeaponType.Shooter.toString());
 			file.set("WeaponInfo.Damage", 3);
 			file.set("WeaponInfo.FireSpeed", 3);
-			file.set("WeaponInfo.Radius", 2);
+			file.set("WeaponInfo.Radius", 1.8);
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
 			file.set("WeaponInfo.InkCost", 1);
 			file.set("WeaponInfo.Angle", 25);
@@ -118,14 +122,14 @@ public class WeaponFiles extends PluginFiles {
 			file2.set("ItemInfo.Name", "3k-Scope");
 			file2.set("ItemInfo.Type", Material.SPYGLASS.toString());
 			file2.set("WeaponInfo.Type", WeaponType.Charger.toString());
-			file2.set("WeaponInfo.Damage", 20);
+			file2.set("WeaponInfo.Damage", 22);
 			file2.set("WeaponInfo.InkCost", 30);
 			file2.set("WeaponInfo.FullCharge", 32);
 
 			file2.set("WeaponInfo.Radius", 3);
 			file2.set("WeaponInfo.FlyingPaintRadius", 2);
 
-			file2.set("WeaponInfo.FlyDecayTick", 10);
+			file2.set("WeaponInfo.FlyDecayTick", 15);
 			file2.set("WeaponInfo.FlyDecayRatio", 10.0);
 
 			file2.set("WeaponInfo.Speed", 4);
@@ -143,7 +147,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("ItemInfo.Name", "SplatCharger");
 			file.set("ItemInfo.Type", Material.BOW.toString());
 			file.set("WeaponInfo.Type", WeaponType.Charger.toString());
-			file.set("WeaponInfo.Damage", 20);
+			file.set("WeaponInfo.Damage", 22);
 			file.set("WeaponInfo.InkCost", 18);
 			file.set("WeaponInfo.FullCharge", 20);
 
@@ -226,5 +230,10 @@ public class WeaponFiles extends PluginFiles {
 		DataStore.addSubWeaponData(splashbomb.getName(), splashbomb);
 		DataStore.addSubWeaponData(suckerbomb.getName(), suckerbomb);
 		DataStore.addSubWeaponData(trap.getName(), trap);
+	}
+
+	public static void AllSpecialWeaponReload() {
+		SpecialWeaponData multimissile=new SpecialWeaponData("MultiMissile",Material.CARROT, DataStore.SpecialType.MultiMissile);
+		DataStore.addSpecialWeaponData(multimissile.getName(),multimissile);
 	}
 }

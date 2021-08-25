@@ -28,14 +28,14 @@ public class QuickBomb extends SubWeapon {
 	}
 
 	@Override
-	public boolean doOnInteract(PlayerInteractEvent e, PlayerData player, Player p) {
+	public boolean doOnUse(PlayerData player, Player p) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
 		if(p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
 		launch(p, subweapon);
-		e.setCancelled(true);
+
 		return true;
 	}
 
@@ -53,7 +53,7 @@ public class QuickBomb extends SubWeapon {
 	public void doOnExex(ExpBottleEvent e, PlayerData data, Player pe) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
 
-		Paint.SpherePaint(e.getEntity().getLocation(), subweapon.getExplRadius(), data);
+		Paint.SpherePaint(e.getEntity().getLocation(), subweapon.getExplRadius(), data,true);
 		MainGame.SphereDamager(data, e.getEntity().getLocation(), subweapon, subweapon.getExplRadius(), true);
 	}
 

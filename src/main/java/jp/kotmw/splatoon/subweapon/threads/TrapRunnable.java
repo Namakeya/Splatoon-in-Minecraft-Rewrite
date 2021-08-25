@@ -50,10 +50,10 @@ public class TrapRunnable extends BukkitRunnable {
 				//bomb.getWorld().playSound(bomb.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, SoundCategory.PLAYERS,1f,1f);
 				SplatColor color= DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid());
 				MainGame.fireworkExplosion(bomb.getLocation(),color);
-				bomb.remove();
+
 
 				for (PlayerData pd : DataStore.getArenaPlayersList(data.getArena())) {
-					if(pd.getTeamid() != pd.getTeamid()) {
+					if(data.getTeamid() != pd.getTeamid()) {
 						Player pe = Bukkit.getPlayer(pd.getName());
 						if (pe.getLocation().distanceSquared(this.bomb.getLocation()) < subweapon.getExplRadius() * subweapon.getExplRadius()*2) {
 							pe.addPotionEffect(glow);
@@ -61,6 +61,7 @@ public class TrapRunnable extends BukkitRunnable {
 						}
 					}
 				}
+				bomb.remove();
 				this.cancel();
 			}else{
 				time--;

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jp.kotmw.splatoon.gamedatas.SpecialWeaponData;
+import jp.kotmw.splatoon.specialweapon.SpecialWeapon;
 import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -94,6 +96,32 @@ public class GameItems {
 				//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
 		item.setItemMeta(meta);
 		return item;
+	}
+
+	public static ItemStack getSpecialWeaponItem(WeaponData data) {
+		//System.out.println("specialweaponname: "+data.getSpecialWeapon());
+		SpecialWeaponData specialweapon = DataStore.getSpecialWeaponData(data.getSpecialWeapon());
+		if(SpecialWeapon.SPECIALENABLED && specialweapon!=null) {
+			ItemStack item = new ItemStack(specialweapon.getItemtype());
+			ItemMeta meta = item.getItemMeta();
+			meta.setDisplayName(specialweapon.getType().toString());
+			List<String> lore = new ArrayList<>();
+			lore.add(ChatColor.GOLD + "SplatoonPluginItem");
+			lore.add("-----Status-----");
+			lore.add("Bomb");
+			lore.add("Bomb!");
+			lore.add("Bomb!!");
+			lore.add("Bomb!!!");
+			lore.add("Bomb!!!!");
+			meta.setLore(lore);
+			//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+			//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
+			item.setItemMeta(meta);
+			return item;
+		}else{
+			System.out.println("specialweapon is null ");
+			return null;
+		}
 	}
 	public static ItemStack getFillerItem(WeaponData data) {
 		ItemStack item=new ItemStack(Material.STONE_BUTTON,64);

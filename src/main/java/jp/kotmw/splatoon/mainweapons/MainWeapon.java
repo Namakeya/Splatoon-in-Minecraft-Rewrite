@@ -1,10 +1,7 @@
 package jp.kotmw.splatoon.mainweapons;
 
-import jp.kotmw.splatoon.gamedatas.ArenaData;
-import jp.kotmw.splatoon.gamedatas.DataStore;
+import jp.kotmw.splatoon.gamedatas.*;
 import jp.kotmw.splatoon.gamedatas.DataStore.WeaponType;
-import jp.kotmw.splatoon.gamedatas.PlayerData;
-import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,6 +26,9 @@ public abstract class MainWeapon implements Listener {
 	public MainWeapon(String bulletname,WeaponType weaponType){
 		this.bulletname=bulletname;
 		this.weaponType=weaponType;
+	}
+	public static WeaponData getWeaponData(PlayerData data){
+		return DataStore.getWeapondata(data.getWeapon());
 	}
 /*
 	public MainWeapon setBulletName(String bulletName){
@@ -60,7 +60,7 @@ public abstract class MainWeapon implements Listener {
 
 		Player player = Bukkit.getPlayer(data.getName());
 		//System.out.println(player.getInventory().getItemInMainHand());
-		return !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
+		return !data.isUsingSpecial() && !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
 	}
 
 	public boolean isMyWeapon(PlayerData data,ItemStack item){

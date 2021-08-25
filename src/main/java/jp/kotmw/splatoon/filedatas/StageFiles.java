@@ -197,7 +197,7 @@ public class StageFiles extends PluginFiles {
 				continue;
 			data.updateTeamColor();
 			data.setScoreBoard(new SplatScoreBoard(data));
-			data.setBossBar(new SplatBossBar(data));
+
 			DataStore.addArenaData(arena, data);
 		}
 	}

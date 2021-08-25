@@ -71,7 +71,8 @@ public class Shooter extends MainWeapon {
 		WeaponData data = DataStore.getWeapondata(pd.getWeapon());
 
 		double damage=data.getDamage()*getDecayRate(ball,data);
-		e.setDamage(damage);
+		e.setDamage(0);
+		MainGame.damageTarget(pd,(LivingEntity) e.getEntity(),damage);
 		//System.out.println(ball.toString()+" damage : "+damage);
 		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 		pe.playSound(e.getEntity().getLocation(), Sound.ENTITY_PLAYER_HURT, SoundCategory.PLAYERS,1,1);
@@ -91,6 +92,7 @@ public class Shooter extends MainWeapon {
 		MainGame.sync(() -> {
 			Snowball snowball = player.launchProjectile(Snowball.class);
 			snowball.setCustomName(bulletname);
+
 			//System.out.println(bulletname);
 			Vector vec2 = new Vector(direction.getX()*weapon.getSpeed(), direction.getY()*weapon.getSpeed(), direction.getZ()*weapon.getSpeed());
 			snowball.setGravity(!weapon.NoGravity());

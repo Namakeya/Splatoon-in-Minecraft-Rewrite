@@ -7,9 +7,11 @@ jp\kotmw\splatoon\util\Title.class
 jp\kotmw\splatoon\util\DetailsColor.class
 jp\kotmw\splatoon\event\ZoneChangeEvent.class
 jp\kotmw\splatoon\maingame\Turf_War$1.class
+jp\kotmw\splatoon\gamedatas\DataStore$SpecialType.class
 jp\kotmw\splatoon\maingame\threads\BattleRunnable.class
 jp\kotmw\splatoon\util\Location.class
 jp\kotmw\splatoon\gamedatas\DataStore$WeaponType.class
+jp\kotmw\splatoon\gamedatas\SpecialWeaponData.class
 jp\kotmw\splatoon\filedatas\StageFiles.class
 jp\kotmw\splatoon\maingame\threads\RespawnRunnable.class
 jp\kotmw\splatoon\gamedatas\ArenaData.class
@@ -31,7 +33,9 @@ jp\kotmw\splatoon\subweapon\threads\SprinklerRunnable.class
 jp\kotmw\splatoon\maingame\threads\TransferRunnable$1.class
 jp\kotmw\splatoon\filedatas\PluginFiles.class
 jp\kotmw\splatoon\util\Polar_coodinates.class
+jp\kotmw\splatoon\specialweapon\threads\MultiMissileRunnable.class
 jp\kotmw\splatoon\mainweapons\threads\ChargerRunnable.class
+jp\kotmw\splatoon\specialweapon\MultiMissile.class
 jp\kotmw\splatoon\util\MaterialUtil.class
 jp\kotmw\splatoon\util\NMSBase.class
 jp\kotmw\splatoon\Main.class
@@ -44,6 +48,7 @@ jp\kotmw\splatoon\superjump\SuperjumpRunnable.class
 jp\kotmw\splatoon\util\MessageUtil.class
 jp\kotmw\splatoon\event\ArenaStatusChangeEvent.class
 jp\kotmw\splatoon\gamedatas\DataStore$GameStatusEnum.class
+jp\kotmw\splatoon\mainweapons\threads\RollerRollRunnable.class
 jp\kotmw\splatoon\util\SplatColor.class
 jp\kotmw\splatoon\mainweapons\Shooter.class
 jp\kotmw\splatoon\util\DetailsColor$DetailsColorType.class
@@ -61,6 +66,7 @@ jp\kotmw\splatoon\gamedatas\PlayerStatusData$1.class
 jp\kotmw\splatoon\maingame\threads\AnimationRunnable.class
 jp\kotmw\splatoon\maingame\MainGame.class
 jp\kotmw\splatoon\subweapon\SplashBomb.class
+jp\kotmw\splatoon\specialweapon\threads\MultiMissileBulletRunnable.class
 jp\kotmw\splatoon\superjump\SuperjumpListener.class
 jp\kotmw\splatoon\gamedatas\WeaponData.class
 jp\kotmw\splatoon\mainweapons\Roller.class
@@ -69,6 +75,7 @@ jp\kotmw\splatoon\gamedatas\SubWeaponData.class
 jp\kotmw\splatoon\mainweapons\ArrowCharger.class
 jp\kotmw\splatoon\filedatas\PlayerFiles.class
 jp\kotmw\splatoon\maingame\InvMenu$1.class
+jp\kotmw\splatoon\specialweapon\SpecialWeapon.class
 jp\kotmw\splatoon\event\BlockPaintEvent.class
 jp\kotmw\splatoon\commands\SettingCommands.class
 jp\kotmw\splatoon\gamedatas\DataStore$BattleType.class

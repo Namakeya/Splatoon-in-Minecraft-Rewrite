@@ -82,7 +82,7 @@ public class SettingCommands extends CommandLib {
 					MainGame.start(DataStore.getRoomData(playerdata.getRoom()));
 					return true;
 				}
-				sendPMsg(ChatColor.RED+"参加してからコマンド実行をしてくださいな");
+				sendPMsg(ChatColor.RED+"部屋に参加してからコマンド実行をしてくださいな");
 				return false;
 
 			} else if("endbattle".equalsIgnoreCase(args[0])) {
@@ -90,7 +90,7 @@ public class SettingCommands extends CommandLib {
 					PlayerData playerdata = DataStore.getPlayerData(player.getName());
 					ArenaData arena=DataStore.getArenaData(playerdata.getArena());
 					if(arena.getGameStatus() == GameStatusEnum.INGAME && arena.getTask()!=null){
-						arena.getTask().setTick(30);
+						arena.getTask().setTick(10);
 					}
 					return true;
 				}
@@ -196,8 +196,7 @@ public class SettingCommands extends CommandLib {
 				data.setStatus(true);
 				data.setGameStatus(GameStatusEnum.ENABLE);
 				StageFiles.setEnable(name);
-				data.updateTeamColor();
-				data.setScoreBoard(new SplatScoreBoard(data));
+				StageFiles.AllStageReload();
 				sendPMsg(ChatColor.GREEN+"設定完了を確認し、使用可能になりました！");
 				return true;
 			} else if("setroom".equalsIgnoreCase(args[0])) {
@@ -255,6 +254,21 @@ public class SettingCommands extends CommandLib {
 				data.setGameStatus(GameStatusEnum.DISABLE);
 				sendPMsg(ChatColor.GREEN+"ステージを無効化し、編集モードに切り替わりました");
 				return true;
+			} else if("start".equalsIgnoreCase(args[0])) {
+				if (DataStore.hasPlayerData(player.getName())) {
+					PlayerData playerdata = DataStore.getPlayerData(player.getName());
+					WaitRoomData roomdata=DataStore.getRoomData(playerdata.getRoom());
+					if(DataStore.hasArenaData(args[1])){
+						MainGame.start(roomdata,DataStore.getArenaData(args[1]));
+						return true;
+					}else{
+						sendPMsg(ChatColor.RED + args[1]+" というアリーナは存在しません");
+						return false;
+					}
+
+				}
+				sendPMsg(ChatColor.RED + "部屋に参加してからコマンド実行をしてくださいな");
+				return false;
 			}
 		} else if(args.length == 3) {
 			String name = args[1];

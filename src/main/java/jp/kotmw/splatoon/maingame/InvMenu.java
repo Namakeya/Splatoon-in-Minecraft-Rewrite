@@ -136,6 +136,7 @@ public class InvMenu implements Listener {
 			meta.setDisplayName(weapon.getName());
 			List<String> lore = new ArrayList<String>();
 			lore.add("サブウェポン: "+weapon.getSubWeapon());
+			lore.add("スペシャル: "+weapon.getSpecialWeapon());
 			meta.setLore(lore);
 			item.setItemMeta(meta);
 			inv.setItem(i, item);
@@ -156,6 +157,9 @@ public class InvMenu implements Listener {
 		case Charger:
 			lore.add(ChatColor.YELLOW+"チャージャー系武器のセレクターを開きます");
 			break;
+			case Blaster:
+				lore.add(ChatColor.RED+"ブラスター系武器のセレクターを開きます");
+				break;
 		default:
 			break;
 		}

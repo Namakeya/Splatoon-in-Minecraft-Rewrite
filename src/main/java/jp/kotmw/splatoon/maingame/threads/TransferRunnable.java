@@ -3,11 +3,14 @@ package jp.kotmw.splatoon.maingame.threads;
 import java.util.Collections;
 import java.util.List;
 
+import jp.kotmw.splatoon.manager.SplatBossBar;
+import jp.kotmw.splatoon.specialweapon.SpecialWeapon;
 import jp.kotmw.splatoon.superjump.Superjump;
 import jp.kotmw.splatoon.superjump.SuperjumpRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -50,7 +53,7 @@ public class TransferRunnable extends BukkitRunnable {
 			Collections.shuffle(datalist);
 			int team = 1, posisions = 1, players = 1;
 			for(PlayerData playerdata : datalist) {
-				if(players >= data.getTotalPlayerCount()) {
+				if(players > data.getTotalPlayerCount()) {
 					MainGame.sendMessage(playerdata, ChatColor.RED+"転送先ステージの許容人数をオーバーしたため、転送ができませんでした");
 					MainGame.sendMessage(playerdata, ChatColor.YELLOW+"このまま残ることも可能ですが、待機前の場所に戻る場合は"+ChatColor.WHITE+" /splat leave "+ChatColor.YELLOW+"コマンドを使用してください");
 					continue;
@@ -76,14 +79,18 @@ public class TransferRunnable extends BukkitRunnable {
 				player.setGameMode(GameMode.ADVENTURE);
 				player.setExp(0.99f);//1.12.2対応のため
 				player.setHealth(20);
-				player.setFoodLevel(4);
 				data.getScoreboard().DefaultScoreBoard(type);
 				data.getScoreboard().setTeam(playerdata);
 				data.getScoreboard().showBoard(playerdata);
-				data.getBossBar().show(playerdata);
+
 				MainGame.Teleport(playerdata, this.data.getTeamPlayerPosision(team, posisions).convertLocation());
+				player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 				team++;
 				players++;
+			}
+			data.setBossBar(new SplatBossBar(data));
+			if(SpecialWeapon.SPECIALENABLED) {
+				data.getBossBar().showAll();
 			}
 			switch(type) {
 			case Turf_War:

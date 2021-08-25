@@ -3,9 +3,12 @@ package jp.kotmw.splatoon.maingame.threads;
 import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.GameItems;
+import jp.kotmw.splatoon.maingame.MainGame;
+import jp.kotmw.splatoon.maingame.SquidMode;
 import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -34,12 +37,20 @@ public class SquidRunnable extends BukkitRunnable {
 			return;
 		}
 		PlayerData data = DataStore.getPlayerData(name);
-		if(data.getInkCoolTime() > 0) {
-			int cooltime = data.getInkCoolTime();
-			cooltime--;
-			data.setInkCoolTime(cooltime);
-			return;
+
+		Player player = Bukkit.getPlayer(name);
+		//System.out.println("sprinting : "+player.isSprinting());
+		if(player.isSprinting()){
+			player.setFoodLevel(2);
+			player.setSprinting(false);
+			if (DataStore.getStatusData(player.getName()).isRunToSquid()) {
+				MainGame.sync(() -> {
+					SquidMode.changeSquid(player);
+				});
+			}
+
 		}
+
 
 		if(data.getRecoilTick() > 0) {
 			int cooltime = data.getRecoilTick();
@@ -51,17 +62,22 @@ public class SquidRunnable extends BukkitRunnable {
 		if(!data.isSquidMode())
 			return;
 
+		if(data.getInkCoolTime() > 0) {
+			int cooltime = data.getInkCoolTime();
+			cooltime--;
+			data.setInkCoolTime(cooltime);
 
-		Player player = Bukkit.getPlayer(name);
-		float ink = player.getExp();
-		if((SplatColorManager.isBelowBlockTeamColor(Bukkit.getPlayer(name), true)) || data.isClimb()) {
+		}else {
+			float ink = player.getExp();
+			if ((SplatColorManager.isBelowBlockTeamColor(Bukkit.getPlayer(name), true)) || data.isClimb()) {
 
-			if (ink <= 0.983) {
-				player.setExp(ink + 0.016f);
-			}
-		}else{
-			if (ink <= 0.997) {
-				player.setExp(ink + 0.002f);
+				if (ink <= 0.983) {
+					player.setExp(ink + 0.016f);
+				}
+			} else {
+				if (ink <= 0.997) {
+					player.setExp(ink + 0.002f);
+				}
 			}
 		}
 		//player.setFoodLevel(2);
@@ -170,5 +186,6 @@ public class SquidRunnable extends BukkitRunnable {
 		//System.out.println(location.getBlock().getType().toString());
 		return DataStore.getConfig().getCanSlipBlocks().contains(location.getBlock().getType().toString());
 	}
+
 
 }

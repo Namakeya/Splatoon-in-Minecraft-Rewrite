@@ -1,24 +1,18 @@
 package jp.kotmw.splatoon.subweapon;
 
-import jp.kotmw.splatoon.Main;
 import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.BombType;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.gamedatas.SubWeaponData;
 import jp.kotmw.splatoon.maingame.MainGame;
-import jp.kotmw.splatoon.manager.Paint;
-import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ExpBottleEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -54,16 +48,15 @@ public abstract class SubWeapon implements Listener {
 
 		Player player = Bukkit.getPlayer(data.getName());
 		//System.out.println(player.getInventory().getItemInMainHand());
-		return data.getSubCooldown()<=0 && !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
+		return !data.isUsingSpecial() && data.getSubCooldown()<=0 && !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
 	}
 
 	public boolean isMyWeapon(PlayerData data,ItemStack item){
 		if(isMyWeaponType(data)
 				&& !data.isAllCancel()
 				&& item != null
-				&& isMyWeaponType(data)
 				&& item.hasItemMeta()
-				&& item.getItemMeta().getDisplayName().equalsIgnoreCase(this.subWeaponType.name())){
+				&& item.getItemMeta().getDisplayName().equalsIgnoreCase(data.getWeapon())){
 			//System.out.println("is my weapon");
 			return true;
 		}
@@ -88,32 +81,41 @@ public abstract class SubWeapon implements Listener {
 	public boolean checkOnInteract(PlayerInteractEvent e){
 		if(getArena(e.getPlayer())!=null) {
 			Action action = e.getAction();
-			if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+			if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
 				//System.out.println("interact");
 				Player player = e.getPlayer();
 				PlayerData data = DataStore.getPlayerData(player.getName());
 				//System.out.println("suitable action");
-				if (canShoot(data)) {
-					return true;
+				if (data.isDropped()){
+				}else{
+					if(canShoot(data)) {
+						data.setDropped(false);//todo onInteractが何故かアイテムドロップした時にも発火するので見分けるため。やり方が雑
+						return true;
+					}
 				}
 			}
 		}
 		return false;
 	}
 
-	public abstract boolean doOnInteract(PlayerInteractEvent e,PlayerData pd,Player pe);
+	public abstract boolean doOnUse(PlayerData pd, Player pe);
 
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
 		//System.out.println("interact");
-		if(checkOnInteract(e)){
+		if(checkOnInteract(e) && DataStore.getStatusData(e.getPlayer().getName()).isClickToSub()){
 			Player player = e.getPlayer();
 			PlayerData data = DataStore.getPlayerData(player.getName());
-			if(doOnInteract(e,data,player)){
-				data.setSubCooldown(12);
-				SubWeaponData sw=DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
-				data.setInkCoolTime(sw.getCooltime());
-			}
+			//System.out.println(e.getItem());
+			MainGame.sync(() -> {
+				if(doOnUse(data,player)){
+					data.setSubCooldown(12);
+					SubWeaponData sw=DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
+					data.setInkCoolTime(sw.getCooltime());
+
+				}
+			});
+			e.setCancelled(true);
 		}
 	}
 

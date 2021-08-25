@@ -33,6 +33,7 @@ public class BlasterBulletRunnable extends BukkitRunnable {
     public void run() {
         if(this.bullet.isDead()){
             this.cancel();
+            return;
         }
         if(!DataStore.hasPlayerData(playerName)) {
             this.cancel();

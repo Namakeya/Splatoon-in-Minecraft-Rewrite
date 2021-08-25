@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
@@ -18,63 +19,82 @@ import jp.kotmw.splatoon.gamedatas.PlayerData;
 
 public class SplatBossBar {
 
-	private Map<Integer, BossBar> teambossbar = new HashMap<>();
+	private Map<String, BossBar> playerbossbar = new HashMap<>();
 	private ArenaData data;
 	
 	public SplatBossBar(ArenaData data) {// ❙
 		this.data = data;
-		IntStream.rangeClosed(1, data.getMaximumTeamNum()).forEach(team -> {
-			BossBar bar = Bukkit.createBossBar(updateisLifeBar_Allteam(team), BarColor.GREEN, BarStyle.SOLID);
+		for(PlayerData pd:DataStore.getArenaPlayersList(data.getName())){
+			BossBar bar = Bukkit.createBossBar("SpecialGauge", BarColor.GREEN, BarStyle.SOLID);
 			bar.setProgress(0.0);
-			teambossbar.put(team, bar);
-		});
+			playerbossbar.put(pd.getName(), bar);
+		}
 	}
 	
 	/**
-	 * 負荷が怖い場所その2
 	 * 
 	 */
 	public void updateBar() {
-		double total = data.getTotalTeamScore();
-		teambossbar.entrySet().forEach(team -> {
-			double teamscore = data.getTeamScore(team.getKey().intValue()),
-					progress = (teamscore > 0.0 ? teamscore / total : 0.0);
-			BossBar bar = team.getValue();
+
+		for(Map.Entry<String,BossBar> entry:playerbossbar.entrySet()){
+			PlayerData pd=DataStore.getPlayerData(entry.getKey());
+			double spp = pd.getSpecialPoint();
+			double progress = spp/ MainWeapon.getWeaponData(pd).getSpecialPoint();
+			BossBar bar = entry.getValue();
 			bar.setProgress((progress > 1.0 ? 1.0 : progress));
-			bar.setColor((progress > 0.5 ? (progress > 0.75 ? BarColor.BLUE : BarColor.GREEN) : (progress < 0.25 ? BarColor.RED : BarColor.YELLOW)));
-		});
+			bar.setColor(progress>0.99?BarColor.YELLOW:BarColor.BLUE);
+		}
 	}
-	
+
 	public void updateLifeBar() {
+		/*
 		teambossbar.entrySet().forEach(team -> {
 			BossBar bar = team.getValue();
 			bar.setTitle(updateisLifeBar_Allteam(team.getKey()));
-		});
+		});*/
 	}
-	
+
 	public void show(PlayerData data) {
+		/*
 		if(data.isAllView()) {
 			teambossbar.values().forEach(bar -> bar.addPlayer(Bukkit.getPlayer(data.getName())));
 			return;
 		}
-		teambossbar.get(data.getTeamid()).addPlayer(Bukkit.getPlayer(data.getName()));
+
+		 */
+		playerbossbar.get(data.getName()).addPlayer(Bukkit.getPlayer(data.getName()));
+	}
+	public void showAll() {
+		/*
+		if(data.isAllView()) {
+			teambossbar.values().forEach(bar -> bar.addPlayer(Bukkit.getPlayer(data.getName())));
+			return;
+		}
+
+		 */
+		for(Map.Entry<String,BossBar> entry:playerbossbar.entrySet()){
+			entry.getValue().addPlayer(Bukkit.getPlayer(entry.getKey()));
+		}
 	}
 	
-	public void hide(int team) {
-		teambossbar.get(team).removeAll();
+	public void hide(String playerName) {
+		playerbossbar.get(playerName).removeAll();
 	}
 	
 	public void removeAllPlayer() {
-		IntStream.rangeClosed(1, data.getMaximumTeamNum()).forEach(team -> teambossbar.get(team).removeAll());
+		for(Map.Entry<String,BossBar> entry:playerbossbar.entrySet()){
+			entry.getValue().removeAll();
+		}
+
 	}
 	
 	public void resetBossBar() {
-		teambossbar.values().forEach(bar -> {
-			bar.setColor(BarColor.GREEN);
-			bar.setProgress(0.0);
-		});
+		for(Map.Entry<String,BossBar> entry:playerbossbar.entrySet()){
+			entry.getValue().setColor(BarColor.GREEN);
+			entry.getValue().setProgress(0.0);
+		}
 	}
-	
+	/*
 	private String updateisLifeBar_Allteam(int myteam) {
 		String text = "";
 		for(int team = 1; team <= data.getMaximumTeamNum(); team++) {
@@ -84,8 +104,11 @@ public class SplatBossBar {
 		}
 		return text;
 	}
+
+	 */
 	
 	private String updateisLifeBar(int team) {
+		/*
 		String players = "";
 		List<PlayerData> playerDatas = DataStore.getArenaPlayersList(data.getName()).stream().filter(pd -> pd.getTeamid() == team).collect(Collectors.toList());
 		for(int playerNum = 1; playerNum <= data.getMaximumPlayerNum(); playerNum++) {
@@ -97,8 +120,10 @@ public class SplatBossBar {
 			players += (playerData.isDead() ? ChatColor.DARK_GRAY : data.getSplatColor(team).getChatColor()) + "❙";
 		}
 		return players + ChatColor.RESET;
+
+		 */
+		return "";
 	}
-	
 	
 	
 	/*

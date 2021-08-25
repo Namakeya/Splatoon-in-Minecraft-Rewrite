@@ -2,6 +2,7 @@ package jp.kotmw.splatoon;
 
 import jp.kotmw.splatoon.commands.*;
 import jp.kotmw.splatoon.mainweapons.*;
+import jp.kotmw.splatoon.specialweapon.MultiMissile;
 import jp.kotmw.splatoon.subweapon.*;
 import jp.kotmw.splatoon.superjump.SuperjumpListener;
 import org.bukkit.Material;
@@ -51,6 +52,7 @@ public class Main extends JavaPlugin{
 		pm.registerEvents(new SplashBomb(), this);
 		pm.registerEvents(new SuckerBomb(), this);
 		pm.registerEvents(new Trap(), this);
+		pm.registerEvents(new MultiMissile(), this);
 		//pm.registerEvents(new Barrier(), this);
 		OtherFiles.AllTemplateFileGenerator();
 		PlayerFiles.AllPlayerFileReload();
@@ -59,10 +61,10 @@ public class Main extends JavaPlugin{
 		OtherFiles.AllSignReload();
 		WeaponFiles.AllWeaponReload();
 		WeaponFiles.AllSubWeaponReload();
+		WeaponFiles.AllSpecialWeaponReload();
 		OtherFiles.ConfigReload();
 		OtherFiles.RankFileReload();
 
-		meaningless=Material.LEGACY_WOOL;
 	}
 
 	@Override

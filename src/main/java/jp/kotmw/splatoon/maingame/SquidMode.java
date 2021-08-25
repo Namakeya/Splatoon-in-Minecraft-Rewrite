@@ -13,10 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -27,34 +24,49 @@ import jp.kotmw.splatoon.manager.SplatColorManager;
 
 public class SquidMode implements Listener {
 
-	static PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 3600*20, 1, false, false);
-	static PotionEffect invisible = new PotionEffect(PotionEffectType.INVISIBILITY, 3600*20, 1, false, false);
+	public static PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 3600*20, 1, false, false);
+	public static PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 3600*20, 0, false, false);
+	public static PotionEffect invisible = new PotionEffect(PotionEffectType.INVISIBILITY, 3600*20, 1, false, false);
 
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void changeSquid(PlayerDropItemEvent e) {
-		if(DataStore.hasPlayerData(e.getPlayer().getName()))
+		if(DataStore.hasPlayerData(e.getPlayer().getName())) {
 			e.setCancelled(true);
-		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
-			return;
-		if(DataStore.getPlayerData(e.getPlayer().getName()).getArena() == null)
-			return;
-		Player player = e.getPlayer();
-		PlayerData data = DataStore.getPlayerData(player.getName());
+			PlayerData data=DataStore.getPlayerData(e.getPlayer().getName());
+			data.setDropped(true);
+			//System.out.println("drop");
+			if (DataStore.getStatusData(e.getPlayer().getName()).isDropToSquid())
+				MainGame.sync(() -> {
+					changeSquid(e.getPlayer());
+				});
+		}
+	}
+
+	public static boolean changeSquid(Player pe){
+
+		if(!DataStore.hasPlayerData(pe.getName()))
+			return false;
+		if(DataStore.getPlayerData(pe.getName()).getArena() == null)
+			return false;
+
+		PlayerData data = DataStore.getPlayerData(pe.getName());
 		if(data.isDead() || data.isAllCancel())
-			return;
-		if(data.getRecoilTick()>0 || data.getSuperjumpStatus()>0)return;
-		player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_SWIM, 1, 1);
+			return false;
+		if(data.getRecoilTick()>0 || data.getSuperjumpStatus()>0)return false ;
+		pe.playSound(pe.getLocation(), Sound.ENTITY_PLAYER_SWIM, 1, 1);
 		if(data.isSquidMode()) {
-			toMan(player,data);
+			SquidMode.toMan(pe,data);
 		} else {
-			toSquid(player,data,true);
-			if(SplatColorManager.isBelowBlockTeamColor(player, true)) {
-				player.addPotionEffect(speed);
+			SquidMode.toSquid(pe,data,true);
+			if(SplatColorManager.isBelowBlockTeamColor(pe, true)) {
+				pe.addPotionEffect(SquidMode.speed);
 			} else {
-				spawnSquid(player);
+				SquidMode.spawnSquid(pe);
+				pe.addPotionEffect(SquidMode.slow);
 			}
 		}
+		return true;
 	}
 
 
@@ -82,7 +94,9 @@ public class SquidMode implements Listener {
 		if(!SplatColorManager.isBelowBlockTeamColor(player, true) && !data.isClimb()) {
 			spawnSquid(player);
 			player.removePotionEffect(PotionEffectType.SPEED);
+			player.addPotionEffect(slow);
 		} else if(SplatColorManager.isBelowBlockTeamColor(player, true) || data.isClimb()) {
+			player.removePotionEffect(PotionEffectType.SLOW);
 			player.addPotionEffect(speed);
 			if(squid != null) {
 				squid.remove();
@@ -115,7 +129,7 @@ public class SquidMode implements Listener {
 			e.setCancelled(true);
 	}*/
 
-	private void spawnSquid(Player player) {
+	public static void spawnSquid(Player player) {
 		PlayerData data = DataStore.getPlayerData(player.getName());
 		if(data.getPlayerSquid() != null)
 			return;
@@ -123,6 +137,7 @@ public class SquidMode implements Listener {
 		squid.setCustomName(player.getName());
 		squid.setAI(false);
 		data.setPlayerSquid(squid);
+
 	}
 	
 
@@ -179,7 +194,7 @@ public class SquidMode implements Listener {
 		//player.getInventory().setHeldItemSlot(0);
 		player.removePotionEffect(PotionEffectType.INVISIBILITY);
 		player.removePotionEffect(PotionEffectType.SPEED);
-		player.setFoodLevel(4);
+		player.removePotionEffect(PotionEffectType.SLOW);
 		WeaponData weapon=DataStore.getWeapondata(data.getWeapon());
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		SplatColor color=arena.getSplatColor(data.getTeamid());

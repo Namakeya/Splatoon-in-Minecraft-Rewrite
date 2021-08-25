@@ -3,6 +3,7 @@ package jp.kotmw.splatoon.maingame.threads;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -34,6 +35,7 @@ public class RespawnRunnable extends BukkitRunnable {
 		} else {
 			PlayerData data = DataStore.getPlayerData(player.getName());
 			Location loc = DataStore.getArenaData(data.getArena()).getTeamPlayerPosision(data.getTeamid(), 1).convertLocation();
+			player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
 			player.getInventory().setHeldItemSlot(0);//1.2.8 復帰した時に武器スロットに設定されなかったため
 			player.teleport(loc);
 			player.setGameMode(GameMode.ADVENTURE);

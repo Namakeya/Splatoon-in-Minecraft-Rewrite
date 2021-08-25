@@ -26,6 +26,8 @@ public class PlayerStatusData extends PlayerFiles {
 
 	private String currentWeapon;
 
+	private boolean runToSquid,dropToSquid,sneakToSquid,swapToSub,clickToSub,dropToSub;
+
 	public PlayerStatusData(String uuid, FileConfiguration file) {
 		this.uuid = uuid;
 		this.name = file.getString("Name");
@@ -40,6 +42,60 @@ public class PlayerStatusData extends PlayerFiles {
 		this.totalpaint = file.getInt("Status.TotalPaint");
 		this.weapons = file.getStringList("Status.Weapons");
 		this.currentWeapon=file.getString("Status.CurrentWeapon");
+		runToSquid=true;
+		dropToSquid=true;
+		sneakToSquid=false;
+		swapToSub=false;
+		clickToSub=true;
+		dropToSub=false;
+	}
+
+	public boolean isRunToSquid() {
+		return runToSquid;
+	}
+
+	public void setRunToSquid(boolean runToSquid) {
+		this.runToSquid = runToSquid;
+	}
+
+	public boolean isDropToSquid() {
+		return dropToSquid;
+	}
+
+	public void setDropToSquid(boolean dropToSquid) {
+		this.dropToSquid = dropToSquid;
+	}
+
+	public boolean isSneakToSquid() {
+		return sneakToSquid;
+	}
+
+	public void setSneakToSquid(boolean sneakToSquid) {
+		this.sneakToSquid = sneakToSquid;
+	}
+
+	public boolean isSwapToSub() {
+		return swapToSub;
+	}
+
+	public void setSwapToSub(boolean swapToSub) {
+		this.swapToSub = swapToSub;
+	}
+
+	public boolean isClickToSub() {
+		return clickToSub;
+	}
+
+	public void setClickToSub(boolean clickToSub) {
+		this.clickToSub = clickToSub;
+	}
+
+	public boolean isDropToSub() {
+		return dropToSub;
+	}
+
+	public void setDropToSub(boolean dropToSub) {
+		this.dropToSub = dropToSub;
 	}
 
 	public String getCurrentWeapon() {

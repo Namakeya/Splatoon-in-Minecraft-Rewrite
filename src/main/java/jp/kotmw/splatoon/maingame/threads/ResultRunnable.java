@@ -62,8 +62,8 @@ public class ResultRunnable extends BukkitRunnable {
 	{
 		i=i<0?0:i;
 		ii=ii>98?98:ii;
-		i=i>ii?ii-1:i;
-		ii=ii<i?i+1:ii;
+		i=i>=ii?ii-1:i;
+		ii=ii<=i?i+1:ii;
 		return data.getSplatColor(1).getChatColor()+base.substring(0, i)+ ChatColor.GRAY +base.substring(i + 1, ii)+ data.getSplatColor(2).getChatColor()+base.substring(ii + 1, 99);
 	}
 /*

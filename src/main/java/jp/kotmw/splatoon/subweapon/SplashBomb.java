@@ -25,14 +25,13 @@ public class SplashBomb extends SubWeapon {
 	}
 
 	@Override
-	public boolean doOnInteract(PlayerInteractEvent e, PlayerData player, Player p) {
+	public boolean doOnUse(PlayerData player, Player p) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
 		if(p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
 		launch(p, subweapon);
-		e.setCancelled(true);
 		return true;
 	}
 

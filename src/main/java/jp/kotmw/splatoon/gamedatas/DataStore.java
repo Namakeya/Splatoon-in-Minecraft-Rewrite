@@ -17,6 +17,7 @@ public class DataStore {
 	private static Map<String, PlayerData> playerdata = new HashMap<>();
 	private static Map<String, WeaponData> weapondata = new HashMap<>();
 	private static Map<String, SubWeaponData> subweapondata = new HashMap<>();
+	private static Map<String, SpecialWeaponData> specialweapondata = new HashMap<>();
 	private static Map<String, SignData> signdata = new HashMap<>();
 	private static Map<String, PlayerStatusData> statusdata = new HashMap<>();
 	private static List<String> prioritylist = new ArrayList<>();
@@ -71,6 +72,10 @@ public class DataStore {
 		return subweapondata.get(subweapon);
 	}
 
+	public static SpecialWeaponData getSpecialWeaponData(String specialweapon) {
+		return specialweapondata.get(specialweapon);
+	}
+
 	public static PlayerStatusData getStatusData(String name) {
 		return statusdata.get(name);
 	}
@@ -109,6 +114,11 @@ public class DataStore {
 
 	public static void addSubWeaponData(String subweapon, SubWeaponData data) {
 		subweapondata.put(subweapon, data);
+	}
+
+	public static void addSpecialWeaponData(String specialweapon, SpecialWeaponData data) {
+		//System.out.println("special weapon add "+specialweapon);
+		specialweapondata.put(specialweapon, data);
 	}
 
 	public static void addSignData(String filename, SignData data) {
@@ -234,6 +244,7 @@ public class DataStore {
 		JOIN("Join"),
 		STATUS("Status"),
 		CHOOSE("Choose"),
+		ARENA("Arena"),
 		SHOP("Shop");
 
 		private final String type;
@@ -272,5 +283,9 @@ public class DataStore {
 
 	public enum BombType {
 		QuickBomb, SplashBomb, SuckerBomb , Trap
+	}
+
+	public enum SpecialType{
+		MultiMissile
 	}
 }

@@ -2,6 +2,7 @@ package jp.kotmw.splatoon.mainweapons;
 
 import jp.kotmw.splatoon.maingame.threads.SquidRunnable;
 import jp.kotmw.splatoon.mainweapons.threads.RollerBulletRunnable;
+import jp.kotmw.splatoon.mainweapons.threads.RollerRollRunnable;
 import jp.kotmw.splatoon.mainweapons.threads.ShooterBulletRunnable;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -89,29 +90,22 @@ public class Roller extends MainWeapon {
 		return false;
 	}
 
-	public void doOnMove(PlayerMoveEvent e,PlayerData data,Player pe){
-		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
-		if(pe.getExp() < weapon.getCost()) {
-			MainGame.sendActionBar(data, ChatColor.RED+"インクがありません!");
-			return;
-		}
-		pe.setExp((float) (pe.getExp()-weapon.getCost()));
-		Color color = DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()).getColor();
-		Location location = pe.getLocation();
-		float yaw = -pe.getLocation().getYaw();
-		Polar_coodinates pc, pc2 = new Polar_coodinates(pe.getWorld(), weapon.getRadius()/2, Math.toRadians(yaw), 0);
-		for(double i = -weapon.getRadius()/2; i <= weapon.getRadius()/2; i+=0.5) {
-			for(int j = 0; j <= 1; j++) {
-				pc = new Polar_coodinates(pe.getWorld(), i, Math.toRadians(yaw)+(Math.PI/2), 0);
-				Location judgeloc = location.clone().add(0, j-0.5, 0).add(pc2.convertLocation()).add(pc.convertLocation());
-				Paint.PaintWool(data, judgeloc.getBlock());
-				MainGame.Damager(data, judgeloc, DataStore.getWeapondata(data.getWeapon()).getDamage());
-
-				pe.getWorld().spawnParticle(Particle.REDSTONE,judgeloc,1,
-						0.5,0.5,0.5, new Particle.DustOptions(color,1.0f));
-
+	public void doOnMove(PlayerMoveEvent e,PlayerData pd,Player pe){
+		WeaponData weapon = DataStore.getWeapondata(pd.getWeapon());
+		//System.out.println(pd.getMotion());
+		//System.out.println(pe.getLocation().getDirection());
+		//System.out.println(pd.getMotion().dot(pe.getLocation().getDirection()));
+		if(pd.getMotion().normalize().dot(pe.getLocation().getDirection())>0.5){
+			//向いている方向と移動している方向が同じ = 前に進んでいるなら
+			if(pe.getExp() < weapon.getCost()) {
+				MainGame.sendActionBar(pd, ChatColor.RED+"インクがありません!");
+				return;
 			}
+			pe.setExp((float) (pe.getExp()-weapon.getCost()));
+			BukkitRunnable task = new RollerRollRunnable(pd.getName(),this,pe.getLocation().clone());
+			task.runTaskTimer(Main.main, 0, 1);
 		}
+
 	}
 
 	@EventHandler
@@ -132,7 +126,8 @@ public class Roller extends MainWeapon {
 		Projectile ball= (Projectile) e.getDamager();
 		WeaponData data = DataStore.getWeapondata(pd.getWeapon());
 		//System.out.println("call5");
-		e.setDamage(data.getInkSplashDamage()*getDecayRate(ball,data));
+		e.setDamage(0);
+		MainGame.damageTarget(pd,((LivingEntity) e.getEntity()),data.getInkSplashDamage()*getDecayRate(ball,data));
 		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 	}
 
@@ -146,8 +141,8 @@ public class Roller extends MainWeapon {
 			float pitch;
 			if(loc.getPitch()>30){
 				pitch=30;
-			}else if(loc.getPitch()<-20){
-				pitch=-20;
+			}else if(loc.getPitch()<-10){
+				pitch=-10;
 			}else{
 				pitch=loc.getPitch();
 			}
@@ -159,7 +154,7 @@ public class Roller extends MainWeapon {
 			loc2=loc2.add(0,2.5,0);
 			Snowball ball=player.getWorld().spawn(loc2,Snowball.class);
 
-			ball.setVelocity(direction);
+			ball.setVelocity(player.getVelocity().add(direction));
 			ball.setShooter(player);
 			ball.setCustomName(bulletname);
 

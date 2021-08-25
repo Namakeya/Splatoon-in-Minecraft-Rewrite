@@ -74,7 +74,8 @@ public class Blaster extends MainWeapon {
 		WeaponData data = DataStore.getWeapondata(pd.getWeapon());
 
 		double damage=data.getDamage()*getDecayRate(ball,data);
-		e.setDamage(damage);
+		e.setDamage(0);
+		MainGame.damageTarget(pd,((LivingEntity) e.getEntity()),damage);
 		//System.out.println(ball.toString()+" damage : "+damage);
 		((LivingEntity) e.getEntity()).setMaximumNoDamageTicks(1);
 		pe.playSound(ball.getLocation(),Sound.BLOCK_ANVIL_PLACE,SoundCategory.PLAYERS,0.6f,1.2f);

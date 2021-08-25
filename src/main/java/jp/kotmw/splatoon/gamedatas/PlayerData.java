@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 public class PlayerData {
 	private String name; //プレイヤー名
@@ -41,6 +42,65 @@ public class PlayerData {
 	private int subCount;//トラップのような設置個数に制限のあるサブをいくつ置いているか
 
 	private int recoilTick;//硬直状態かどうか
+
+	private boolean dropped;//アイテムドロップしたかどうか。onInteractで左クリックとアイテムドロップを見分けるために使用
+
+	private int specialPoint;//スペシャルポイント
+
+	private boolean usingSpecial;//スペシャル使用中かどうか
+
+	private boolean canUseSpecial;//スペシャル使用可能かどうか
+
+	private Location lastPos;// プレイヤーの前tickの位置
+
+	private Vector motion=new Vector(0,0,0);//getVelocity()が動作しないのでこれを使う
+
+	public Vector getMotion() {
+		return motion;
+	}
+
+	public Location getLastPos() {
+		return lastPos;
+	}
+
+	public void setLastPos(Location lastPos) {
+		if(this.lastPos!=null) {
+			this.motion = (lastPos.toVector().subtract(this.lastPos.toVector()));
+		}
+		this.lastPos = lastPos;
+	}
+
+	public boolean isCanUseSpecial() {
+		return canUseSpecial;
+	}
+
+	public void setCanUseSpecial(boolean canUseSpecial) {
+		this.canUseSpecial = canUseSpecial;
+	}
+
+	public boolean isUsingSpecial() {
+		return usingSpecial;
+	}
+
+	public void setUsingSpecial(boolean usingSpecial) {
+		this.usingSpecial = usingSpecial;
+	}
+
+	public int getSpecialPoint() {
+		return specialPoint;
+	}
+
+	public void setSpecialPoint(int specialPoint) {
+		this.specialPoint = specialPoint;
+	}
+
+	public boolean isDropped() {
+		return dropped;
+	}
+
+	public void setDropped(boolean dropped) {
+		this.dropped = dropped;
+	}
 
 	public int getSubCount() {
 		return subCount;

@@ -1,6 +1,9 @@
 package jp.kotmw.splatoon.maingame;
 
+import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.superjump.Superjump;
+import jp.kotmw.splatoon.util.MessageUtil;
+import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -26,6 +29,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import jp.kotmw.splatoon.Main;
@@ -44,6 +48,17 @@ import java.util.List;
 
 public class Listeners implements Listener {
 
+	public static PotionEffect sat=new PotionEffect(PotionEffectType.SATURATION,20*6000,1,false,false);
+
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlace(PlayerInteractEvent e) {
+		PlayerData data=DataStore.getPlayerData(e.getPlayer().getName());
+		//System.out.println("interact2");
+		if(data!=null && data.isDropped()) {
+			data.setDropped(false);
+		}
+	}
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlace(BlockPlaceEvent e) {
@@ -79,7 +94,7 @@ public class Listeners implements Listener {
 		}
 		return false;
 	}
-
+/*
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onHung(FoodLevelChangeEvent e) {
 		//System.out.println(e.getFoodLevel());
@@ -100,6 +115,8 @@ public class Listeners implements Listener {
 			//e.getEntity().setFoodLevel();
 	}
 
+ */
+
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInvClick(InventoryClickEvent e) {
@@ -118,7 +135,10 @@ public class Listeners implements Listener {
 		//System.out.println(e.getPlayer().getItemInUse()!=null);
 		if(!DataStore.hasPlayerData(e.getPlayer().getName()))
 			return;
+
 		Player player = e.getPlayer();
+		PlayerData pd=DataStore.getPlayerData(player.getName());
+		pd.setLastPos(player.getLocation());
 		if(!DataStore.getPlayerData(player.getName()).isMove()) {
 			Location from = e.getFrom(), to = e.getTo();
 			if(from.getX() != to.getX()
@@ -127,7 +147,7 @@ public class Listeners implements Listener {
 			e.setCancelled(true);
 			return;
 		}
-		player.setFoodLevel(4);
+		player.addPotionEffect(sat);
 		Location location = player.getLocation();
 		if(location.getBlock().getType() == Material.WATER ||
 				location.getBlock().getType() == Material.WATER) {
@@ -181,15 +201,25 @@ public class Listeners implements Listener {
 			return;
 		if(DataStore.getPlayerData(e.getEntity().getName()).getArena() == null)
 			return;
-		Player player = e.getEntity();
 		e.setDeathMessage("");
 		e.setKeepInventory(true);
+
+		MainGame.sync(() -> {deathSyncFunc(e);});
+
+	}
+
+	public void deathSyncFunc(PlayerDeathEvent e){
+		Player player = e.getEntity();
+		PlayerData data = DataStore.getPlayerData(player.getName());
+
+
 		player.getInventory().setHeldItemSlot(8);
 		player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 		player.setRemainingAir(player.getMaximumAir());
 		player.setFoodLevel(20);
+
 		player.setGameMode(GameMode.SPECTATOR);
-		PlayerData data = DataStore.getPlayerData(player.getName());
+
 		if(data.isSquidMode()) {
 			LivingEntity squid = data.getPlayerSquid();
 			if(squid != null)

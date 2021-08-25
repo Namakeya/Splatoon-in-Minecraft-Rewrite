@@ -19,7 +19,7 @@ public class AnimationRunnable extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		if(i <= 50) {
+		if(i <= 12) {
 			for(PlayerData data : DataStore.getRoomPlayersList(this.data.getName()))
 				MainGame.sendActionBar(data, "    "+ChatColor.DARK_GREEN.toString()+ChatColor.BOLD+getTextLine(i));
 			i++;
@@ -31,12 +31,12 @@ public class AnimationRunnable extends BukkitRunnable {
 	public static String getTextLine(int i) {
 		String text = "定員に達するまで今しばらくお待ちください";
 		String blank = "                                        ";
-		if(i <= 20)
-			return blank.substring(i*2, blank.length())+text.substring(0, i);
-		else if(i > 20 && i <= 30)
+		if(i <= 5)
+			return blank.substring(i*8, blank.length())+text.substring(0, i*4);
+		else if(i > 5 && i <= 7)
 			return text;
-		else if(i > 30)
-			return text.substring(i-30, text.length())+blank.substring(0, (i-30)*2);
+		else if(i > 7)
+			return text.substring((i-7)*4, text.length())+blank.substring(0, (i-7)*8);
 		return text;
 	}
 

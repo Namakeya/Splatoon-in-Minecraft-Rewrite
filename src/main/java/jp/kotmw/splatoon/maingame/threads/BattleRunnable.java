@@ -1,5 +1,8 @@
 package jp.kotmw.splatoon.maingame.threads;
 
+import jp.kotmw.splatoon.gamedatas.WeaponData;
+import jp.kotmw.splatoon.maingame.GameItems;
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -59,7 +62,15 @@ public class BattleRunnable extends BukkitRunnable {
 				if (data.getSubCooldown() > 0) {
 					data.setSubCooldown(data.getSubCooldown() - 1);
 				}
+				WeaponData weaponData=MainWeapon.getWeaponData(data);
+				if(!data.isCanUseSpecial() && data.getSpecialPoint()>= weaponData.getSpecialPoint()){
+					MainGame.sendMessage(data,ChatColor.RED+"||| SPECIAL AVAILABLE!! |||");
+					Player player=Bukkit.getPlayer(data.getName());
+					player.getInventory().setItem(2, GameItems.getSpecialWeaponItem(weaponData));
+					data.setCanUseSpecial(true);
+				}
 			}
+			this.arenaData.getBossBar().updateBar();
 			if(tick%20 == 0) {
 				if(tick > (second+5)*20) {//転送後のTitle表示
 					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
@@ -181,12 +192,22 @@ public class BattleRunnable extends BukkitRunnable {
 			}
 			pdata.setTask(null);
 			pdata.setSquidTask(null);
+			/*
 			pdata.setSubCount(0);
+			pdata.setDropped(false);
+			pdata.setSpecialPoint(0);
+			pdata.setCanUseSpecial(false);
+*/
+
+
+
 			arenaData.getScoreboard().hideBoard(pdata);
 			Player player = Bukkit.getPlayer(pdata.getName());
 			player.getInventory().clear();
-			player.removePotionEffect(PotionEffectType.SPEED);
-			player.removePotionEffect(PotionEffectType.INVISIBILITY);
+			for(PotionEffectType p:PotionEffectType.values()){
+				player.removePotionEffect(p);
+			}
+
 			player.setGameMode(GameMode.SPECTATOR);
 			player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 			player.setFoodLevel(20);

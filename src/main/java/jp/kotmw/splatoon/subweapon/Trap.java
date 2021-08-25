@@ -9,6 +9,7 @@ import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 import jp.kotmw.splatoon.subweapon.threads.TrapRunnable;
+import jp.kotmw.splatoon.util.MessageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
@@ -25,15 +26,14 @@ public class Trap extends SubWeapon {
 	}
 
 	@Override
-	public boolean doOnInteract(PlayerInteractEvent e, PlayerData player, Player p) {
+	public boolean doOnUse(PlayerData player, Player p) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
 		if(p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
-		PlayerData pd=DataStore.getPlayerData(player.getName());
 		launch(p, subweapon);
-		e.setCancelled(true);
+		MessageUtil.sendMessage(player,"Trap Placed");
 		return true;
 	}
 

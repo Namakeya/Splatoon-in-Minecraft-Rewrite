@@ -32,9 +32,9 @@ public class SettingCompleter implements TabCompleter {
         roomcommand.add("setroom");
         roomcommand.add("removeroom");
         roomcommand.add("addarena");
-        roomcommand.add("removearena");
 
         List<String> arenacommand=new ArrayList();
+        arenacommand.add("removearena");
         arenacommand.add("setarena");
         arenacommand.add("setarea");
         arenacommand.add("finish");
