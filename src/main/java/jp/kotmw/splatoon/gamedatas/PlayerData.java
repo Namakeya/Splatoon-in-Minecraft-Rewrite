@@ -56,7 +56,7 @@ public class PlayerData {
 	private Vector motion=new Vector(0,0,0);//getVelocity()が動作しないのでこれを使う
 
 	public Vector getMotion() {
-		return motion;
+		return motion.clone();
 	}
 
 	public Location getLastPos() {

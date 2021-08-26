@@ -71,6 +71,7 @@ public class Listeners implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBreak(BlockBreakEvent e) {
+		System.out.println("break");
 		if(DataStore.hasPlayerData(e.getPlayer().getName())) {
 			e.setCancelled(true);
 			return;

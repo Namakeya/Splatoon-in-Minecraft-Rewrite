@@ -11,6 +11,7 @@ import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,7 +48,7 @@ public class QuickBomb extends SubWeapon {
 		player.setExp((float) (ink-data.getCost()));
 		ThrownExpBottle expBottle = player.launchProjectile(ThrownExpBottle.class, player.getLocation().getDirection());
 		expBottle.setCustomName(bulletname);
-		player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT,1,1);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS,1,1);
 	}
 	@Override
 	public void doOnExex(ExpBottleEvent e, PlayerData data, Player pe) {

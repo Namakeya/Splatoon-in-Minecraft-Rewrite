@@ -10,6 +10,7 @@ import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -47,7 +48,7 @@ public class SplashBomb extends SubWeapon {
 		tntprimed.setVelocity(player.getLocation().getDirection());
 		tntprimed.setCustomName(bulletname);
 		new SplashBombRunnable(DataStore.getPlayerData(player.getName()), tntprimed).runTaskTimer(Main.main, 0, 1);
-		player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT,1,1);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS,1,1);
 
 	}
 	@Override

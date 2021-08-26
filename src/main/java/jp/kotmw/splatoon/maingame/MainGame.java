@@ -356,7 +356,7 @@ public class MainGame extends MessageUtil {
 
 			}
 		}else{
-			System.out.println(pd.getName() + " cannot damage " + target.getName());
+			//System.out.println(pd.getName() + " cannot damage " + target.getName());
 		}
 	}
 

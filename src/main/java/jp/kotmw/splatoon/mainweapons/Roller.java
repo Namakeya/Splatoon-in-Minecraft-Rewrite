@@ -153,8 +153,9 @@ public class Roller extends MainWeapon {
 			loc2.setPitch(0);
 			loc2=loc2.add(0,2.5,0);
 			Snowball ball=player.getWorld().spawn(loc2,Snowball.class);
-
-			ball.setVelocity(player.getVelocity().add(direction));
+			Vector motion=pd.getMotion();
+			if(motion.getY()>0.1)motion=motion.setY(0.1);
+			ball.setVelocity(pd.getMotion().add(direction));
 			ball.setShooter(player);
 			ball.setCustomName(bulletname);
 

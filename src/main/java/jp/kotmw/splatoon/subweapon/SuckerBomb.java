@@ -10,6 +10,7 @@ import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.subweapon.threads.SplashBombRunnable;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -43,7 +44,7 @@ public class SuckerBomb extends SubWeapon {
 		player.setExp((float) (ink-data.getCost()));
 		ThrownExpBottle expBottle = player.launchProjectile(ThrownExpBottle.class, player.getLocation().getDirection());
 		expBottle.setCustomName(bulletname);
-		player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT,1,1);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS, 1,1);
 	}
 	@Override
 	public void doOnExex(ExpBottleEvent e, PlayerData data, Player pe) {
@@ -57,6 +58,7 @@ public class SuckerBomb extends SubWeapon {
 		tntprimed.setSource(pe);
 		tntprimed.setGravity(false);
 		tntprimed.setVelocity(new Vector(0,0,0));
+		pe.getWorld().playSound(pe.getLocation(), Sound.ENTITY_TNT_PRIMED, SoundCategory.PLAYERS, 2,1);
 	}
 
 	public boolean checkOnExplode(ExplosionPrimeEvent e){

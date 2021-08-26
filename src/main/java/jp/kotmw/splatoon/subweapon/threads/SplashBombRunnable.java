@@ -1,5 +1,9 @@
 package jp.kotmw.splatoon.subweapon.threads;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -21,8 +25,10 @@ public class SplashBombRunnable extends BukkitRunnable {
 	@Override
 	public void run() {
 		int tick = bomb.getFuseTicks();
+		Player pe= Bukkit.getPlayer(data.getName());
 		if(bomb.isOnGround() && tick > 20) {
 			bomb.setFuseTicks(1*20);
+			pe.getWorld().playSound(pe.getLocation(), Sound.ENTITY_TNT_PRIMED, SoundCategory.PLAYERS, 2f,1f);
 		}
 		if(tick == 0) {
 			SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
