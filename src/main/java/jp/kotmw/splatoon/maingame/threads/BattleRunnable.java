@@ -2,6 +2,7 @@ package jp.kotmw.splatoon.maingame.threads;
 
 import jp.kotmw.splatoon.gamedatas.WeaponData;
 import jp.kotmw.splatoon.maingame.GameItems;
+import jp.kotmw.splatoon.maingame.Turf_War;
 import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,6 +30,7 @@ public class BattleRunnable extends BukkitRunnable {
 	private int second;
 	private BattleType type;
 	private String main, sub;
+	public boolean endNow=false;
 
 	public BattleRunnable(ArenaData data, int second, BattleType type) {
 		this.arenaData = data;
@@ -57,7 +59,7 @@ public class BattleRunnable extends BukkitRunnable {
 	@Override
 	public void run() {
 		//System.out.println("call");
-		if(tick > 0) {
+		if((tick > 0 || arenaData.getBattleClass().doExtra(tick)) && !endNow) {
 			for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 				if (data.getSubCooldown() > 0) {
 					data.setSubCooldown(data.getSubCooldown() - 1);
@@ -94,6 +96,12 @@ public class BattleRunnable extends BukkitRunnable {
 					}
 
 				} else if(tick == second*20) {//戦闘開始
+					switch(type) {
+						case Splat_Zones:
+							//TransferRunnable内で動かすとなぜかアーマースタンドが二重に生成されたのでここに移動
+							((SplatZones)arenaData.getBattleClass()).showZone(0);
+							break;
+					}
 					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						data.setMove(true);
 						data.setAllCansel(false);
@@ -120,19 +128,24 @@ public class BattleRunnable extends BukkitRunnable {
 					arenaData.getSuperjump().setSuperjumpItems();
 					if((tick/20)%60 == 0)
 						MainGame.sendMessageforArena(arenaData.getName(), ChatColor.YELLOW+"残り時間 "+ChatColor.AQUA.toString()+ChatColor.BOLD+(tick/20)/60+ChatColor.YELLOW+" 分");
-					if(tick/20 <= 10) {
+					if(tick/20 <= 10 && 0<tick) {
 						for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName()))
 							MainGame.sendTitle(data, 0, 2, 0, ChatColor.GRAY.toString()+ChatColor.BOLD+tick/20, " ");
 					}
 				}
 			}
 			if(type == BattleType.Splat_Zones) {
-				if(tick%10 == 0)
+				if(tick%10 == 0 && tick < second*20 )
 					((SplatZones) arenaData.getBattleClass()).checkArea();
-				int team1_count = arenaData.getTeam1_count().getcount();
-				int team2_count = arenaData.getTeam2_count().getcount();
-				if(team1_count == 0 || team2_count == 0) {
-					ResetPlayerData();
+				for(int i=1;i<=arenaData.getMaximumTeamNum();i++){
+					if(arenaData.getCount(i).getcount()==0) {
+						tick = 0;
+						return;
+					}
+				}
+
+
+					/*ResetPlayerData();
 					for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
 						MainGame.sendTitle(data, 0, 2, 0, ChatColor.GRAY.toString()+ChatColor.BOLD+"Finish!", " ");
 						MainGame.sendMessage(data, ChatColor.RED+"開発途中のため、リザルトはスキップします");
@@ -141,8 +154,9 @@ public class BattleRunnable extends BukkitRunnable {
 						stand.remove();
 					MainGame.end(arenaData, true);
 					this.cancel();
-					return;
-				}
+					return;*/
+
+
 			}
 		} else {
 			for(PlayerData data : DataStore.getArenaPlayersList(this.arenaData.getName())) {
@@ -155,9 +169,11 @@ public class BattleRunnable extends BukkitRunnable {
 			if(type == BattleType.Turf_War)
 				arenaData.getBattleClass().resultBattle();// TODO ここ 直しました sesamugi
 			else if(type == BattleType.Splat_Zones) {
-				for(ArmorStand stand : arenaData.getAreastands())
-					stand.remove();
-				MainGame.end(arenaData, false);
+				SplatZones.clearAreaStand(arenaData);
+				//for(ArmorStand stand : arenaData.getAreastands())
+					//stand.remove();
+				arenaData.getBattleClass().resultBattle();
+				//MainGame.end(arenaData, false);
 			}
 			this.cancel();
 		}

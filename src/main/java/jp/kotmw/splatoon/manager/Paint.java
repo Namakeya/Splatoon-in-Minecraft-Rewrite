@@ -1,5 +1,7 @@
 package jp.kotmw.splatoon.manager;
 
+import jp.kotmw.splatoon.maingame.BattleClass;
+import jp.kotmw.splatoon.maingame.SplatZones;
 import jp.kotmw.splatoon.specialweapon.SpecialWeapon;
 import jp.kotmw.splatoon.util.MaterialUtil;
 import org.bukkit.Bukkit;
@@ -28,31 +30,54 @@ public class Paint {
 	@SuppressWarnings("deprecation")
 	public static boolean PaintWool(PlayerData data, Block block,boolean countAsSPP) {
 		ArenaData arena = DataStore.getArenaData(data.getArena());
+
+		if(PaintWool(data,arena,data.getTeamid(),block)) {
+			//カーペットのみカウントする。将来的に「上が開いているブロック」という基準でカウントする可能性もあり sesamugi
+			if (MaterialUtil.isCarpet(block.getType())) {
+
+				addScore(data, countAsSPP);//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
+
+			}
+
+
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+
+	/**主にエリア塗りなどプレイヤーの介さない塗り用
+	 * @param data はnullable*/
+	public static boolean PaintWool(PlayerData data,ArenaData arena,int team,Block block){
 		if(block == null || block.getType() == Material.AIR)
 			return false;
 		if(!isCanPaintBlock(block))
 			return false;
 		if(!isCanPaintColor(DyeColor.getByWoolData((byte) SplatColorManager.getColorID(block))))
 			return false;
-		if(SplatColorManager.getColorID(block) == arena.getSplatColor(data.getTeamid()).getColorID())
+		if(SplatColorManager.getColorID(block) == arena.getSplatColor(team).getColorID())
 			return false;
 		//カーペットのみカウントする。将来的に「上が開いているブロック」という基準でカウントする可能性もあり sesamugi
 		if(MaterialUtil.isCarpet(block.getType())) {
 			int bonus = 0;//塗ったブロックが敵チームのカラーだったら、この変数に敵チームの番号が入る
-			for (int team = 1; team <= arena.getMaximumTeamNum(); team++)
-				if ((data.getTeamid() != team) && SplatColorManager.getColorID(block) == arena.getSplatColor(team).getColorID()) {
-					bonus = team;
+			for (int team_ = 1; team_ <= arena.getMaximumTeamNum(); team_++)
+				if ((team != team_) && SplatColorManager.getColorID(block) == arena.getSplatColor(team_).getColorID()) {
+					bonus = team_;
 					break;
 				}
 
-			addScore(data, countAsSPP);//0じゃない場合は敵チームのを上書きしたという事だからボーナスに追加
-			arena.addTeamScore(data.getTeamid(), bonus);//TODO ここ
+			arena.addTeamScore(team, bonus);//TODO ここ
+			if(arena.getBattleClass() instanceof SplatZones
+					&& ((SplatZones)arena.getBattleClass()).isInArea(block.getLocation())){
+				arena.addTeamAreaOccupation(team, bonus);
+			}
 		}
 		BlockPaintEvent event = new BlockPaintEvent(block, data, arena);
 		Bukkit.getPluginManager().callEvent(event);
 		addRollBack(arena, block);
 
-		ColorChange(block, DataStore.getArenaData(data.getArena()).getSplatColor(data.getTeamid()));
+		ColorChange(block, arena.getSplatColor(team));
 		return true;
 	}
 	

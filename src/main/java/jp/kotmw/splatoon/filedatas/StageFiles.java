@@ -12,8 +12,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.DataStore.GameStatusEnum;
-import jp.kotmw.splatoon.maingame.Turf_War;
-import jp.kotmw.splatoon.manager.SplatBossBar;
+import jp.kotmw.splatoon.maingame.BattleClass;
 import jp.kotmw.splatoon.manager.SplatScoreBoard;
 
 public class StageFiles extends PluginFiles {
@@ -41,7 +40,7 @@ public class StageFiles extends PluginFiles {
 			z1 = z2b;
 			z2 = z1b;
 		}
-		int paintblockscount = Turf_War.getTotalArea(world, x1, x2, y1, y2, z1, z2);
+		int paintblockscount = BattleClass.getTotalArea(world, x1, x2, y1, y2, z1, z2);
 		if(paintblockscount < 1)
 			return false;
 		file.set("Stage.Status", false);
@@ -100,16 +99,18 @@ public class StageFiles extends PluginFiles {
 			x1 = x2b;
 			x2 = x1b;
 		}
-		int y = y2b;
-		if(y1b < y2b)
-			y = y1b;
+		int y1 = y1b, y2 = y2b;
+		if(y1b < y2b) {
+			y1 = y2b;
+			y2 = y1b;
+		}
 		int z1 = z1b, z2 = z2b;
 		if(z1b < z2b) {
 			z1 = z2b;
 			z2 = z1b;
 		}
-		file.set("SplatZone.Pos1", x1+"/"+y+"/"+z1);
-		file.set("SplatZone.Pos2", x2+"/"+y+"/"+z2);
+		file.set("SplatZone.Pos1", x1+"/"+y1+"/"+z1);
+		file.set("SplatZone.Pos2", x2+"/"+y2+"/"+z2);
 		SettingFiles(file, DirFile(filedir, arena));
 		return true;
 	}
@@ -122,7 +123,7 @@ public class StageFiles extends PluginFiles {
 		FileConfiguration file = YamlConfiguration.loadConfiguration(DirFile(filedir, arena));
 		ArenaData data = new ArenaData(arena, file);
 		if(update) {
-			int paintblockscount = Turf_War.getTotalArea(Bukkit.getWorld(data.getWorld()), 
+			int paintblockscount = BattleClass.getTotalArea(Bukkit.getWorld(data.getWorld()),
 					data.getStagePosition1().getBlockX(), 
 					data.getStagePosition2().getBlockX(), 
 					data.getStagePosition1().getBlockY(), 
@@ -143,7 +144,7 @@ public class StageFiles extends PluginFiles {
 
 	/**
 	 *
-	 * @param arena
+	 * @param data
 	 * @return 設定が終わってない、若しくはMapに入ってない場合、既に有効化されていればfalseを返す
 	 */
 	public static boolean isFinishSetup(ArenaData data) {
@@ -196,7 +197,7 @@ public class StageFiles extends PluginFiles {
 			if(!data.isStatus())
 				continue;
 			data.updateTeamColor();
-			data.setScoreBoard(new SplatScoreBoard(data));
+
 
 			DataStore.addArenaData(arena, data);
 		}

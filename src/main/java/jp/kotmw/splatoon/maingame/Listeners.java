@@ -53,6 +53,7 @@ public class Listeners implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlace(PlayerInteractEvent e) {
+		//System.out.println(e.getAction());
 		PlayerData data=DataStore.getPlayerData(e.getPlayer().getName());
 		//System.out.println("interact2");
 		if(data!=null && data.isDropped()) {
@@ -71,7 +72,7 @@ public class Listeners implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onBreak(BlockBreakEvent e) {
-		System.out.println("break");
+		//System.out.println("break");
 		if(DataStore.hasPlayerData(e.getPlayer().getName())) {
 			e.setCancelled(true);
 			return;

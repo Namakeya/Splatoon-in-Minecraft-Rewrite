@@ -1,7 +1,6 @@
 package jp.kotmw.splatoon.manager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +22,7 @@ public class SplatScoreBoard {
 	private Scoreboard scoreboard;
 	private ArenaData data;
 
-	private String timeScoreLast;
+	private Map<String,Score> scoreMap=new HashMap<>();
 
 	
 	public SplatScoreBoard(ArenaData data) {
@@ -47,32 +46,52 @@ public class SplatScoreBoard {
 			scoreboard.getTeam("SplatTeam"+teamnum).setPrefix(data.getSplatColor(teamnum).getChatColor().toString());
 		}
 		Objective objective = scoreboard.getObjective(data.getName());
-		objective.getScore(conversionTime(1)).setScore(0);
-		scoreboard.resetScores(conversionTime(1));
+		Score timescore= scoreMap.get("time");
+		timescore.setScore(0);
+		scoreboard.resetScores(timescore.getEntry());
 	}
 
 	public void DefaultScoreBoard(BattleType type) {
 		Objective obj = scoreboard.getObjective(data.getName());
-		List<String> board = new ArrayList<String>();
-		board.add(ChatColor.GREEN+"-Time left-");
-		board.add(conversionTime(MainGame.getTime(type)));
-		board.add(ChatColor.RESET.toString());
-		board.add("Stage : "+data.getName());
+		Map<String,String> board = new LinkedHashMap<>();//順序を維持するためLinkedHashMapでなければならない
+		board.put("TIMELEFT",ChatColor.GREEN+"-Time left-");
+		board.put("time",conversionTime(MainGame.getTime(type)));
+		board.put("NOLINE1",ChatColor.RESET.toString());
+		board.put("stage","Stage : "+data.getName());
 		if(type == BattleType.Splat_Zones) {
-			board.add(ChatColor.RESET.toString()+ChatColor.RESET.toString());
-			board.add(ChatColor.YELLOW+"-Count-");
-			board.add(data.getSplatColor(1).getChatColor()+"Team1 : "+ChatColor.WHITE+100);
-			board.add(data.getSplatColor(2).getChatColor()+"Team2 : "+ChatColor.WHITE+100);
+			board.put("NOLINE2",ChatColor.RESET.toString()+ChatColor.RESET.toString());
+			board.put("COUNT",ChatColor.YELLOW+"-Count-");
+			board.put("team1count",data.getSplatColor(1).getChatColor()+"Team1 : "+ChatColor.WHITE+100);
+			board.put("team2count",data.getSplatColor(2).getChatColor()+"Team2 : "+ChatColor.WHITE+100);
 		}
 		int i = board.size() -1;
-		for(String boardtxt : board) {
-			Score score = obj.getScore(boardtxt);
+		for(Map.Entry<String,String> boardtxt : board.entrySet()) {
+			Score score = obj.getScore(boardtxt.getValue());
 			score.setScore(i);
+			scoreMap.put(boardtxt.getKey(),score);
 			i--;
 		}
 	}
 
+	public void updateScore(String name,String value){
+		Objective obj = scoreboard.getObjective(data.getName());
+		Score score= scoreMap.get(name);
+		//int scorevalue = obj.getScore(ChatColor.GREEN+"-Time left-").getScore()-1;
+		assert(score!=null);
+		int scorevalue=score.getScore();
+		score.setScore(0);
+		//System.out.println(score.getEntry());
+		scoreboard.resetScores(score.getEntry());
+		score= obj.getScore(value);
+		score.setScore(scorevalue);
+		scoreMap.put(name,score);
+
+	}
+
 	private String conversionTime(int tick) {
+		if(tick<=0){
+			return ChatColor.RED.toString()+" 延長中! ";
+		}
 		int second = tick%60;
 		int minut = (tick/60)%60;
 		if(String.valueOf(second).length() == 2)
@@ -81,54 +100,31 @@ public class SplatScoreBoard {
 	}
 
 	public void changeTime(int tick) {
-		Objective obj = scoreboard.getObjective(data.getName());
 		if(tick%20 != 0)
 			tick -= tick%20;
-		int scorevalue = obj.getScore(ChatColor.GREEN+"-Time left-").getScore()-1;
-		if(timeScoreLast != null) {
-			Score score = obj.getScore(timeScoreLast);
-			score.setScore(0);
-			scoreboard.resetScores(timeScoreLast);
-		}
-		timeScoreLast=conversionTime(tick/20);
-		Score score = obj.getScore(timeScoreLast);
-		score.setScore(scorevalue);
+		updateScore("time",conversionTime(tick/20));
+
 	}
 
-	public void updateTeam1Count() {
+	public void updateCount(int team) {
 		Objective obj = scoreboard.getObjective(data.getName());
-		int team1value = obj.getScore(ChatColor.YELLOW+"-Count-").getScore()-1;
-		TeamCountManager manager = data.getTeam1_count();
-		List<String> beforelist = getText(1, manager, true);
-		String aftertext = getText(1, manager, false).get(0);
-		for(String beforetext : beforelist) {
-			obj.getScore(beforetext).setScore(0);
-			scoreboard.resetScores(beforetext);
-		}
-		if(manager.getpenalty() > 0)
-			aftertext = getText(1, manager, false).get(1);
-		obj.getScore(aftertext).setScore(team1value);
-	}
+		//int team1value = obj.getScore(ChatColor.YELLOW+"-Count-").getScore()-1;
+		TeamCountManager manager = data.getCount(team);
+		if(team==1){
+			updateScore("team1count",getCountText(team,manager));
+		}else if(team==2){
+			updateScore("team2count",getCountText(team,manager));
+		}else{
 
-	public void updateTeam2Count() {
-		Objective obj = scoreboard.getObjective(data.getName());
-		int team2value = obj.getScore(ChatColor.YELLOW+"-Count-").getScore()-2;
-		TeamCountManager manager = data.getTeam2_count();
-		List<String> beforelist = getText(2, manager, true);
-		String aftertext = getText(2, manager, false).get(0);
-		for(String beforetext : beforelist) {
-			obj.getScore(beforetext).setScore(0);
-			scoreboard.resetScores(beforetext);
 		}
-		if(manager.getpenalty() > 0)
-			aftertext = getText(2, manager, false).get(1);
-		obj.getScore(aftertext).setScore(team2value);
-	}
 
+	}
+/*
 	public void updatePenalty(int team, int beforepenalty) {
 		Objective obj = scoreboard.getObjective(data.getName());
 		int team1value = obj.getScore(ChatColor.YELLOW+"-Count-").getScore()-1;
-		TeamCountManager manager = team == 1 ? data.getTeam1_count() : data.getTeam2_count();
+		TeamCountManager manager = data.getCount(team);
+
 		if(manager.getpenalty() < 1)
 			return;
 		String beforetext = data.getSplatColor(team).getChatColor()+"Team"+team+" : "+ChatColor.WHITE+(manager.getcount())+" +"+beforepenalty;
@@ -141,17 +137,17 @@ public class SplatScoreBoard {
 		team1 = obj.getScore(aftertext);
 		team1.setScore(team1value);
 	}
-	
+	*/
 	public Scoreboard getScoreboard() {
 		return scoreboard;
 	}
 
-	private List<String> getText(int team,TeamCountManager manager, boolean before) {
-		int Subtraction = before ? 1 : 0;
-		List<String> list = new ArrayList<String>();
-		list.add(data.getSplatColor(team).getChatColor()+"Team"+team+" : "+ChatColor.WHITE+(manager.getcount()+Subtraction));
-		list.add(data.getSplatColor(team).getChatColor()+"Team"+team+" : "+ChatColor.WHITE+(manager.getcount())+" +"+(manager.getpenalty()+Subtraction));
-		return list;
+	private String getCountText(int team,TeamCountManager manager) {
+		if(manager.getpenalty()>0){
+			return data.getSplatColor(team).getChatColor()+"Team"+team+" : "+ChatColor.WHITE+(manager.getcount())+" +"+(manager.getpenalty());
+		}else{
+			return data.getSplatColor(team).getChatColor()+"Team"+team+" : "+ChatColor.WHITE+(manager.getcount());
+		}
 	}
 	
 	public void setTeam(PlayerData data) {

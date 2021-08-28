@@ -10,11 +10,11 @@ import jp.kotmw.splatoon.gamedatas.ArenaData;
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.maingame.MainGame;
-import jp.kotmw.splatoon.maingame.Turf_War;
+import jp.kotmw.splatoon.maingame.BattleClass;
 
 public class ResultRunnable extends BukkitRunnable {
 
-	private Turf_War battle;
+	private BattleClass battle;
 	private int tick = 26+10+10;
 	private int i = 0;
 	private int ii = 98;
@@ -22,12 +22,9 @@ public class ResultRunnable extends BukkitRunnable {
 	private static String base = "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||";
 	private static String space = "            ";
  
-	public ResultRunnable(Turf_War battle) {
+	public ResultRunnable(BattleClass battle,int[] scorePercentage) {
 		this.battle = battle;
-		this.scorePercentage=new int[battle.getArena().getMaximumTeamNum()];
-		for(int i=0;i<battle.getArena().getMaximumTeamNum();i++){
-			scorePercentage[i] = (int) ((battle.getTeamScore(i+1) / (battle.getTotalTeamScore()))*100);
-		}
+		this.scorePercentage=scorePercentage;
 
 	}
 

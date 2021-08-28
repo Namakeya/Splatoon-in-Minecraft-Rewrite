@@ -1,17 +1,20 @@
 package jp.kotmw.splatoon.maingame;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import jp.kotmw.splatoon.Main;
+import jp.kotmw.splatoon.maingame.threads.ResultRunnable;
 import jp.kotmw.splatoon.util.MaterialUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.apache.http.annotation.Obsolete;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -22,125 +25,153 @@ import jp.kotmw.splatoon.gamedatas.PlayerData;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.manager.SplatColorManager;
 import jp.kotmw.splatoon.manager.TeamCountManager;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public class SplatZones extends Turf_War {
+public class SplatZones extends BattleClass {
 
 	public SplatZones(ArenaData data) {
 		super(data);
 	}
 
-	public void showZone() {
+	/**
+	 * BattleRunnable.java #L125
+	 * で呼び出されます
+	 */
+
+
+	public double getTeamScore(int team) {
+		return 100-data.getCount(team).getcount();
+
+	}
+
+	public double getTotalTeamScore() {
+		return getTeamScore(1)+getTeamScore(2)+1;
+	}
+
+
+	public void showZone(int colorid) {
+		//System.out.println("showZone");
 		List<ArmorStand> areastands = new ArrayList<ArmorStand>();
 		int x1 = (int)data.getAreaPosition1().getX();
 		int y1 = (int)data.getAreaPosition1().getY();
 		int z1 = (int)data.getAreaPosition1().getZ();
 		int x2 = (int)data.getAreaPosition2().getX();
+		int y2 = (int)data.getAreaPosition2().getY();
 		int z2 = (int)data.getAreaPosition2().getZ();
+		int i=0;
+		World w=Bukkit.getWorld(data.getWorld());
+		//World w=Bukkit.getPlayer(DataStore.getArenaPlayersList(data.getName()).get(0).getName()).getWorld();
 		for(int x = x2; x <= x1; x++) {
 			for(int y = y1+2;y <= y1+20;y+=5) {
 				for(int z = z2; z <= z1; z++) {
 					if((x == x1 || x == x2) || (z == z1 || z == z2)) {
-						Location l = new Location(Bukkit.getWorld(data.getWorld()), x+0.5, y, z+0.5);
-						ArmorStand stand = (ArmorStand) Bukkit.getWorld(data.getWorld()).spawnEntity(l, EntityType.ARMOR_STAND);
-						ItemStack item = new ItemStack(Material.WHITE_STAINED_GLASS, 1);
+
+						Location l = new Location(w, x+0.5, y, z+0.5);
+						ArmorStand stand = (ArmorStand) w.spawnEntity(l, EntityType.ARMOR_STAND);
+						ItemStack item = new ItemStack(MaterialUtil.fromColorIdToStainedGlass(colorid), 1);
 						ItemMeta meta = item.getItemMeta();
-						meta.setDisplayName(ChatColor.RESET+"SplatPluginItem ["+data.getName()+"]");
+						meta.setDisplayName("SplatPluginItem ["+data.getName()+"]");
 						item.setItemMeta(meta);
 						stand.setHelmet(item);
 						stand.setVisible(false);
 						stand.setGravity(false);
 						stand.setMarker(true);
+						stand.setCustomName("SplatPluginItem ["+data.getName()+"]");
 						areastands.add(stand);
+						i++;
 					}
 				}
 			}
 		}
-		data.setTotalareablock(getTotalArea(Bukkit.getWorld(data.getWorld()), x1, x2, y1, y1, z1, z2));
+		//System.out.println("i : "+i);
+		//System.out.println("areastands : "+areastands.size());
+		data.setTotalareablock(getTotalArea(Bukkit.getWorld(data.getWorld()), x1, x2, y1, y2, z1, z2));
 		data.setAreastands(areastands);
 	}
 
-	public void checkArea() {
-		int team1 = 0, team2 = 0;
+	public boolean isInArea(Location location){
 		int x1 = (int)data.getAreaPosition1().getX();
 		int y1 = (int)data.getAreaPosition1().getY();
 		int z1 = (int)data.getAreaPosition1().getZ();
 		int x2 = (int)data.getAreaPosition2().getX();
+		int y2 = (int)data.getAreaPosition2().getY();
+		int z2 = (int)data.getAreaPosition2().getZ();
+		return x2<=location.getX() && location.getX()<=x1
+				&& y2<=location.getY() && location.getY()<=y1
+				&& z2<=location.getZ() && location.getZ()<=z1;
+	}
+
+	public int getOpposite(int team){
+		return team==1?2:1;
+	}
+
+	public void checkArea() {
+		/*
+		int area[]=new int[data.getMaximumTeamNum()];
+		int x1 = (int)data.getAreaPosition1().getX();
+
+		int z1 = (int)data.getAreaPosition1().getZ();
+		int x2 = (int)data.getAreaPosition2().getX();
+		int y2 = (int)data.getAreaPosition2().getY();
 		int z2 = (int)data.getAreaPosition2().getZ();
 		for(int x = x2; x <= x1; x++) {
 			for(int z = z2; z <= z1; z++) {
-				Block block = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y1, z);
-				Block aboveBlock = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y1+1, z);
+				Block block = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y2, z);
+				Block aboveBlock = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y2+1, z);
 				if(block.getType() != Material.AIR
 						&& aboveBlock.getType() == Material.AIR) {
 					int colorbyte = SplatColorManager.getColorID(block);
-					if(data.getSplatColor(1).getColorID() == colorbyte) {
-						team1++;
-					} else if(data.getSplatColor(2).getColorID() == colorbyte) {
-						team2++;
+					for(int i=1;i<=data.getMaximumTeamNum();i++){
+						if(data.getSplatColor(i).getColorID() == colorbyte) {
+							area[i - 1]++;
+						}
 					}
+
 				}
 			}
 		}
+
+		 */
 		int totalareablock = data.getTotalareablock();
-		if((totalareablock*0.5 > team1) && (totalareablock*0.5 > team2))
+		if((totalareablock*0.5 > data.getTeamAreaOccupation(1)) && (totalareablock*0.5 > data.getTeamAreaOccupation(2)))
 			return; //開始当初でteam1,team2が両方ともぜんぜん塗ってない時の処理
-		TeamCountManager team1_manage = data.getTeam1_count(), team2_manage = data.getTeam2_count();
-		if(team1_manage.ishavearea()) {//team1が既にエリアを確保している場合
-			if(totalareablock*0.5 < team2) {//相手チームが5割以上になった場合
-				//カウントストップ
+
+		for(int i=1;i<=data.getMaximumTeamNum();i++){
+			//System.out.println("team "+i+" 's score:"+data.getTeamAreaOccupation(i));
+			if(data.getCount(i).ishavearea()) {//片方が既にエリアを確保している場合
+				if(totalareablock*0.5 < data.getTeamAreaOccupation(getOpposite(i))) {//相手チームが5割以上になった場合
+					//カウントストップ
+					for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
+						String text = player.getTeamid() == i ?
+								data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップされた!":
+								data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップした！";
+						MainGame.sendTitle(player, 0, 5, 0, " ", text);
+					}
+					data.getCount(i).sethavearea(false);
+					return;
+				}
+				data.getCount(i).updatecount();
+				data.getScoreboard().updateCount(i);
+				return;
+			}else if(totalareablock*0.75 < data.getTeamAreaOccupation(i)) {//どちらも確保していない状況から片方が確保した場合
+				System.out.println("Team1: "+data.getTeamAreaOccupation(1)+"      "+"Team2: "+data.getTeamAreaOccupation(2));
+				data.getCount(i).sethavearea(true);
+				int teambefore=data.getCount(getOpposite(i)).setpenalty();
+				data.getScoreboard().updateCount(getOpposite(i));
+				//todo ペナルティ計算
+				ZoneChangeEvent event = new ZoneChangeEvent();
+				Bukkit.getPluginManager().callEvent(event);
+				EnsureArea(i);
 				for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
-					String text = player.getTeamid() == 1 ?
-							data.getSplatColor(2).getChatColor()+"カウントストップされた!":
-							data.getSplatColor(2).getChatColor()+"カウントストップした！";
+					String text = player.getTeamid() == i ?
+							data.getSplatColor(i).getChatColor()+"ガチエリア確保した!":
+							data.getSplatColor(i).getChatColor()+"ガチエリア確保された!";
 					MainGame.sendTitle(player, 0, 5, 0, " ", text);
 				}
-				team1_manage.sethavearea(false);
-				return;
-			}
-			team1_manage.updatecount();
-			data.getScoreboard().updateTeam1Count();
-			return;
-		} else if(team2_manage.ishavearea()) {
-			if(totalareablock*0.5 < team1) {//相手チームが5割以上になった場合
-				//カウントストップ
-				for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
-					String text = player.getTeamid() == 1 ?
-							data.getSplatColor(1).getChatColor()+"カウントストップした!":
-							data.getSplatColor(1).getChatColor()+"カウントストップされた！";
-					MainGame.sendTitle(player, 0, 5, 0, " ", text);
-				}
-				team2_manage.sethavearea(false);
-				return;
-			}
-			team2_manage.updatecount();
-			data.getScoreboard().updateTeam2Count();
-			return;
-		}
-		if((totalareablock*0.8 < team1) || (totalareablock*0.8 < team2)) {
-			System.out.println("Team1: "+team1+"      "+"Team2: "+team2);
-			int ensureteam = team1 > team2 ? 1 : 2;
-			switch(ensureteam) {
-			case 1:
-				team1_manage.sethavearea(true);
-				int team1_before = team2_manage.setpenalty();
-				data.getScoreboard().updatePenalty(1, team1_before);
-				break;
-			case 2:
-				team2_manage.sethavearea(true);
-				int team2_before = team1_manage.setpenalty();
-				data.getScoreboard().updatePenalty(2, team2_before);
-				break;
-			}
-			ZoneChangeEvent event = new ZoneChangeEvent();
-			Bukkit.getPluginManager().callEvent(event);
-			EnsureArea(ensureteam);
-			for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
-				String text = player.getTeamid() == ensureteam ?
-						data.getSplatColor(ensureteam).getChatColor()+"ガチエリア確保した!":
-						data.getSplatColor(ensureteam).getChatColor()+"ガチエリア確保された!";
-				MainGame.sendTitle(player, 0, 5, 0, " ", text);
 			}
 		}
+
+
 	}
 
 	public void EnsureArea(int ensureteam) {
@@ -148,22 +179,76 @@ public class SplatZones extends Turf_War {
 		int z1 = (int)data.getAreaPosition1().getZ();
 		int x2 = (int)data.getAreaPosition2().getX();
 		int z2 = (int)data.getAreaPosition2().getZ();
-		for(int x = x2; x <= x1; x++)
-			for(int z = z2; z <= z1; z++) {
-				Block block = Bukkit.getWorld(data.getWorld()).getBlockAt(x, (int)data.getAreaPosition1().getY(), z);
-				Paint.addRollBack(data, block);
-				Paint.ColorChange(block, data.getSplatColor(ensureteam));
+		int y1 = (int)data.getAreaPosition1().getY();
+		int y2 = (int)data.getAreaPosition2().getY();
+		for(int x = x2; x <= x1; x++) {
+			for (int z = z2; z <= z1; z++) {
+				for (int y = y2; y <= y1; y++) {
+
+					Block block = Bukkit.getWorld(data.getWorld()).getBlockAt(x, y, z);
+					if(MaterialUtil.isCarpet(block.getType())) {
+						Paint.PaintWool(null, data, ensureteam, block);
+					}
+				}
 			}
-		data.getAreastands().forEach(stand -> stand.setHelmet(new ItemStack(MaterialUtil.fromColorIdToStainedGlass(data.getSplatColor(ensureteam).getColorID()), 1)));
+		}
+		for(ArmorStand stand:data.getAreastands()){
+			ItemStack item=new ItemStack(MaterialUtil.fromColorIdToStainedGlass(data.getSplatColor(ensureteam).getColorID()),1);
+			ItemMeta meta = item.getItemMeta();
+			meta.setDisplayName("SplatPluginItem ["+data.getName()+"]");
+			item.setItemMeta(meta);
+			//System.out.println(stand.getLocation());
+			//System.out.println(item.getType());
+			stand.setHelmet(item);
+			//System.out.println(stand.getHelmet().getType());
+
+
+		}
+		//showZone(data.getSplatColor(ensureteam).getColorID());
+
+	}
+
+	@Override
+	public boolean doExtra(int tick){
+		if(tick>=20*(-30)){
+			//30秒以内... 勝っている方がエリアを取っていない場合延長
+		for(int i=1;i<=data.getMaximumTeamNum();i++) {
+			if (data.getCount(i).getcount() >= data.getCount(getOpposite(i)).getcount()
+					&& !data.getCount(getOpposite(i)).ishavearea()) {
+				return true;
+			}
+		}
+		}else{
+			//30秒以降... 負けている方がエリアを取っている場合延長
+			for(int i=1;i<=data.getMaximumTeamNum();i++) {
+				if (data.getCount(i).getcount() >= data.getCount(getOpposite(i)).getcount()
+						&& data.getCount(i).ishavearea()) {
+					return true;
+				}
+			}
+		}
+		return false;
+
+
 	}
 
 	public static void clearAreaStand(ArenaData data) {
+		//System.out.println("SplatPluginItem ["+data.getName()+"]");
+		for(ArmorStand stand : data.getAreastands()) {
+			//System.out.println("data "+stand.getHelmet().getType());
+			stand.remove();
+		}
 		for(Entity entity : Bukkit.getWorld(data.getWorld()).getEntities()) {
 			if(entity.getType() != EntityType.ARMOR_STAND)
-				return;
+				continue;
 			ItemMeta meta=((ArmorStand)entity).getHelmet().getItemMeta();
-			if(meta!=null && meta.getDisplayName().equalsIgnoreCase(ChatColor.RESET+"SplatPluginItem ["+data.getName()+"]"))
+			//System.out.println("name : "+entity.getName());
+			if((meta!=null && meta.getDisplayName().equalsIgnoreCase("SplatPluginItem ["+data.getName()+"]"))
+			||entity.getName().equalsIgnoreCase("SplatPluginItem ["+data.getName()+"]")){
+				//System.out.println("name "+((ArmorStand) entity).getHelmet().getType());
 				entity.remove();
+			}
+
 		}
 	}
 }

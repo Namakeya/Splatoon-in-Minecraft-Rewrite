@@ -6,7 +6,6 @@ jp\kotmw\splatoon\util\WoolColorEnum.class
 jp\kotmw\splatoon\util\Title.class
 jp\kotmw\splatoon\util\DetailsColor.class
 jp\kotmw\splatoon\event\ZoneChangeEvent.class
-jp\kotmw\splatoon\maingame\Turf_War$1.class
 jp\kotmw\splatoon\gamedatas\DataStore$SpecialType.class
 jp\kotmw\splatoon\maingame\threads\BattleRunnable.class
 jp\kotmw\splatoon\util\Location.class
@@ -60,6 +59,7 @@ jp\kotmw\splatoon\specialweapon\Barrier.class
 jp\kotmw\splatoon\mainweapons\threads\BlasterBulletRunnable.class
 jp\kotmw\splatoon\commands\PlayerCommands.class
 jp\kotmw\splatoon\mainweapons\threads\RollerRunnable.class
+jp\kotmw\splatoon\maingame\BattleClass.class
 jp\kotmw\splatoon\gamedatas\DataStore$RankingPattern.class
 jp\kotmw\splatoon\mainweapons\threads\RollerBulletRunnable.class
 jp\kotmw\splatoon\gamedatas\PlayerStatusData$1.class
@@ -86,6 +86,7 @@ jp\kotmw\splatoon\commands\CommandLib.class
 jp\kotmw\splatoon\gamedatas\PlayerData.class
 jp\kotmw\splatoon\manager\Paint.class
 jp\kotmw\splatoon\gamedatas\ConfigData.class
+jp\kotmw\splatoon\maingame\BattleClass$1.class
 jp\kotmw\splatoon\manager\SplatBossBar.class
 jp\kotmw\splatoon\commands\ConsoleCommands.class
 jp\kotmw\splatoon\commands\PlayerCompleter.class

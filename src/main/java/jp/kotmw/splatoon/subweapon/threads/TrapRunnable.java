@@ -10,6 +10,7 @@ import jp.kotmw.splatoon.manager.SplatColorManager;
 import jp.kotmw.splatoon.subweapon.SplashBomb;
 import jp.kotmw.splatoon.util.SplatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.ArmorStand;
@@ -41,6 +42,12 @@ public class TrapRunnable extends BukkitRunnable {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
 		if(bomb.isDead()){
 			this.cancel();
+		}
+		for (PlayerData pd : DataStore.getArenaPlayersList(data.getArena())) {
+			if (data.getTeamid() == pd.getTeamid()) {
+				Player pe = Bukkit.getPlayer(pd.getName());
+				pe.spawnParticle(Particle.SMOKE_NORMAL,bomb.getLocation(),0,0,0.2,0);
+			}
 		}
 		if(activated) {
 			if(time<=0){
@@ -78,7 +85,7 @@ public class TrapRunnable extends BukkitRunnable {
 			}
 
 			for (PlayerData pd : DataStore.getArenaPlayersList(data.getArena())) {
-				if(pd.getTeamid() != pd.getTeamid()) {
+				if(data.getTeamid() != pd.getTeamid()) {
 					Player pe = Bukkit.getPlayer(pd.getName());
 					if (pe.getLocation().distanceSquared(this.bomb.getLocation()) < subweapon.getExplRadius() * subweapon.getExplRadius()) {
 						this.activated = true;

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import jp.kotmw.splatoon.superjump.Superjump;
-import jp.kotmw.splatoon.superjump.SuperjumpRunnable;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,7 +16,7 @@ import org.bukkit.entity.ArmorStand;
 import jp.kotmw.splatoon.event.ArenaStatusChangeEvent;
 import jp.kotmw.splatoon.gamedatas.DataStore.GameStatusEnum;
 import jp.kotmw.splatoon.maingame.GameSigns;
-import jp.kotmw.splatoon.maingame.Turf_War;
+import jp.kotmw.splatoon.maingame.BattleClass;
 import jp.kotmw.splatoon.maingame.threads.BattleRunnable;
 import jp.kotmw.splatoon.manager.SplatBossBar;
 import jp.kotmw.splatoon.manager.SplatScoreBoard;
@@ -33,7 +32,7 @@ public class ArenaData {
 	private Location stagepos1, stagepos2;
 	private Location areapos1, areapos2;
 	private Map<Integer, List<Location>> posisions = new HashMap<>();
-	private int teamscount;
+	private int numOfTeams;
 	private int totalPlayerCount, playersmaximuncount = 4, playersminimumcount = 20;
 	private int winteam;
 	private Map<Integer, SplatColor> teamcolor = new HashMap<>();
@@ -44,10 +43,11 @@ public class ArenaData {
 	private GameStatusEnum gameStatus;
 	private SplatScoreBoard scoreboard;
 	private SplatBossBar bossBar;
-	private Turf_War battle;
+	private BattleClass battle;
 	private Map<org.bukkit.Location,BlockData> rollbackblocks = new HashMap<org.bukkit.Location,BlockData>();
-	private TeamCountManager team1_count, team2_count;
+	private TeamCountManager[] count;
 	private int totalareablock;
+	private Map<Integer, Double> areaOccupation=new HashMap<>();
 	private List<ArmorStand> areastands = new ArrayList<ArmorStand>();
 
 	public ArenaData(String arena, FileConfiguration file) {
@@ -80,9 +80,10 @@ public class ArenaData {
 			this.areapos1 = new Location(null, 0, 0, 0);
 			this.areapos2 = new Location(null, 0, 0, 0);
 		}
-		this.teamscount = getMaxTeam(file);
+		this.numOfTeams = getMaxTeam(file);
 		int playerscount;
-		for(int i = 1; i <= this.teamscount; i++) {
+		this.count =new TeamCountManager[this.numOfTeams];
+		for(int i = 1; i <= this.numOfTeams; i++) {
 			playerscount = getMaxPlayer(file, i);
 			List<Location> poss = new ArrayList<>();
 			for(int ii = 1; ii <= playerscount; ii++) {
@@ -96,9 +97,8 @@ public class ArenaData {
 				poss.add(new Location(world, x, y, z, yaw, pitch));
 			}
 			posisions.put(i, poss);
+			this.count[i-1]=new TeamCountManager();
 		}
-		this.team1_count = new TeamCountManager();
-		this.team2_count = new TeamCountManager();
 	}
 
 	public Superjump getSuperjump() {
@@ -126,14 +126,14 @@ public class ArenaData {
 	 * @return 引数の番号の座標が帰ってくる
 	 */
 	public Location getTeamPlayerPosision(int team, int num) {
-		if((team > teamscount || team < 0) || (num > getMaximumPlayerNum(team) || num < 0))
+		if((team > numOfTeams || team < 0) || (num > getMaximumPlayerNum(team) || num < 0))
 			return null;
 		if(posisions.containsKey(team))
 			return posisions.get(team).get(num-1);
 		return null;
 	}
 	
-	public int getMaximumTeamNum() {return teamscount;}
+	public int getMaximumTeamNum() {return numOfTeams;}
 	
 	public int getTotalPlayerCount() {return totalPlayerCount;}
 	
@@ -148,7 +148,7 @@ public class ArenaData {
 	public int getWinTeam() {return winteam;}
 	
 	public SplatColor getSplatColor(int team) {
-		if(team > teamscount || team>teamcolor.size())
+		if(team > numOfTeams || team>teamcolor.size())
 			return SplatColor.WHITE;
 		return teamcolor.get(team);
 	}
@@ -170,25 +170,35 @@ public class ArenaData {
 
 	public SplatBossBar getBossBar() {return bossBar;}
 
-	public Turf_War getBattleClass() {return battle;}
+	public BattleClass getBattleClass() {return battle;}
 
 	public Map<org.bukkit.Location,BlockData> getRollbackblocks() {return rollbackblocks;}
 
-	public TeamCountManager getTeam1_count() {return team1_count;}
-
-	public TeamCountManager getTeam2_count() {return team2_count;}
+	public TeamCountManager getCount(int team) {return count[team-1];}
 
 	public int getTotalareablock() {return totalareablock;}
 
-	public List<ArmorStand> getAreastands() {return areastands;}
+	public List<ArmorStand> getAreastands() {
+		//System.out.println("get");
+		return areastands;
+	}
 	
 	public double getTeamScore(int team) {
-		if(team > teamscount || team < 1)
+		if(team > numOfTeams || team < 1)
 			return 0.0;
 		double fix = (team == 1 ? 0.01 : 0.0);
 		if(!scores.containsKey(team))
 			scores.put(team, 0.0);
 		return (scores.get(team) == 0.0 ? fix : scores.get(team));
+	}
+
+	public double getTeamAreaOccupation(int team) {
+		if(team > numOfTeams || team < 1)
+			return 0.0;
+		double fix = (team == 1 ? 0.01 : 0.0);
+		if(!areaOccupation.containsKey(team))
+			areaOccupation.put(team, 0.0);
+		return (areaOccupation.get(team) == 0.0 ? fix : areaOccupation.get(team));
 	}
 	
 	public double getTotalTeamScore() {
@@ -230,19 +240,22 @@ public class ArenaData {
 
 	public void setBossBar(SplatBossBar bossBar) {this.bossBar = bossBar;}
 	
-	public void setBattleClass(Turf_War battle) {this.battle = battle;}
+	public void setBattleClass(BattleClass battle) {this.battle = battle;}
 
 	public void addRollBackBlock(org.bukkit.Location loc, BlockData data) {this.rollbackblocks.put(loc,data);}
 
 	public void setTotalareablock(int totalareablock) {this.totalareablock = totalareablock;}
 
-	public void setAreastands(List<ArmorStand> areastands) {this.areastands = areastands;}
+	public void setAreastands(List<ArmorStand> areastands) {
+		//System.out.println("set");
+		this.areastands = areastands;
+	}
 
 	public void updateTeamColor(){
 		List<SplatColor> colors = SplatColor.teamColor;
 		Collections.shuffle(colors);
 		//System.out.println(colors.size()+" colors exists");
-		for(int i=0;i<teamscount;i++){
+		for(int i = 0; i< numOfTeams; i++){
 			//System.out.println(i+" color is "+colors.get(i));
 			teamcolor.put(i+1, colors.get(i));
 		}
@@ -277,10 +290,25 @@ public class ArenaData {
 		//戦闘中の平均的な重さが予想できない・・・
 		//負荷は非常に軽いです　最後に集計でも問題ないとは思いますがこちらの方がスマートなので採用しました sesamugi
 	}
+
+	public void addTeamAreaOccupation(int team, int beforeteam) {
+		double param = (areaOccupation.containsKey(team) ? areaOccupation.get(team) : 0.0), param2;
+		if(beforeteam != 0 && areaOccupation.get(beforeteam) != null) {
+			param2 = areaOccupation.get(beforeteam);
+			areaOccupation.put(beforeteam, --param2);
+		}
+		areaOccupation.put(team, ++param);
+		totalscore += (beforeteam != 0 ? 0.0 : 1.0);
+
+		//System.out.println("team "+team+"'s area occupation : "+param);
+		//ガチエリアを立体化したことに伴い負荷の増加が予想されるので、塗りのタイミングでスコアを動かす方式にしました
+	}
 	
 	public void clearStatus() {
 		updateTeamColor();
-		this.team1_count = this.team2_count = new TeamCountManager();
+		for(int i = 1; i <= this.numOfTeams; i++) {
+			this.count[i-1]=new TeamCountManager();
+		}
 		this.runtask = null;
 		this.rollbackblocks.clear();
 		this.setGameStatus(GameStatusEnum.ENABLE);
@@ -289,6 +317,7 @@ public class ArenaData {
 		this.bossBar.removeAllPlayer();
 		this.bossBar.resetBossBar();
 		this.scores.clear();
+		this.areaOccupation.clear();
 	}
 	
 	@Override

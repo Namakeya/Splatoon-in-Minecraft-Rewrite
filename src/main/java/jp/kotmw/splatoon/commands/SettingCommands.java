@@ -90,7 +90,7 @@ public class SettingCommands extends CommandLib {
 					PlayerData playerdata = DataStore.getPlayerData(player.getName());
 					ArenaData arena=DataStore.getArenaData(playerdata.getArena());
 					if(arena.getGameStatus() == GameStatusEnum.INGAME && arena.getTask()!=null){
-						arena.getTask().setTick(10);
+						arena.getTask().endNow=true;
 					}
 					return true;
 				}
