@@ -25,7 +25,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("ItemInfo.Name", "SplatShooter");
 			file.set("ItemInfo.Type", Material.WOODEN_HOE.toString());
 			file.set("WeaponInfo.Type", WeaponType.Shooter.toString());
-			file.set("WeaponInfo.Damage", 4);
+			file.set("WeaponInfo.Damage", 3);
 			file.set("WeaponInfo.FireSpeed", 4);
 			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
@@ -36,7 +36,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.SoundVolume", 0.5);
 			file.set("WeaponInfo.SoundPitch", 1.5);
 			file.set("WeaponInfo.AirResistance", 0.0);
-			file.set("WeaponInfo.ManSpeed", 0.8);
+			//file.set("WeaponInfo.ManSpeed", 0.8);
 			file.set("WeaponInfo.SubWeapon", "QuickBomb");
 
 			file.set("WeaponInfo.SpecialWeapon", "MultiMissile");
@@ -75,20 +75,21 @@ public class WeaponFiles extends PluginFiles {
 			file.set("ItemInfo.Type", Material.STICK.toString());
 			file.set("WeaponInfo.Type", WeaponType.Roller.toString());
 			file.set("WeaponInfo.Damage", 20);
-			file.set("WeaponInfo.Radius", 3);
+			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.InkSplash", 5);
 			file.set("WeaponInfo.FireSpeed", 12);
 			file.set("WeaponInfo.InkSplashDamage", 10);
-			file.set("WeaponInfo.InkSplashAngle", 90);
-			file.set("WeaponInfo.InkSplashPaintRadius", 1.5);
+			file.set("WeaponInfo.InkSplashAngle", 75);
+			file.set("WeaponInfo.InkSplashPaintRadius", 2);
 			file.set("WeaponInfo.InkSplashCost", 10);
 			file.set("WeaponInfo.SlowLevel", 0);
-			file.set("WeaponInfo.InkCost", 0.1);
-			file.set("WeaponInfo.AirResistance", 0.2);
+			file.set("WeaponInfo.InkCost", 0.2);
+			file.set("WeaponInfo.AirResistance", 0.3);
 			file.set("WeaponInfo.FlyDecayTick", 10);
 			file.set("WeaponInfo.FlyDecayRatio", 5.0);
+			file.set("WeaponInfo.RecoilTick", 10);
 
-			file.set("WeaponInfo.Speed", 1);
+			file.set("WeaponInfo.Speed", 2.5);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.player.splash.high_speed");
 			file.set("WeaponInfo.SoundVolume", 0.8);
 			file.set("WeaponInfo.SoundPitch", 1.3);
@@ -124,7 +125,7 @@ public class WeaponFiles extends PluginFiles {
 			file2.set("WeaponInfo.Type", WeaponType.Charger.toString());
 			file2.set("WeaponInfo.Damage", 22);
 			file2.set("WeaponInfo.InkCost", 30);
-			file2.set("WeaponInfo.FullCharge", 32);
+			file2.set("WeaponInfo.FullCharge", 28);
 
 			file2.set("WeaponInfo.Radius", 3);
 			file2.set("WeaponInfo.FlyingPaintRadius", 2);
@@ -181,13 +182,13 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.FlyingPaintRadius", 1.5);
 			file.set("WeaponInfo.InkCost", 6);
-			file.set("WeaponInfo.Speed", 0.8);
+			file.set("WeaponInfo.Speed", 1);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.zombie.attack_wooden_door");
 			file.set("WeaponInfo.SoundVolume", 0.5);
 			file.set("WeaponInfo.SoundPitch", 1.7);
 			file.set("WeaponInfo.AirResistance", 0.0);
 			file.set("WeaponInfo.ManSpeed", 0.8);
-			file.set("WeaponInfo.RecoilTick", 7);
+			//file.set("WeaponInfo.RecoilTick", 0);
 			file.set("WeaponInfo.NoGravity", true);
 
 			file.set("WeaponInfo.FlyDecayTick", 11);

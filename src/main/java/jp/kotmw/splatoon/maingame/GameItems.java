@@ -136,8 +136,17 @@ public class GameItems {
 		ItemStack item=new ItemStack(Material.LEATHER_HELMET,1);
 		LeatherArmorMeta meta = (LeatherArmorMeta)item.getItemMeta();
 		meta.setColor(color.getColor());
-		//meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
-		//new AttributeModifier(UUID.randomUUID(),"speed",-0.2,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
+		meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+		new AttributeModifier(UUID.randomUUID(),"speed",data.getManSpeed()-1,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HEAD));
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	public static ItemStack getFeetItemSquid(WeaponData data) {
+		ItemStack item=new ItemStack(Material.STONE_BUTTON,1);
+		ItemMeta meta = item.getItemMeta();
+		meta.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED,
+				new AttributeModifier(UUID.randomUUID(),"speed",0.4,AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.FEET));
 		item.setItemMeta(meta);
 		return item;
 	}

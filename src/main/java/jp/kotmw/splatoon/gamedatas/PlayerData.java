@@ -55,6 +55,17 @@ public class PlayerData {
 
 	private Vector motion=new Vector(0,0,0);//getVelocity()が動作しないのでこれを使う
 
+	private boolean isSprinting;
+
+
+	public boolean isSprinting() {
+		return isSprinting;
+	}
+
+	public void setSprinting(boolean sprinting) {
+		isSprinting = sprinting;
+	}
+
 	public Vector getMotion() {
 		return motion.clone();
 	}

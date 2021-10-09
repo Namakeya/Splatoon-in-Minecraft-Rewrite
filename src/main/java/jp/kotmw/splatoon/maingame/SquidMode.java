@@ -24,7 +24,7 @@ import jp.kotmw.splatoon.manager.SplatColorManager;
 
 public class SquidMode implements Listener {
 
-	public static PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 3600*20, 1, false, false);
+	//public static PotionEffect speed = new PotionEffect(PotionEffectType.SPEED, 3600*20, 1, false, false);
 	public static PotionEffect slow = new PotionEffect(PotionEffectType.SLOW, 3600*20, 0, false, false);
 	public static PotionEffect invisible = new PotionEffect(PotionEffectType.INVISIBILITY, 3600*20, 1, false, false);
 
@@ -60,7 +60,7 @@ public class SquidMode implements Listener {
 		} else {
 			SquidMode.toSquid(pe,data,true);
 			if(SplatColorManager.isBelowBlockTeamColor(pe, true)) {
-				pe.addPotionEffect(SquidMode.speed);
+				//pe.addPotionEffect(SquidMode.speed);
 			} else {
 				SquidMode.spawnSquid(pe);
 				pe.addPotionEffect(SquidMode.slow);
@@ -77,8 +77,13 @@ public class SquidMode implements Listener {
 			return;
 		if(!DataStore.getPlayerData(e.getPlayer().getName()).isSquidMode())
 			return;
+		//System.out.println("move");
 		Player player = e.getPlayer();
 		PlayerData data = DataStore.getPlayerData(player.getName());
+
+
+
+
 		LivingEntity squid = data.getPlayerSquid();
 		if(squid != null) squid.teleport(player.getLocation());
 		if(SplatColorManager.isTargetBlockTeamColor(player)) {
@@ -93,11 +98,11 @@ public class SquidMode implements Listener {
 		}
 		if(!SplatColorManager.isBelowBlockTeamColor(player, true) && !data.isClimb()) {
 			spawnSquid(player);
-			player.removePotionEffect(PotionEffectType.SPEED);
+			//player.removePotionEffect(PotionEffectType.SPEED);
 			player.addPotionEffect(slow);
 		} else if(SplatColorManager.isBelowBlockTeamColor(player, true) || data.isClimb()) {
 			player.removePotionEffect(PotionEffectType.SLOW);
-			player.addPotionEffect(speed);
+			//player.addPotionEffect(speed);
 			if(squid != null) {
 				squid.remove();
 				data.setPlayerSquid(null);

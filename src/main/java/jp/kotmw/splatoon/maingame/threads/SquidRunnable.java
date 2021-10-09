@@ -40,16 +40,10 @@ public class SquidRunnable extends BukkitRunnable {
 
 		Player player = Bukkit.getPlayer(name);
 		//System.out.println("sprinting : "+player.isSprinting());
-		if(player.isSprinting()){
-			player.setFoodLevel(2);
-			player.setSprinting(false);
-			if (DataStore.getStatusData(player.getName()).isRunToSquid()) {
-				MainGame.sync(() -> {
-					SquidMode.changeSquid(player);
-				});
-			}
 
-		}
+
+
+
 
 
 		if(data.getRecoilTick() > 0) {

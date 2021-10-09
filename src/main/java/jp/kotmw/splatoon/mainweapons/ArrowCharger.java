@@ -92,6 +92,7 @@ public class ArrowCharger extends MainWeapon{
 
 	@Override
 public void shoot(PlayerData data) {
+		super.shoot(data);
 	Player player = Bukkit.getPlayer(data.getName());
 	WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
 	Paint.SpherePaint(player.getLocation(), DataStore.getWeapondata(data.getWeapon()).getRadius(), data);

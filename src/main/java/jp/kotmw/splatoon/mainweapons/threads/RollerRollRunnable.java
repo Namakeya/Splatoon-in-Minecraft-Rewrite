@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 /**相打ち判定用*/
 public class RollerRollRunnable extends BukkitRunnable {
@@ -38,23 +39,20 @@ public class RollerRollRunnable extends BukkitRunnable {
             WeaponData weapon = DataStore.getWeapondata(pd.getWeapon());
             Color color = DataStore.getArenaData(pd.getArena()).getSplatColor(pd.getTeamid()).getColor();
 
-            float yaw = -location.getYaw();
-            Polar_coodinates pc, pc2 = new Polar_coodinates(pe.getWorld(), weapon.getRadius() / 2, Math.toRadians(yaw), 0);
-            for (double i = -weapon.getRadius() / 2; i <= weapon.getRadius() / 2; i += 0.5) {
-                for (int j = 0; j <= 1; j++) {
-                    pc = new Polar_coodinates(pe.getWorld(), i, Math.toRadians(yaw) + (Math.PI / 2), 0);
-                    Location judgeloc = location.clone().add(0, j - 0.5, 0).add(pc2.convertLocation()).add(pc.convertLocation());
-                    Paint.PaintWool(pd, judgeloc.getBlock());
-                    MainGame.sync(() -> {
-                        MainGame.Damager(pd, judgeloc, DataStore.getWeapondata(pd.getWeapon()).getDamage());
-                    });
-                    if(timer==0) {
-                        pe.getWorld().spawnParticle(Particle.REDSTONE, judgeloc, 1,
-                                0.5, 0.5, 0.5, new Particle.DustOptions(color, 1.0f));
-                    }
-
-                }
+            int ways=(int)Math.ceil(weapon.getRadius()*1.8);
+            for(int i=0;i<ways;i++) {
+                float yaw = -location.getYaw()+(i-(ways-1f)/2f)*30;
+                double yawradian = Math.toRadians(yaw);
+                //Polar_coodinates pc, pc2 = new Polar_coodinates(pe.getWorld(), weapon.getRadius() / 2, Math.toRadians(yaw), 0);
+                Vector offset = new Vector(Math.sin(yawradian), 0, Math.cos(yawradian)).multiply(weapon.getRadius());
+                //System.out.println(offset);
+                Location rollCenter = location.clone().add(offset);
+                Paint.UnderCylinderPaint(rollCenter, 1, 1.5, pd);
+                MainGame.sync(() -> {
+                    MainGame.SphereDamager(pd, rollCenter, weapon.getDamage(), weapon.getDamage(), 0, 1, false);
+                });
             }
+
         }
         if(timer>2){
             this.cancel();

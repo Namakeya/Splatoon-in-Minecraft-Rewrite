@@ -188,10 +188,10 @@ public class Paint {
 		//boolean hollow = false;
 		int painted=0;
 		if(radius>30)return 0;
-		for(double x = center_X - radius; x <= center_X + radius +0.1 ;x++)
-			for(double y = center_Y - height; y <= center_Y +0.1 ;y++)
-				for(double z = center_Z - radius; z <= center_Z + radius +0.1 ;z++) {
-					double distance = ((center_X - x)*(center_X - x)) + ((center_Z - z)*(center_Z - z));
+		for(int x = (int) Math.floor(center_X - radius); x <= Math.floor(center_X + radius) ; x++)
+			for(int y = (int) Math.floor(center_Y - height); y <= (int) Math.floor(center_Y) ;y++)
+				for(int z = (int) Math.floor(center_Z - radius); z <= (int) Math.floor(center_Z + radius);z++) {
+					double distance = ((center_X - (x+0.5))*(center_X - (x+0.5))) + ((center_Z - (z+0.5))*(center_Z - (z+0.5)));
 					if(distance < (radius*radius)) {
 						Location l = new Location(center.getWorld(), x, y, z);
 						if(Paint.PaintWool(data, l.getBlock(),countAsSPP)){

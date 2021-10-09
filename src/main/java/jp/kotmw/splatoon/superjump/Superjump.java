@@ -35,7 +35,7 @@ public class Superjump{
     }
     public void superjumpTo(PlayerData player, Location location){
         //System.out.println(player.getName() +" to "+ location);
-        BukkitRunnable task = new SuperjumpRunnable(arenaData,player,location,80);
+        BukkitRunnable task = new SuperjumpRunnable(arenaData,player,location.add(0,0.5,0),80);
         task.runTaskTimer(Main.main, 20, 1);
         Player pe= Bukkit.getPlayer(player.getName());
         SquidMode.toSquid(pe,player,false);

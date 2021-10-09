@@ -23,10 +23,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
@@ -49,7 +46,19 @@ import java.util.List;
 public class Listeners implements Listener {
 
 	public static PotionEffect sat=new PotionEffect(PotionEffectType.SATURATION,20*6000,1,false,false);
+	public static PotionEffect invisible=new PotionEffect(PotionEffectType.INVISIBILITY,20*5,1,false,false);
+/*
+	@EventHandler
+	public void on(PlayerToggleSprintEvent e){
+		if(e.isCancelled()) return;
+		Player player=e.getPlayer();
+		if(!DataStore.hasPlayerData(player.getName())) {
+			return;
+		}
+		PlayerData data = DataStore.getPlayerData(player.getName());
+		//System.out.println("togglesprint : "+player.isSprinting());
 
+	}*/
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlace(PlayerInteractEvent e) {
@@ -149,6 +158,16 @@ public class Listeners implements Listener {
 			e.setCancelled(true);
 			return;
 		}
+/*
+		if(player.isSprinting()){
+			player.setFoodLevel(2);
+			player.setSprinting(false);
+			e.setCancelled(true);
+			data.setSprinting(true);
+			player.setWalkSpeed(0.3f);
+		}
+
+ */
 		player.addPotionEffect(sat);
 		Location location = player.getLocation();
 		if(location.getBlock().getType() == Material.WATER ||
@@ -220,7 +239,11 @@ public class Listeners implements Listener {
 		player.setRemainingAir(player.getMaximumAir());
 		player.setFoodLevel(20);
 
-		player.setGameMode(GameMode.SPECTATOR);
+		//player.setGameMode(GameMode.SPECTATOR);
+		player.setAllowFlight(true);
+		player.setFlying(true);
+		player.setCollidable(false);
+		player.teleport(player.getLocation().add(0,10,0));
 
 		if(data.isSquidMode()) {
 			LivingEntity squid = data.getPlayerSquid();
@@ -231,6 +254,8 @@ public class Listeners implements Listener {
 			player.removePotionEffect(PotionEffectType.INVISIBILITY);
 			player.removePotionEffect(PotionEffectType.SPEED);
 		}
+		player.getInventory().clear();
+		player.addPotionEffect(invisible);
 		data.setDead(true);
 		DataStore.getArenaData(data.getArena()).getBossBar().updateLifeBar();
 		new RespawnRunnable(5, player).runTaskTimer(Main.main, 0, 20);

@@ -88,6 +88,7 @@ public class Blaster extends MainWeapon {
 
 	@Override
 	public void shoot(PlayerData data) {
+		super.shoot(data);
 		Player player = Bukkit.getPlayer(data.getName());
 		WeaponData weapon = DataStore.getWeapondata(data.getWeapon());
 		player.setExp((float) (player.getExp()-weapon.getCost()));

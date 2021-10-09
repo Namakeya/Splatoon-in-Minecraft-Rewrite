@@ -194,7 +194,9 @@ public abstract class MainWeapon implements Listener {
 		//System.out.println(loc.getDirection());
 		return loc.getDirection();
 	}
-	public void shoot(PlayerData data) {}
+	public void shoot(PlayerData data) {
+		data.setRecoilTick(getWeaponData(data).getRecoilTick());
+	}
 	/*
 	public static void shoot(PlayerData data) {
 		Player player = Bukkit.getPlayer(data.getName());

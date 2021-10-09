@@ -97,11 +97,15 @@ public class Roller extends MainWeapon {
 		//System.out.println(pd.getMotion().dot(pe.getLocation().getDirection()));
 		if(pd.getMotion().normalize().dot(pe.getLocation().getDirection())>0.5){
 			//向いている方向と移動している方向が同じ = 前に進んでいるなら
-			if(pe.getExp() < weapon.getCost()) {
+			float cost=weapon.getCost();
+			if(!pe.isOnGround()){
+				cost*=4;
+			}
+			if(pe.getExp() < cost) {
 				MainGame.sendActionBar(pd, ChatColor.RED+"インクがありません!");
 				return;
 			}
-			pe.setExp((float) (pe.getExp()-weapon.getCost()));
+			pe.setExp((float) (pe.getExp()-cost));
 			BukkitRunnable task = new RollerRollRunnable(pd.getName(),this,pe.getLocation().clone());
 			task.runTaskTimer(Main.main, 0, 1);
 		}
@@ -133,29 +137,43 @@ public class Roller extends MainWeapon {
 
 	@Override
 	public void shoot(PlayerData pd) {
+		super.shoot(pd);
 		WeaponData weapon=DataStore.getWeapondata(pd.getWeapon());
 		Player player=Bukkit.getPlayer(pd.getName());
 		for(int i = 0; i<weapon.getInkSplash(); i++) {
 			Location loc=player.getLocation().clone();
-			loc.setYaw(loc.getYaw()+(float)weapon.getInkSplashAngle()*((float)i/weapon.getInkSplash()-0.5f));
+			loc.setYaw(loc.getYaw()+(float)weapon.getInkSplashAngle()*(((float)i+0.5f)/weapon.getInkSplash()-0.5f));
+
+			float ymotion;
+			if(loc.getPitch()>0){
+				ymotion=0;
+			}else if(loc.getPitch()<-60){
+				ymotion=-60;
+			}else{
+				ymotion=loc.getPitch();
+			}
+
 			float pitch;
-			if(loc.getPitch()>30){
-				pitch=30;
-			}else if(loc.getPitch()<-10){
-				pitch=-10;
+			if(loc.getPitch()<0){
+				pitch=0;
 			}else{
 				pitch=loc.getPitch();
 			}
 			//System.out.println(pitch);
+
+
 			loc.setPitch(pitch);
+
+
 			Vector direction = loc.getDirection().multiply(weapon.getSpeed());
 			Location loc2=player.getLocation().clone();
 			loc2.setPitch(0);
-			loc2=loc2.add(0,2.5,0);
+			loc2=loc2.add(0,2.5-ymotion*0.03,0);
 			Snowball ball=player.getWorld().spawn(loc2,Snowball.class);
-			Vector motion=pd.getMotion();
+			Vector motion=pd.getMotion().multiply(2);
 			if(motion.getY()>0.1)motion=motion.setY(0.1);
-			ball.setVelocity(pd.getMotion().add(direction));
+			//System.out.println(motion);
+			ball.setVelocity(motion.add(direction));
 			ball.setShooter(player);
 			ball.setCustomName(bulletname);
 
@@ -163,7 +181,10 @@ public class Roller extends MainWeapon {
 			task.runTaskTimer(Main.main, 0, 1);
 			//System.out.println(ball.getLocation());
 
+
+
 		}
+		//Paint.SpherePaint(player.getLocation(),2, pd);
 	}
 
 

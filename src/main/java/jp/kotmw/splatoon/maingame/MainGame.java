@@ -159,6 +159,7 @@ public class MainGame extends MessageUtil {
 			player.getInventory().setItem(2, GameItems.getSpecialWeaponItem(weapon));
 		}
 		player.getInventory().setItem(EquipmentSlot.HEAD,GameItems.getHelmetItem(weapon,color));
+		player.getInventory().setItem(EquipmentSlot.FEET,null);
 		/*for(int i=0;i<9;i++){
 			if(player.getInventory().getItem(i) == null){
 				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));
@@ -178,6 +179,7 @@ public class MainGame extends MessageUtil {
 		ArenaData arena = DataStore.getArenaData(data.getArena());
 		SplatColor color=arena.getSplatColor(data.getTeamid());
 		player.getInventory().setItem(EquipmentSlot.HEAD,null);
+		player.getInventory().setItem(EquipmentSlot.FEET,GameItems.getFeetItemSquid(weapon));
 		for(int i=0;i<3;i++){
 			if(player.getInventory().getItem(i) == null){
 				player.getInventory().setItem(i,GameItems.getFillerItem(DataStore.getWeapondata(data.getWeapon())));

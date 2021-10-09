@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.maingame.threads;
 
+import jp.kotmw.splatoon.maingame.MainGame;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -36,9 +37,12 @@ public class RespawnRunnable extends BukkitRunnable {
 			PlayerData data = DataStore.getPlayerData(player.getName());
 			Location loc = DataStore.getArenaData(data.getArena()).getTeamPlayerPosision(data.getTeamid(), 1).convertLocation();
 			player.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1);
+			MainGame.setInv(data);
 			player.getInventory().setHeldItemSlot(0);//1.2.8 復帰した時に武器スロットに設定されなかったため
 			player.teleport(loc);
 			player.setGameMode(GameMode.SURVIVAL);
+			player.setCollidable(true);
+			player.setAllowFlight(false);
 			player.setVelocity(new Vector());
 			player.setExp(0.99f);
 			data.setDead(false);
