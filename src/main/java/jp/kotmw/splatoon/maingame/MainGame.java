@@ -155,7 +155,7 @@ public class MainGame extends MessageUtil {
 		SplatColor color=arena.getSplatColor(data.getTeamid());
 		player.getInventory().setItem(0, GameItems.getWeaponItem(weapon));
 		//player.getInventory().setItem(1, GameItems.getSubWeaponItem(weapon));
-		if(!SpecialWeapon.SPPENABLED || data.isCanUseSpecial()) {
+		if(!SpecialWeapon.SPPENABLED || data.isCanUseSpecial() || data.isUsingSpecial()) {
 			player.getInventory().setItem(2, GameItems.getSpecialWeaponItem(weapon));
 		}
 		player.getInventory().setItem(EquipmentSlot.HEAD,GameItems.getHelmetItem(weapon,color));
@@ -344,18 +344,29 @@ public class MainGame extends MessageUtil {
 	/**Mainly for Debugging*/
 	public static void damageTarget(PlayerData pd, LivingEntity target, double amount){
 		if(canDamage(pd,target)) {
-			System.out.println(pd.getName() + " dealt "+String.format("%.0f",amount)+" damage to " + target.getName());
-			target.setMaximumNoDamageTicks(1);
-			target.damage(amount);
-			Player player=Bukkit.getPlayer(pd.getName());
-			if(target.isDead() || ((target instanceof Player) && DataStore.getPlayerData(target.getName()).isDead())) {
-				SplatColor color = DataStore.getArenaData(pd.getArena()).getSplatColor(pd.getTeamid());
-				MessageUtil.sendMessageforArena(pd.getArena(), color.getChatColor() + pd.getWeapon() + " -> " + target.getName());
+			PlayerData targetData=null;
+			if((target instanceof Player) && DataStore.hasPlayerData(target.getName())){
+				targetData=DataStore.getPlayerData(target.getName());
+			}
+			if(targetData!=null && targetData.getArmors().size()>0){
+				for(PlayerData.Armor a : targetData.getArmors()){
+					a.setHp((int) (a.getHp()-amount));
+				}
+				target.getWorld().playSound(target.getLocation(),Sound.BLOCK_ANVIL_PLACE,SoundCategory.PLAYERS,0.5f,2f);
+			}else {
+				System.out.println(pd.getName() + " dealt " + String.format("%.0f", amount) + " damage to " + target.getName());
+				target.setMaximumNoDamageTicks(1);
+				target.damage(amount);
+				Player player = Bukkit.getPlayer(pd.getName());
+				if (target.isDead() || (targetData!=null && targetData.isDead())) {
+					SplatColor color = DataStore.getArenaData(pd.getArena()).getSplatColor(pd.getTeamid());
+					MessageUtil.sendMessageforArena(pd.getArena(), color.getChatColor() + pd.getWeapon() + " -> " + target.getName());
 
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_SPLASH, 3f, 0.6f);
-				MainGame.fireworkExplosion(target.getLocation(), color);
-				Paint.SpherePaint(target.getLocation(), 4, pd);
+					player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_SPLASH, 3f, 0.6f);
+					MainGame.fireworkExplosion(target.getLocation(), color);
+					Paint.SpherePaint(target.getLocation(), 4, pd);
 
+				}
 			}
 		}else{
 			//System.out.println(pd.getName() + " cannot damage " + target.getName());

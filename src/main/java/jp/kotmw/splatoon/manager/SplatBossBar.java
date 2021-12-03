@@ -39,8 +39,13 @@ public class SplatBossBar {
 		for(Map.Entry<String,BossBar> entry:playerbossbar.entrySet()){
 			PlayerData pd=DataStore.getPlayerData(entry.getKey());
 			if(pd!=null) {
-				double spp = pd.getSpecialPoint();
-				double progress = spp / MainWeapon.getWeaponData(pd).getSpecialPoint();
+				double progress =0;
+				if(pd.isUsingSpecial()){
+					progress=(double)pd.getSpecialProgress()/100;
+				}else {
+					double spp = pd.getSpecialPoint();
+					progress= spp / MainWeapon.getWeaponData(pd).getSpecialPoint();
+				}
 				BossBar bar = entry.getValue();
 				bar.setProgress((progress > 1.0 ? 1.0 : progress));
 				bar.setColor(progress > 0.99 ? BarColor.YELLOW : BarColor.BLUE);

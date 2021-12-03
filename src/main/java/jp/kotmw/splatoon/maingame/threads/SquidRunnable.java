@@ -6,9 +6,7 @@ import jp.kotmw.splatoon.maingame.GameItems;
 import jp.kotmw.splatoon.maingame.MainGame;
 import jp.kotmw.splatoon.maingame.SquidMode;
 import jp.kotmw.splatoon.util.SplatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -41,9 +39,35 @@ public class SquidRunnable extends BukkitRunnable {
 		Player player = Bukkit.getPlayer(name);
 		//System.out.println("sprinting : "+player.isSprinting());
 
-
-
-
+		int maxArmorHP=0;
+		for(int i=0;i<data.getArmors().size();i++){
+			PlayerData.Armor a=data.getArmors().get(i);
+			if(a.getHp()>maxArmorHP)maxArmorHP=a.getHp();
+			a.setDuration(a.getDuration()-1);
+			if(a.getDuration()<=0){
+				player.getWorld().playSound(player.getLocation(),Sound.BLOCK_GRASS_BREAK,SoundCategory.PLAYERS,0.7f,1.4f);
+				data.getArmors().remove(i);
+				i--;
+			}else if(a.getHp()<=0){
+				player.getWorld().playSound(player.getLocation(),Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,SoundCategory.PLAYERS,1f,1f);
+				data.getArmors().remove(i);
+				i--;
+			}
+		}
+		if(maxArmorHP>0){
+			int particles=10+maxArmorHP;
+			if(particles>30)particles=30;
+			for (Player p:player.getWorld().getPlayers()
+				 ) {
+				if(p != player) {
+					p.spawnParticle(Particle.REDSTONE, player.getLocation().add(0, 1, 0), particles,
+							1, 1, 1, new Particle.DustOptions(Color.WHITE, 1.0f));
+				}else{
+					player.spawnParticle(Particle.REDSTONE,player.getLocation().add(0,1,0),particles/5,
+							1,1,1, new Particle.DustOptions(Color.WHITE,1.0f));
+				}
+			}
+		}
 
 
 		if(data.getRecoilTick() > 0) {

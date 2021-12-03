@@ -46,7 +46,7 @@ public class TrapRunnable extends BukkitRunnable {
 		for (PlayerData pd : DataStore.getArenaPlayersList(data.getArena())) {
 			if (data.getTeamid() == pd.getTeamid()) {
 				Player pe = Bukkit.getPlayer(pd.getName());
-				pe.spawnParticle(Particle.SMOKE_NORMAL,bomb.getLocation(),0,0,0.2,0);
+				pe.spawnParticle(Particle.SMOKE_NORMAL,bomb.getLocation(),0,0,0.1,0);
 			}
 		}
 		if(activated) {

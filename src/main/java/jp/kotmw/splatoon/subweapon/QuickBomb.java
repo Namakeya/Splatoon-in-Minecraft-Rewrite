@@ -30,29 +30,30 @@ public class QuickBomb extends SubWeapon {
 
 	@Override
 	public boolean doOnUse(PlayerData player, Player p) {
-		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
-		if(p.getExp() < subweapon.getCost()) {
+		SubWeaponData subweapon = DataStore.getSubWeaponData(subWeaponType.name());
+		if(!player.isUsingSpecial() && p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
-		launch(p, subweapon);
-
+		launch(player,p, subweapon);
 		return true;
 	}
 
 
 
 
-	private void launch(Player player, SubWeaponData data) {
-		float ink = player.getExp();
-		player.setExp((float) (ink-data.getCost()));
+	private void launch(PlayerData pd,Player player, SubWeaponData data) {
+		if(!pd.isUsingSpecial()) {
+			float ink = player.getExp();
+			player.setExp((float) (ink - data.getCost()));
+		}
 		ThrownExpBottle expBottle = player.launchProjectile(ThrownExpBottle.class, player.getLocation().getDirection());
 		expBottle.setCustomName(bulletname);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, SoundCategory.PLAYERS,1,1);
 	}
 	@Override
 	public void doOnExex(ExpBottleEvent e, PlayerData data, Player pe) {
-		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
+		SubWeaponData subweapon = DataStore.getSubWeaponData(subWeaponType.name());
 
 		Paint.SpherePaint(e.getEntity().getLocation(), subweapon.getExplRadius(), data,true);
 		MainGame.SphereDamager(data, e.getEntity().getLocation(), subweapon, subweapon.getExplRadius(), true);

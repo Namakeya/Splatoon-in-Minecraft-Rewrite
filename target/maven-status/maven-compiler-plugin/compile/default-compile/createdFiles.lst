@@ -25,6 +25,7 @@ jp\kotmw\splatoon\mainweapons\Charger.class
 jp\kotmw\splatoon\maingame\GameSigns.class
 jp\kotmw\splatoon\ScheduleTest.class
 jp\kotmw\splatoon\superjump\Superjump.class
+jp\kotmw\splatoon\specialweapon\SplashPitcher.class
 jp\kotmw\splatoon\subweapon\SubWeapon.class
 jp\kotmw\splatoon\mainweapons\threads\ChargerBulletRunnable.class
 jp\kotmw\splatoon\subweapon\threads\TrapRunnable.class
@@ -46,6 +47,7 @@ jp\kotmw\splatoon\filedatas\WeaponFiles.class
 jp\kotmw\splatoon\superjump\SuperjumpRunnable.class
 jp\kotmw\splatoon\util\MessageUtil.class
 jp\kotmw\splatoon\event\ArenaStatusChangeEvent.class
+jp\kotmw\splatoon\specialweapon\SuckerPitcher.class
 jp\kotmw\splatoon\gamedatas\DataStore$GameStatusEnum.class
 jp\kotmw\splatoon\mainweapons\threads\RollerRollRunnable.class
 jp\kotmw\splatoon\util\SplatColor.class
@@ -62,6 +64,7 @@ jp\kotmw\splatoon\mainweapons\threads\RollerRunnable.class
 jp\kotmw\splatoon\maingame\BattleClass.class
 jp\kotmw\splatoon\gamedatas\DataStore$RankingPattern.class
 jp\kotmw\splatoon\mainweapons\threads\RollerBulletRunnable.class
+jp\kotmw\splatoon\gamedatas\PlayerData$Armor.class
 jp\kotmw\splatoon\gamedatas\PlayerStatusData$1.class
 jp\kotmw\splatoon\maingame\threads\AnimationRunnable.class
 jp\kotmw\splatoon\maingame\MainGame.class
@@ -89,9 +92,11 @@ jp\kotmw\splatoon\gamedatas\ConfigData.class
 jp\kotmw\splatoon\maingame\BattleClass$1.class
 jp\kotmw\splatoon\manager\SplatBossBar.class
 jp\kotmw\splatoon\commands\ConsoleCommands.class
+jp\kotmw\splatoon\specialweapon\QuickPitcher.class
 jp\kotmw\splatoon\commands\PlayerCompleter.class
 jp\kotmw\splatoon\subweapon\QuickBomb.class
 jp\kotmw\splatoon\event\PlayerGameJoinEvent.class
+jp\kotmw\splatoon\specialweapon\threads\PitcherRunnable.class
 jp\kotmw\splatoon\subweapon\Trap.class
 jp\kotmw\splatoon\maingame\Turf_War.class
 jp\kotmw\splatoon\maingame\MainGame$1.class
@@ -103,6 +108,7 @@ jp\kotmw\splatoon\maingame\threads\ResultRunnable.class
 jp\kotmw\splatoon\commands\SettingCompleter.class
 jp\kotmw\splatoon\maingame\SquidMode.class
 jp\kotmw\splatoon\event\BattleStartEvent.class
+jp\kotmw\splatoon\specialweapon\SuperSensor.class
 jp\kotmw\splatoon\maingame\SplatZones.class
 jp\kotmw\splatoon\maingame\threads\TransferRunnable.class
 jp\kotmw\splatoon\maingame\GameItems.class

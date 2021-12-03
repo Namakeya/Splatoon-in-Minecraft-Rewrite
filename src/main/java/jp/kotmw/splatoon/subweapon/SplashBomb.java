@@ -28,20 +28,22 @@ public class SplashBomb extends SubWeapon {
 	@Override
 	public boolean doOnUse(PlayerData player, Player p) {
 		SubWeaponData subweapon = DataStore.getSubWeaponData(DataStore.getWeapondata(player.getWeapon()).getSubWeapon());
-		if(p.getExp() < subweapon.getCost()) {
+		if(!player.isUsingSpecial() && p.getExp() < subweapon.getCost()) {
 			MainGame.sendActionBar(player, ChatColor.RED+"インクがありません!");
 			return false;
 		}
-		launch(p, subweapon);
+		launch(player,p, subweapon);
 		return true;
 	}
 
 
 
 
-	private void launch(Player player, SubWeaponData data) {
-		float ink = player.getExp();
-		player.setExp((float) (ink-data.getCost()));
+	private void launch(PlayerData pd,Player player, SubWeaponData data) {
+		if(!pd.isUsingSpecial()) {
+			float ink = player.getExp();
+			player.setExp((float) (ink - data.getCost()));
+		}
 		TNTPrimed tntprimed = (TNTPrimed) player.getLocation().getWorld().spawnEntity(player.getLocation().add(0, 1, 0), EntityType.PRIMED_TNT);
 		tntprimed.setFuseTicks(120*20);
 		tntprimed.setYield(0);

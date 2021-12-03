@@ -48,7 +48,8 @@ public abstract class SubWeapon implements Listener {
 
 		Player player = Bukkit.getPlayer(data.getName());
 		//System.out.println(player.getInventory().getItemInMainHand());
-		return !data.isUsingSpecial() && data.getSubCooldown()<=0 && !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
+		return data.getSubCooldown()<=0 && !data.isSquidMode() && ((!data.isUsingSpecial() && isMyWeapon(data,player.getInventory().getItemInMainHand()))
+				||(data.isUsingSpecial() && DataStore.getWeapondata(data.getWeapon()).getSpecialWeapon().equalsIgnoreCase(subWeaponType.name())));
 	}
 
 	public boolean isMyWeapon(PlayerData data,ItemStack item){
@@ -109,8 +110,18 @@ public abstract class SubWeapon implements Listener {
 			//System.out.println(e.getItem());
 			MainGame.sync(() -> {
 				if(doOnUse(data,player)){
-					data.setSubCooldown(12);
-					SubWeaponData sw=DataStore.getSubWeaponData(DataStore.getWeapondata(data.getWeapon()).getSubWeapon());
+					if(data.isUsingSpecial()){
+						if(this.subWeaponType == BombType.QuickBomb){
+							data.setSubCooldown(6);
+						}else{
+							data.setSubCooldown(10);
+						}
+
+					}else{
+						data.setSubCooldown(12);
+					}
+
+					SubWeaponData sw=DataStore.getSubWeaponData(subWeaponType.name());
 					data.setInkCoolTime(sw.getCooltime());
 
 				}
@@ -134,10 +145,10 @@ public abstract class SubWeapon implements Listener {
 		if(isMyBullet(e.getEntity())) {
 			Player player = (Player) e.getEntity().getShooter();
 			if (getArena(player) != null) {
-				PlayerData data = DataStore.getPlayerData(player.getName());
-				if (this.isMyWeaponType(data)){
+				//PlayerData data = DataStore.getPlayerData(player.getName());
+				//if (this.isMyWeaponType(data)){
 					return true;
-				}
+				//}
 			}
 		}
 		return false;

@@ -41,8 +41,9 @@ public class RespawnRunnable extends BukkitRunnable {
 			player.getInventory().setHeldItemSlot(0);//1.2.8 復帰した時に武器スロットに設定されなかったため
 			player.teleport(loc);
 			player.setGameMode(GameMode.SURVIVAL);
-			player.setCollidable(true);
-			player.setAllowFlight(false);
+			player.setArrowsInBody(0);
+			//player.setCollidable(true);
+			//player.setAllowFlight(false);
 			player.setVelocity(new Vector());
 			player.setExp(0.99f);
 			data.setDead(false);

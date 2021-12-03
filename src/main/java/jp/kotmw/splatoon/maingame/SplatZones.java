@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -132,6 +133,26 @@ public class SplatZones extends BattleClass {
 		}
 
 		 */
+		boolean areaneutral = true;
+		for(int i=1;i<=data.getMaximumTeamNum();i++) {
+			if (data.getCount(i).ishavearea()) {
+				areaneutral=false;
+				for (PlayerData pd : DataStore.getArenaPlayersList(data.getName())
+				) {
+					if (pd.getTeamid() != i){
+						pd.setSpecialPoint(pd.getSpecialPoint()+5);
+					}
+				}
+			}
+		}
+		if(areaneutral){
+			for (PlayerData pd : DataStore.getArenaPlayersList(data.getName())
+			) {
+				if(data.getCount(pd.getTeamid()).getcount() > data.getCount(getOpposite(pd.getTeamid())).getcount())
+				pd.setSpecialPoint(pd.getSpecialPoint()+2);
+
+			}
+		}
 		int totalareablock = data.getTotalareablock();
 		if((totalareablock*0.5 > data.getTeamAreaOccupation(1)) && (totalareablock*0.5 > data.getTeamAreaOccupation(2)))
 			return; //開始当初でteam1,team2が両方ともぜんぜん塗ってない時の処理
@@ -142,10 +163,17 @@ public class SplatZones extends BattleClass {
 				if(totalareablock*0.5 < data.getTeamAreaOccupation(getOpposite(i))) {//相手チームが5割以上になった場合
 					//カウントストップ
 					for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
-						String text = player.getTeamid() == i ?
-								data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップされた!":
-								data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップした！";
-						MainGame.sendTitle(player, 0, 5, 0, " ", text);
+						if(player.getTeamid() == i){
+							MainGame.sendTitle(player, 0, 5, 0, " "
+									, data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップされた!");
+							Player pe=Bukkit.getPlayer(player.getName());
+							pe.playSound(pe.getLocation(),Sound.BLOCK_CHEST_LOCKED,SoundCategory.PLAYERS,1f,1.2f);
+						}else{
+							MainGame.sendTitle(player, 0, 5, 0, " "
+									, data.getSplatColor(getOpposite(i)).getChatColor()+"カウントストップした！");
+							Player pe=Bukkit.getPlayer(player.getName());
+							pe.playSound(pe.getLocation(),Sound.BLOCK_CHEST_LOCKED,SoundCategory.PLAYERS,1f,1.2f);
+						}
 					}
 					data.getCount(i).sethavearea(false);
 					return;
@@ -158,15 +186,21 @@ public class SplatZones extends BattleClass {
 				data.getCount(i).sethavearea(true);
 				int teambefore=data.getCount(getOpposite(i)).setpenalty();
 				data.getScoreboard().updateCount(getOpposite(i));
-				//todo ペナルティ計算
 				ZoneChangeEvent event = new ZoneChangeEvent();
 				Bukkit.getPluginManager().callEvent(event);
 				EnsureArea(i);
 				for(PlayerData player : DataStore.getArenaPlayersList(data.getName())) {
-					String text = player.getTeamid() == i ?
-							data.getSplatColor(i).getChatColor()+"ガチエリア確保した!":
-							data.getSplatColor(i).getChatColor()+"ガチエリア確保された!";
-					MainGame.sendTitle(player, 0, 5, 0, " ", text);
+					if(player.getTeamid() == i){
+						MainGame.sendTitle(player, 0, 5, 0, " "
+								, data.getSplatColor(i).getChatColor()+"ガチエリア確保した!");
+						Player pe=Bukkit.getPlayer(player.getName());
+						pe.playSound(pe.getLocation(),Sound.BLOCK_ANVIL_USE,SoundCategory.PLAYERS,1f,1.2f);
+					}else{
+						MainGame.sendTitle(player, 0, 5, 0, " "
+								, data.getSplatColor(i).getChatColor()+"ガチエリア確保された!");
+						Player pe=Bukkit.getPlayer(player.getName());
+						pe.playSound(pe.getLocation(),Sound.ENTITY_ITEM_BREAK,SoundCategory.PLAYERS,0.7f,1f);
+					}
 				}
 			}
 		}

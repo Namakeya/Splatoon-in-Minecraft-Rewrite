@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>kotmw.plugin</groupId>
   <artifactId>Splatoon_in_minecraft-Rewrite</artifactId>
-  <version>1.6.1-SNAPSHOT</version>
+  <version>1.7.1-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>

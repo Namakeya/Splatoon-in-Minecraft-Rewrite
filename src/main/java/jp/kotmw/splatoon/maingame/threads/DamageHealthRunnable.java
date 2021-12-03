@@ -33,14 +33,23 @@ public class DamageHealthRunnable extends BukkitRunnable {
 		if(SplatColorManager.isBelowBlockTeamColor(player, true)) {
 
 			if(player.getHealth() < 20.0 && data.isSquidMode()){
-				double health=player.getHealth()+3.0;
+				double health=player.getHealth()+0.3;
 				health=health<20?health:20;
 				player.setHealth(health);
 			}
 		}
-		else if(SplatColorManager.isBelowBlockTeamColor(player, false)) {
-			if(player.getHealth() >= 14.0) player.damage(2.0);
-			player.addPotionEffect(slowness);
+		else if(SplatColorManager.isBelowBlockTeamColor(player, false)){
+			player.setFoodLevel(2);
+			if(data.getArmors().size()==0) {
+				double health;
+				if(player.getHealth()>12.2) {
+					health = player.getHealth() - 0.2;
+					player.setHealth(health);
+				}
+
+				player.addPotionEffect(slowness);
+			}
 		}
+
 	}
 }

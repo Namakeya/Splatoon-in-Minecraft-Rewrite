@@ -60,7 +60,7 @@ public abstract class MainWeapon implements Listener {
 
 		Player player = Bukkit.getPlayer(data.getName());
 		//System.out.println(player.getInventory().getItemInMainHand());
-		return !data.isUsingSpecial() && !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
+		return !data.isSquidMode() && isMyWeapon(data,player.getInventory().getItemInMainHand());
 	}
 
 	public boolean isMyWeapon(PlayerData data,ItemStack item){

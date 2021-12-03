@@ -98,9 +98,6 @@ public class Roller extends MainWeapon {
 		if(pd.getMotion().normalize().dot(pe.getLocation().getDirection())>0.5){
 			//向いている方向と移動している方向が同じ = 前に進んでいるなら
 			float cost=weapon.getCost();
-			if(!pe.isOnGround()){
-				cost*=4;
-			}
 			if(pe.getExp() < cost) {
 				MainGame.sendActionBar(pd, ChatColor.RED+"インクがありません!");
 				return;

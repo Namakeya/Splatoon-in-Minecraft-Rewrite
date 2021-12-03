@@ -145,7 +145,7 @@ public class Paint {
 
 	private static void addScore(PlayerData data, boolean countAsSPP) {
 		int score = data.getScore();
-		if(SpecialWeapon.SPECIALENABLED && SpecialWeapon.SPPENABLED && countAsSPP) {
+		if(SpecialWeapon.SPECIALENABLED && SpecialWeapon.SPPENABLED && countAsSPP && !data.isUsingSpecial()) {
 			data.setSpecialPoint(data.getSpecialPoint()+1);
 		}
 		data.setScore(score + 1);

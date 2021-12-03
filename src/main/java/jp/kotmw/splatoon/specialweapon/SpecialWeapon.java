@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 
 public abstract class SpecialWeapon implements Listener{
-    public static final boolean SPECIALENABLED=false;
+    public static final boolean SPECIALENABLED=true;
     public static final boolean SPPENABLED=true;
 
     public SpecialType specialType;
@@ -86,7 +86,8 @@ public abstract class SpecialWeapon implements Listener{
     public boolean checkOnInteract(PlayerInteractEvent e){
         if(getArena(e.getPlayer())!=null) {
             Action action = e.getAction();
-            if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+            if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK
+                    ||action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                 //System.out.println("interact");
                 Player player = e.getPlayer();
                 PlayerData data = DataStore.getPlayerData(player.getName());
@@ -109,10 +110,11 @@ public abstract class SpecialWeapon implements Listener{
             Player player = e.getPlayer();
             PlayerData data = DataStore.getPlayerData(player.getName());
             if(doOnInteract(e,data,player)){
-                data.setUsingSpecial(true);
+                player.setExp(0.999f);
                 data.setCanUseSpecial(false);
                 data.setSpecialPoint(0);
                 player.getInventory().setItem(2,null);
+                player.getInventory().setHeldItemSlot(0);
             }
         }
     }

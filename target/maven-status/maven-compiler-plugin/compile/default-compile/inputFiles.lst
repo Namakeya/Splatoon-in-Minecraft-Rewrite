@@ -1,5 +1,6 @@
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\Blaster.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\SplashBomb.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\QuickPitcher.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\MessageUtil.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\NMSBase.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\QuickBomb.java
@@ -15,6 +16,7 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\filedatas\WeaponFiles.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\event\BattleEndEvent.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\DataStore.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\SuperSensor.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\SpecialWeaponData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\subweapon\SuckerBomb.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\SettingCompleter.java
@@ -73,12 +75,14 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\threads\TransferRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\MainGame.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\Title.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\threads\PitcherRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\gamedatas\PlayerStatusData.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\commands\CommandLib.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\threads\ChargerBulletRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\BattleClass.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\ArrowCharger.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\util\SplatColor.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\SuckerPitcher.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\threads\MultiMissileRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\threads\RollerRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\manager\Paint.java
@@ -94,4 +98,5 @@ C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\sql\DataBaseTest.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\threads\ShooterRunnable.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\maingame\SquidMode.java
+C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\specialweapon\SplashPitcher.java
 C:\Users\adamh\IdeaProjects\Splatoon-in-Minecraft-Rewrite\src\main\java\jp\kotmw\splatoon\mainweapons\MainWeapon.java

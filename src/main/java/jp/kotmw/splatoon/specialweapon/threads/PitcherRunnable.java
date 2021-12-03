@@ -2,26 +2,22 @@ package jp.kotmw.splatoon.specialweapon.threads;
 
 import jp.kotmw.splatoon.gamedatas.DataStore;
 import jp.kotmw.splatoon.gamedatas.PlayerData;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import jp.kotmw.splatoon.util.DetailsColor.DetailsColorType;
-
 import static jp.kotmw.splatoon.specialweapon.Barrier.barrierhp;
 
-public class BarrierRunnable extends BukkitRunnable {
-	
+public class PitcherRunnable extends BukkitRunnable {
+
 	Player player;
 	PlayerData playerData;
-	float pitch = 0;
 	int duration;
 	int timer=0;
-	
-	public BarrierRunnable(Player player,PlayerData playerData,int duration)
+
+	public PitcherRunnable(Player player, PlayerData playerData, int duration)
 	{
 		this.player = player;
 		this.playerData=playerData;
@@ -30,15 +26,10 @@ public class BarrierRunnable extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		for(PlayerData data : DataStore.getArenaPlayersList(playerData.getArena())) {
-			if(data.getTeamid() == playerData.getTeamid() && data!=playerData
-			&& Bukkit.getPlayer(data.getName()).getLocation().distanceSquared(player.getLocation())<9) {
-				data.addArmor(barrierhp,duration-timer);
-			}
-		}
+		playerData.setSpecialProgress(100*(duration-timer)/duration);
 		if(this.duration<timer || playerData.isDead()){
-			playerData.setSpecialProgress(0);
 			this.cancel();
+			playerData.setSpecialProgress(0);
 		}else{
 			timer++;
 

@@ -47,7 +47,10 @@ public class RollerRollRunnable extends BukkitRunnable {
                 Vector offset = new Vector(Math.sin(yawradian), 0, Math.cos(yawradian)).multiply(weapon.getRadius());
                 //System.out.println(offset);
                 Location rollCenter = location.clone().add(offset);
-                Paint.UnderCylinderPaint(rollCenter, 1, 1.5, pd);
+                //todo onGroundつけるかどうか
+                if(!pd.isDead() && pe.isOnGround()) {
+                    Paint.UnderCylinderPaint(rollCenter, 0.8, 1.5, pd);
+                }
                 MainGame.sync(() -> {
                     MainGame.SphereDamager(pd, rollCenter, weapon.getDamage(), weapon.getDamage(), 0, 1, false);
                 });

@@ -286,6 +286,6 @@ public class DataStore {
 	}
 
 	public enum SpecialType{
-		MultiMissile
+		MultiMissile, Barrier,SplashBomb,QuickBomb,SuckerBomb,SuperSensor
 	}
 }

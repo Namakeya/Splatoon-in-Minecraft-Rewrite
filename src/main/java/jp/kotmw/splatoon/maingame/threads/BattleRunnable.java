@@ -115,7 +115,7 @@ public class BattleRunnable extends BukkitRunnable {
 						}
 						if(data.getHealthTask() == null) {
 							BukkitRunnable task = new DamageHealthRunnable(data.getName());
-							task.runTaskTimer(Main.main, 0, 10);
+							task.runTaskTimer(Main.main, 0, 1);
 							data.setHealthTask(task);
 						}
 					}

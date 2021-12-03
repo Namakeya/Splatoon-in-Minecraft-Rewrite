@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.maingame;
 
+import jp.kotmw.splatoon.mainweapons.MainWeapon;
 import jp.kotmw.splatoon.manager.Paint;
 import jp.kotmw.splatoon.superjump.Superjump;
 import jp.kotmw.splatoon.util.MessageUtil;
@@ -225,7 +226,7 @@ public class Listeners implements Listener {
 		e.setDeathMessage("");
 		e.setKeepInventory(true);
 
-		MainGame.sync(() -> {deathSyncFunc(e);});
+		deathSyncFunc(e);
 
 	}
 
@@ -239,11 +240,17 @@ public class Listeners implements Listener {
 		player.setRemainingAir(player.getMaximumAir());
 		player.setFoodLevel(20);
 
-		//player.setGameMode(GameMode.SPECTATOR);
-		player.setAllowFlight(true);
-		player.setFlying(true);
-		player.setCollidable(false);
-		player.teleport(player.getLocation().add(0,10,0));
+		if(data.isUsingSpecial()){
+			data.setSpecialPoint(data.getSpecialProgress()* MainWeapon.getWeaponData(data).getSpecialPoint() /100);
+			data.setSpecialProgress(0);
+		}
+
+
+		player.setGameMode(GameMode.SPECTATOR);
+		//player.setAllowFlight(true);
+		//player.setFlying(true);
+		//player.setCollidable(false);
+		//player.teleport(player.getLocation().add(0,10,0));
 
 		if(data.isSquidMode()) {
 			LivingEntity squid = data.getPlayerSquid();
@@ -255,7 +262,7 @@ public class Listeners implements Listener {
 			player.removePotionEffect(PotionEffectType.SPEED);
 		}
 		player.getInventory().clear();
-		player.addPotionEffect(invisible);
+		//player.addPotionEffect(invisible);
 		data.setDead(true);
 		DataStore.getArenaData(data.getArena()).getBossBar().updateLifeBar();
 		new RespawnRunnable(5, player).runTaskTimer(Main.main, 0, 20);

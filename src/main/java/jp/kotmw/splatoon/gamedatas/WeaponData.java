@@ -98,7 +98,7 @@ public class WeaponData {
 		this.ExplosionRadius=file.getDouble("WeaponInfo.ExplosionRadius");
 
 		this.specialWeapon=file.getString("WeaponInfo.SpecialWeapon","MultiMissile");
-		this.specialPoint=file.getInt("WeaponInfo.SpecialPoint",200);
+		this.specialPoint=file.getInt("WeaponInfo.SpecialPoint",300);
 	}
 
 	public String getSpecialWeapon() {

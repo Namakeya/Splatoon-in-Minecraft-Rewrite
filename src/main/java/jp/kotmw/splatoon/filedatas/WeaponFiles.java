@@ -25,13 +25,13 @@ public class WeaponFiles extends PluginFiles {
 			file.set("ItemInfo.Name", "SplatShooter");
 			file.set("ItemInfo.Type", Material.WOODEN_HOE.toString());
 			file.set("WeaponInfo.Type", WeaponType.Shooter.toString());
-			file.set("WeaponInfo.Damage", 3);
+			file.set("WeaponInfo.Damage", 4);
 			file.set("WeaponInfo.FireSpeed", 4);
 			file.set("WeaponInfo.Radius", 2);
 			file.set("WeaponInfo.FlyingPaintRadius", 1);
-			file.set("WeaponInfo.InkCost", 3);
+			file.set("WeaponInfo.InkCost", 2.5);
 			file.set("WeaponInfo.Angle", 6);
-			file.set("WeaponInfo.Speed", 1);
+			file.set("WeaponInfo.Speed", 1.1);
 			file.set("WeaponInfo.SoundId", "minecraft:entity.zombie.attack_wooden_door");
 			file.set("WeaponInfo.SoundVolume", 0.5);
 			file.set("WeaponInfo.SoundPitch", 1.5);
@@ -40,7 +40,7 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.SubWeapon", "QuickBomb");
 
 			file.set("WeaponInfo.SpecialWeapon", "MultiMissile");
-			file.set("WeaponInfo.SpecialPoint", 200);
+			file.set("WeaponInfo.SpecialPoint", 400);
 			SettingFiles(file, DirFile(filedir, "SplatShooter"));
 		}
 
@@ -64,6 +64,8 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.FlyDecayTick", 30);
 			file.set("WeaponInfo.FlyDecayRatio", 5.0);
 			file.set("WeaponInfo.SubWeapon", "SplashBomb");
+			file.set("WeaponInfo.SpecialWeapon", "Barrier");
+			file.set("WeaponInfo.SpecialPoint", 350);
 			SettingFiles(file, DirFile(filedir, "WakabaShooter"));
 		}
 	}
@@ -95,6 +97,9 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.SoundPitch", 1.3);
 
 			file.set("WeaponInfo.SubWeapon", "SuckerBomb");
+
+			file.set("WeaponInfo.SpecialWeapon", "SplashBomb");
+			file.set("WeaponInfo.SpecialPoint", 350);
 			SettingFiles(file, DirFile(filedir, "SplatRoller"));
 		}
 	}
@@ -139,6 +144,9 @@ public class WeaponFiles extends PluginFiles {
 			file2.set("WeaponInfo.SoundVolume", 1);
 			file2.set("WeaponInfo.SoundPitch", 1.2);
 
+			file2.set("WeaponInfo.SpecialWeapon", "SuperSensor");
+			file2.set("WeaponInfo.SpecialPoint", 350);
+
 			file2.set("WeaponInfo.SubWeapon", "Trap");
 			SettingFiles(file2, DirFile(filedir, "3k-Scope"));
 		}
@@ -165,6 +173,9 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.SoundId", "minecraft:entity.zombie.break_wooden_door");
 			file.set("WeaponInfo.SoundVolume", 1);
 			file.set("WeaponInfo.SoundPitch", 1.2);
+
+			file.set("WeaponInfo.SpecialWeapon", "MultiMissile");
+			file.set("WeaponInfo.SpecialPoint", 400);
 
 			file.set("WeaponInfo.SubWeapon", "SplashBomb");
 			SettingFiles(file, DirFile(filedir, "SplatCharger"));
@@ -195,6 +206,9 @@ public class WeaponFiles extends PluginFiles {
 			file.set("WeaponInfo.ExplosionDamage", 7);
 			file.set("WeaponInfo.ExplosionRadius", 3);
 			file.set("WeaponInfo.SubWeapon", "Trap");
+
+			file.set("WeaponInfo.SpecialWeapon", "QuickBomb");
+			file.set("WeaponInfo.SpecialPoint", 350);
 			SettingFiles(file, DirFile(filedir, "CrafBlaster"));
 		}
 	}
@@ -235,6 +249,16 @@ public class WeaponFiles extends PluginFiles {
 
 	public static void AllSpecialWeaponReload() {
 		SpecialWeaponData multimissile=new SpecialWeaponData("MultiMissile",Material.CARROT, DataStore.SpecialType.MultiMissile);
+		SpecialWeaponData barrier=new SpecialWeaponData("Barrier",Material.WHITE_STAINED_GLASS, DataStore.SpecialType.Barrier);
+		SpecialWeaponData splashPitcher=new SpecialWeaponData("SplashBomb",Material.TNT, DataStore.SpecialType.SplashBomb);
+		SpecialWeaponData quickPitcher=new SpecialWeaponData("QuickBomb",Material.EXPERIENCE_BOTTLE, DataStore.SpecialType.QuickBomb);
+		SpecialWeaponData suckerPitcher=new SpecialWeaponData("SuckerBomb",Material.STICKY_PISTON, DataStore.SpecialType.SuckerBomb);
+		SpecialWeaponData superSensor=new SpecialWeaponData("SuperSensor",Material.GLOWSTONE, DataStore.SpecialType.SuperSensor);
 		DataStore.addSpecialWeaponData(multimissile.getName(),multimissile);
+		DataStore.addSpecialWeaponData(barrier.getName(),barrier);
+		DataStore.addSpecialWeaponData(splashPitcher.getName(),splashPitcher);
+		DataStore.addSpecialWeaponData(quickPitcher.getName(),quickPitcher);
+		DataStore.addSpecialWeaponData(suckerPitcher.getName(),suckerPitcher);
+		DataStore.addSpecialWeaponData(superSensor.getName(),superSensor);
 	}
 }

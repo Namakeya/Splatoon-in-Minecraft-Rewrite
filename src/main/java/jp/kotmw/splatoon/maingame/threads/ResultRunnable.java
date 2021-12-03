@@ -58,6 +58,8 @@ public class ResultRunnable extends BukkitRunnable {
 	private static String MeterText(ArenaData data, int i, int ii)
 	{
 		i=i<0?0:i;
+		i=i>=98?97:i;
+		ii=i<=0?1:ii;
 		ii=ii>98?98:ii;
 		i=i>=ii?ii-1:i;
 		ii=ii<=i?i+1:ii;

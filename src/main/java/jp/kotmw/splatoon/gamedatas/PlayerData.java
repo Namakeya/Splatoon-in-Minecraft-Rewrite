@@ -1,5 +1,6 @@
 package jp.kotmw.splatoon.gamedatas;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -47,7 +48,7 @@ public class PlayerData {
 
 	private int specialPoint;//スペシャルポイント
 
-	private boolean usingSpecial;//スペシャル使用中かどうか
+	private int specialProgress;//スペシャル使用中かどうか
 
 	private boolean canUseSpecial;//スペシャル使用可能かどうか
 
@@ -55,8 +56,18 @@ public class PlayerData {
 
 	private Vector motion=new Vector(0,0,0);//getVelocity()が動作しないのでこれを使う
 
+	private List<Armor> armors=new ArrayList<Armor>();
+
 	private boolean isSprinting;
 
+
+	public List<Armor> getArmors() {
+		return armors;
+	}
+
+	public void addArmor(int hp,int duration){
+		armors.add(new Armor(hp, duration));
+	}
 
 	public boolean isSprinting() {
 		return isSprinting;
@@ -90,11 +101,15 @@ public class PlayerData {
 	}
 
 	public boolean isUsingSpecial() {
-		return usingSpecial;
+		return specialProgress>0;
 	}
 
-	public void setUsingSpecial(boolean usingSpecial) {
-		this.usingSpecial = usingSpecial;
+	public int getSpecialProgress() {
+		return specialProgress;
+	}
+
+	public void setSpecialProgress(int specialProgress) {
+		this.specialProgress = specialProgress;
 	}
 
 	public int getSpecialPoint() {
@@ -267,4 +282,32 @@ public class PlayerData {
 	public void setCharge(int charge) {this.charge = charge;}
 
 	public void setInkCoolTime(int inkcooltime) {this.inkcooltime = inkcooltime;}
+
+	public static class Armor{
+		private int hp;
+		private int duration;
+
+		public Armor(int hp, int duration) {
+			this.hp = hp;
+			this.duration = duration;
+		}
+
+		public int getHp() {
+			return hp;
+		}
+
+		public void setHp(int hp) {
+			this.hp = hp;
+		}
+
+		public int getDuration() {
+			return duration;
+		}
+
+		public void setDuration(int duration) {
+			this.duration = duration;
+		}
+	}
 }
+
+

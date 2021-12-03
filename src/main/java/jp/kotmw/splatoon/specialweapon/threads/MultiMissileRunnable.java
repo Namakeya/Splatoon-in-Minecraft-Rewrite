@@ -39,7 +39,7 @@ public class MultiMissileRunnable extends BukkitRunnable {
     @Override
     public void run() {
         if(phase>maxPhase){
-            launcher.setUsingSpecial(false);
+            launcher.setSpecialProgress(0);
             this.cancel();
         }else{
             Player pe=Bukkit.getPlayer(launcher.getName());
